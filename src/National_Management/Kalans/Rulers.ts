@@ -140,4 +140,7 @@ class Rulers extends Kalan {
         }
         this.bureaucratic_component.net_improvement = kalan.total_productivity - kalan.unmodified_productivity
     }
+    update_goods_produced(_goods_production: number) {
+        this.goods_produced = 0
+    }
 }

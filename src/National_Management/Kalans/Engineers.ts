@@ -160,4 +160,8 @@ class Engineers extends Kalan {
         this.bureaucratic_component.net_improvement = kalan.cl_points_gained - kalan.unmodified_corvee_labor
     }
 
+    update_goods_produced(_goods_production: number) {
+        this.goods_produced = 0
+    }
+
 }

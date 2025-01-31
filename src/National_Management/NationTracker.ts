@@ -77,6 +77,7 @@ class NationTracker {
        this.update_population_growths();
        this.update_cl_points_gained();
        this.update_finance_points_gained();
+       this.update_goods_produced()
     }
 
     update_loyalties() {
@@ -162,6 +163,12 @@ class NationTracker {
     update_finance_points_gained(){
         this.kalans.forEach(kalan => {
             kalan.update_finance_points_gained(this.tax_factor)
+        }) 
+    }
+
+    update_goods_produced(){
+        this.kalans.forEach(kalan => {
+            kalan.update_goods_produced(this.goods_production)
         }) 
     }
 }

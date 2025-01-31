@@ -112,4 +112,8 @@ class Warriors extends Kalan {
         }
     }
 
+    update_goods_produced(_goods_production: number) {
+        this.goods_produced = 0
+    }
+
 }

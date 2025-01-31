@@ -47,6 +47,8 @@ class Kalan {
     cl_points_gained: number = 0
     finance_points_gained: number = 0
     direct_tax_points: number = 100
+    goods_produced: number = 0
+    taxed_goods: number = 0
 
     constructor() {
         this.tax_rates.set(TaxRates.none,0)
@@ -102,6 +104,9 @@ class Kalan {
     update_cl_points_gained(_uzbaden: Rulers){}
     update_finance_points_gained(tax_factor: number){
         this.finance_points_gained = this.direct_tax_points/100 * this.taxed_productivity * tax_factor
+    }
+    update_goods_produced(goods_production: number) {
+        this.goods_produced = Math.round(this.taxed_goods * goods_production / 100 * this.taxed_productivity)
     }
 }
 

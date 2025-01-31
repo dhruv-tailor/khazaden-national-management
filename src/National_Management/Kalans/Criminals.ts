@@ -106,4 +106,8 @@ class Criminals extends Kalan {
         this.finance_points_gained = 0
     }
 
+    update_goods_produced(_goods_production: number) {
+        this.goods_produced = 0
+    }
+
 }

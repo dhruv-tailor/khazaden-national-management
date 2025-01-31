@@ -1,7 +1,6 @@
 class Archivists extends Kalan {
 
     direct_tax_points: number = 100
-    taxed_goods: number = 0
     bureaucratic_component: BureaucraticComponent = new BureaucraticComponent([
         BureaucraticFocus.Kibil,
         BureaucraticFocus.Dush,
