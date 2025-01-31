@@ -76,6 +76,7 @@ class NationTracker {
        this.update_development_growths();
        this.update_population_growths();
        this.update_cl_points_gained();
+       this.update_finance_points_gained();
     }
 
     update_loyalties() {
@@ -149,6 +150,18 @@ class NationTracker {
     update_cl_points_gained() {
         this.kalans.forEach(kalan => {
             kalan.update_cl_points_gained(this.uzbaden)
+        }) 
+    }
+
+    update_net_improvements() {
+        this.kalans.forEach(kalan => {
+            kalan.update_net_improvement(this.kalans)
+        })
+    }
+
+    update_finance_points_gained(){
+        this.kalans.forEach(kalan => {
+            kalan.update_finance_points_gained(this.tax_factor)
         }) 
     }
 }

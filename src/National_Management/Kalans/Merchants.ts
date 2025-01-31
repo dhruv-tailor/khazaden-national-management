@@ -105,4 +105,37 @@ class Merchants extends Kalan {
         this.bureaucratic_component.bonus = bonus 
     }
 
+    update_net_improvement(kalans: Kalan[]): void {
+        let kalan : Kalan = new Kalan();
+        switch (this.bureaucratic_component.focus) {
+            case BureaucraticFocus.Kibil:
+                kalan = kalans[3]
+                break;
+            case BureaucraticFocus.Dush:
+                kalan = kalans[4]
+                break;
+            case BureaucraticFocus.Baraz:
+                kalan = kalans[5]
+                break;
+            case BureaucraticFocus.Felak:
+                kalan = kalans[7]
+                break;
+            case BureaucraticFocus.Zaram:
+                kalan = kalans[8]
+                break;
+            case BureaucraticFocus.Baruk:
+                kalan = kalans[9]
+                break;
+            case BureaucraticFocus.Hund:
+                kalan = kalans[10]
+                break;
+            case BureaucraticFocus.Zaharn:
+                kalan = kalans[11]
+                break;
+            default:
+                break;
+        }
+        this.bureaucratic_component.net_improvement = kalan.development_growth - kalan.unmodified_development_growth
+    }
+
 }

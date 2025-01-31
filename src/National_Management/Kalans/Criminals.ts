@@ -102,4 +102,8 @@ class Criminals extends Kalan {
         }
     }
 
+    update_finance_points_gained(_tax_factor: number){
+        this.finance_points_gained = 0
+    }
+
 }

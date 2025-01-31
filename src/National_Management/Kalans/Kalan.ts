@@ -45,6 +45,8 @@ class Kalan {
     unmodified_population_growth: number = 0
 
     cl_points_gained: number = 0
+    finance_points_gained: number = 0
+    direct_tax_points: number = 100
 
     constructor() {
         this.tax_rates.set(TaxRates.none,0)
@@ -95,11 +97,12 @@ class Kalan {
     }
 
     update_unutilized_taxed_productivity() {}
-
     update_bureaucratic_bonus(_kalans: Kalan[]) {}
-    // RETURN TO
     update_net_improvement(_kalans: Kalan[]) {}
     update_cl_points_gained(_uzbaden: Rulers){}
+    update_finance_points_gained(tax_factor: number){
+        this.finance_points_gained = this.direct_tax_points/100 * this.taxed_productivity * tax_factor
+    }
 }
 
 enum TaxRates {
