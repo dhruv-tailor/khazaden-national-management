@@ -38,11 +38,67 @@ class NationTracker {
     kalans = [this.uzbaden,this.mazar,this.kheled,this.kibil,this.dush,
         this.baraz,this.zigil,this.felak,this.zaram,this.baruk,this.hund,this.zaharn]
 
+    settlements: Settlement[];
+    terrains: Map<TerrainType, Terrain> = new Map<TerrainType, Terrain>();
+    new_settlement_cost: number = 0;
+
+    cl_gained: number = 0;
+    cl_spent_last_turn: number = 0;
+    cl_spent_this_turn: number = 0;
+    upgrade_cost: number = 0;
+    net_cl: number = 0;
+
     constructor() {
         this.turn_tracker = new TurnTracker();
         this.goods = new Map<string, Good>();
         this.set_starting_goods();
         this.update_kalans();
+        this.terrains.set(TerrainType.Farmland, new Terrain('Farmland', 40, 3, 1.5, 3, 1.5, 0, 0, 0, 0, 0,1.75,1.75,2.25,1.75,0,0,0,0,0));
+        this.terrains.set(TerrainType.Forest, new Terrain('Forest', 25, 1.4, 1.4, 0, 0, 15, 0, 0, 0, 0,1,1,0,0,10,0,0,0,0));
+        this.terrains.set(TerrainType.Enchanted_Forest, new Terrain('Enchanted Forest', 10, 1.5, 1.5, 0, 0, 10, 20, 0, 0, 0,1,1,0,0,5,15,0,0,0));
+        this.terrains.set(TerrainType.Mountain, new Terrain('Mountain', 75, 1.2, 2, 0, 0, 0, 0, 5, 3, 4,0.6,0.6,0.4,0.4,0.13,0,1.2,1.2,0.6));
+        const mountainTerrain = this.terrains.get(TerrainType.Mountain);
+        if (!mountainTerrain) {
+            throw new Error("Mountain terrain is not defined");
+        }
+        this.settlements = [new Settlement(
+            'Skarduhn', 
+            mountainTerrain, 
+            SettlementTier.Hamlet,
+            this.settlement_expansion_factor,
+        )];
+        this.update_new_settlement_cost();
+        this.update_cl_gained();
+        this.update_cl_spent();
+        this.update_upgrade_cost();
+    }
+
+    update_upgrade_cost() {
+        this.upgrade_cost = this.cl_spent_this_turn - this.cl_spent_last_turn
+    }
+    
+    update_net_cl() {
+        this.net_cl = this.cl_gained - this.upgrade_cost
+    }
+
+    update_new_settlement_cost() {
+        this.new_settlement_cost = (this.settlements.length ** 2) * this.new_settlement_factor
+    }
+
+    update_cl_gained() {
+        this.cl_gained = this.felak.cl_points_gained + this.zaram.cl_points_gained + this.baruk.cl_points_gained + this.hund.cl_points_gained + this.zaharn.cl_points_gained
+    }
+
+    update_cl_spent() {
+        this.cl_spent_this_turn = ((this.settlements.length - 1) ** 2) * this.new_settlement_factor
+        this.settlements.forEach(settlement => {
+            let cost = 2 ** (settlement.tier - 2)
+            if (settlement.tier === SettlementTier.Hamlet) {
+                cost = 0
+            }
+            this.cl_spent_this_turn += cost * this.settlement_expansion_factor
+        }
+        )
     }
 
     set_starting_goods() {
