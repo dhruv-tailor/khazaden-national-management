@@ -48,11 +48,32 @@ class NationTracker {
     upgrade_cost: number = 0;
     net_cl: number = 0;
 
+    //Population Table
+    food_needs_met: number = 100;
+    food_growth_modifier: number = 0;
+    pops_lost_to_starvation: number = 0;
+    initial_population_growth: number = 0;
+    gained_pg: number = 0;
+    final_pg: number = 0;
+
+    //Pop Calculations Table
+    avg_pop_growth_factor: number = 0;
+    pg_pop_loss: number = 0;
+    pop_final_last_turn: number = 0;
+    pop_final_pop_loss: number = 0;
+
+    foreign_nations: Map<string, ForeignNation> = new Map<string, ForeignNation>();
+
+    migration_growth_modifier: number = 0;
+    current_pop_cap: number = 0;
+    starting_pop: number = 0;
+
     constructor() {
         this.turn_tracker = new TurnTracker();
         this.goods = new Map<string, Good>();
         this.set_starting_goods();
         this.update_kalans();
+        this.set_foreign_nations();
         this.terrains.set(TerrainType.Farmland, new Terrain('Farmland', 40, 3, 1.5, 3, 1.5, 0, 0, 0, 0, 0,1.75,1.75,2.25,1.75,0,0,0,0,0));
         this.terrains.set(TerrainType.Forest, new Terrain('Forest', 25, 1.4, 1.4, 0, 0, 15, 0, 0, 0, 0,1,1,0,0,10,0,0,0,0));
         this.terrains.set(TerrainType.Enchanted_Forest, new Terrain('Enchanted Forest', 10, 1.5, 1.5, 0, 0, 10, 20, 0, 0, 0,1,1,0,0,5,15,0,0,0));
@@ -71,6 +92,89 @@ class NationTracker {
         this.update_cl_gained();
         this.update_cl_spent();
         this.update_upgrade_cost();
+        this.update_food_needs_met();
+        this.update_pop_calculation_table();
+        this.update_population_growth();
+        
+    }
+
+    set_foreign_nations() {
+        this.foreign_nations.set('Eidgenossenkhazaden', new ForeignNation('Eidgenossenkhazaden',0.25));
+        this.foreign_nations.set('Bætañuesa', new ForeignNation('Bætañuesa',0.11));
+        this.foreign_nations.set('Dragonsbane', new ForeignNation('Dragonsbane',0.08));
+        this.foreign_nations.set('Sledzianska', new ForeignNation('Sledzianska',0.04));
+        this.foreign_nations.set('Polabtheli', new ForeignNation('Polabtheli',0));
+        this.foreign_nations.set('Kayasahr', new ForeignNation('Kayasahr',0.05));
+        this.foreign_nations.set('Garozemle', new ForeignNation('Garozemle',0.04));
+        this.foreign_nations.set('Sæmark', new ForeignNation('Sæmark',0.2));
+        this.foreign_nations.set('Terra Kontor', new ForeignNation('Terra Kontor',0.03));
+        this.foreign_nations.set('Pactusallamanni', new ForeignNation('Pactusallamanni',0.2));
+        this.foreign_nations.set('Beznesti', new ForeignNation('Beznesti',0));
+
+        const first_one = this.foreign_nations.get('Eidgenossenkhazaden');
+        if (first_one) {
+            first_one.recognition_status = RecognitionStatus.Limited;
+            first_one.trade_agreement_status = TradeAgreementStatus.HighTariffs;
+            first_one.migration_status = MigrationStatus.OpenBorders;
+            first_one.combatant_status = CombatantStatus.Neutral;
+            first_one.alliance_status = AllianceStatus.Friendly;
+            first_one.vassal_status = VassalStatus.None;
+            first_one.military_access_status = MilitaryAccessStatus.Limited;
+            first_one.relations = 2;
+        }
+    }
+
+    update_pop_calculation_table() {
+        let total_init_pop =0;
+        this.kalans.forEach(kalan => {
+            total_init_pop += kalan.initial_population
+        })
+        this.avg_pop_growth_factor = total_init_pop*17.5226452905812-113.226452905812
+        this.pop_final_last_turn = this.initial_pop_cap * this.starting_po * Math.exp(this.initial_mgm*this.inital_pg/this.avg_pop_growth_factor)
+        this.pop_final_last_turn /= this.initial_pop_cap + this.starting_po * (Math.exp(this.initial_mgm*this.inital_pg/this.avg_pop_growth_factor) - 1)
+        this.pg_pop_loss = this.avg_pop_growth_factor / this.initial_mgm
+        this.pop_final_pop_loss = this.pop_final_last_turn - this.pops_lost_to_starvation
+        this.pg_pop_loss *= Math.log((this.pop_final_pop_loss*this.initial_pop_cap-this.pop_final_pop_loss*this.starting_po)/(this.initial_pop_cap*this.starting_po-this.pop_final_pop_loss*this.starting_po))
+    }
+
+    update_food_needs_met() {
+        this.food_needs_met = (this.goods.get('Food and Water')?.initial_needs_met ?? 0) * 100
+        if(this.food_needs_met >= 75) {
+            this.food_growth_modifier = 1 * (this.food_needs_met - 75) / 25
+            this.pops_lost_to_starvation = 0
+        }
+        else {
+            this.food_growth_modifier = 0;
+            let total_pops = 0
+            this.kalans.forEach(kalan => {
+                total_pops += kalan.population
+            })
+            this.pops_lost_to_starvation = Math.round(0.1 *(75-this.food_needs_met)/75 * total_pops)
+        }
+    }
+
+    update_population_growth() {
+        this.initial_population_growth = this.inital_pg
+        let total_pop_growth = 0
+        this.kalans.forEach(kalan => {
+            total_pop_growth += kalan.population_growth
+        })
+        this.gained_pg = this.initial_population_growth * 0.7 * this.food_growth_modifier
+        if(this.pops_lost_to_starvation > 0){
+            this.gained_pg -= this.initial_population_growth - this.pg_pop_loss
+        }
+        this.final_pg = this.initial_population_growth + this.gained_pg
+        this.foreign_nations.forEach(foreign_nation => {
+            this.migration_growth_modifier += foreign_nation.get_migration_growth_modifier()
+        })
+        this.current_pop_cap = 0;
+        this.settlements.forEach(settlement => {
+            this.current_pop_cap += settlement.pop_cap
+        })
+        this.starting_pop = 0;
+        this.kalans.forEach(kalan => {
+            this.starting_pop += kalan.initial_population
+        })
     }
 
     update_upgrade_cost() {
