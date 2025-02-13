@@ -49,6 +49,12 @@ class Kalan {
     direct_tax_points: number = 100
     goods_produced: number = 0
     taxed_goods: number = 0
+    conversion_cost: number = 0
+
+    pop_conversion:number = 0
+    pops_after_conversion:number = 0
+    pops_added_from_pop_growth:number = 0
+    education_cost:number = 0
 
     constructor() {
         this.tax_rates.set(TaxRates.none,0)
@@ -71,6 +77,14 @@ class Kalan {
         this.productivity_managed_chart.set(false,0)
         this.loyalty_managed_chart.set(true,2)
         this.loyalty_managed_chart.set(false,0)
+    }
+
+    update_pops_after_conversion() {
+        this.pops_after_conversion = this.initial_population + this.pop_conversion
+    }
+
+    update_education_cost(conversion_factor:number) {
+        this.education_cost = this.pops_after_conversion * conversion_factor * 6/5
     }
 
     update_productivity_rate(goods: Map<string, Good>) {
@@ -107,6 +121,10 @@ class Kalan {
     }
     update_goods_produced(goods_production: number) {
         this.goods_produced = Math.round(this.taxed_goods * goods_production / 100 * this.taxed_productivity)
+    }
+
+    update_conversion_cost(modifier:number) {
+        this.conversion_cost = Math.max(0,Math.round(this.initial_population * modifier * 12/(10/3)))
     }
 }
 

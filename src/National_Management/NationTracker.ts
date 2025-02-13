@@ -67,6 +67,9 @@ class NationTracker {
     migration_growth_modifier: number = 0;
     current_pop_cap: number = 0;
     starting_pop: number = 0;
+    pop_final_projected: number = 0;
+    final_pop: number = 0;
+    pops_gained: number = 0;
 
     constructor() {
         this.turn_tracker = new TurnTracker();
@@ -95,7 +98,20 @@ class NationTracker {
         this.update_food_needs_met();
         this.update_pop_calculation_table();
         this.update_population_growth();
-        
+        this.update_conversion_costs();
+    }
+
+    update_conversion_costs() {
+        this.kalans.forEach(kalan => {
+            kalan.update_conversion_cost(this.pop_conversion_factor)
+        })
+    }
+
+    update_pop_final() {
+        this.pop_final_projected = (this.initial_pop_cap * this.starting_po * Math.exp(this.initial_mgm*this.final_pg/this.avg_pop_growth_factor))
+        this.pop_final_projected /= (this.initial_pop_cap + this.starting_po * (Math.exp(this.initial_mgm*this.final_pg/this.avg_pop_growth_factor) - 1))
+        this.final_pop = Math.floor(this.pop_final_projected)
+        this.pops_gained = this.final_pop - this.starting_pop
     }
 
     set_foreign_nations() {
