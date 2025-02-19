@@ -3,6 +3,7 @@ import { FloatLabel } from "primereact/floatlabel";
 import { InputText } from "primereact/inputtext";
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { load } from '@tauri-apps/plugin-store';
 
 
 function NewGame() {
@@ -10,14 +11,28 @@ function NewGame() {
 
     const [saveName, setSaveName] = useState('')
 
-    const startGame = () => {
+
+    const startGame = async () => {
         let initial_settlement = {
             name: 'Skarduhn',
             terrain_type: 'mountain',
             tier: 1
         }
-    
-        navigate('/Game', {state: {init_settlements: [initial_settlement]}})
+
+        const store = await load(`${saveName}.json`,{autoSave: false})
+        await store.set('settlements', [initial_settlement])
+        await store.save()
+
+        const savestore = await load('savegames.json', {autoSave: false});
+        let savegames = await savestore.get<string[]>('savegames');
+        if (!savegames) {
+            savegames = []
+        }
+        savegames.push(saveName)
+        await savestore.set('savegames', savegames)
+        await savestore.save()
+        
+        navigate('/Game')
 
     }
 

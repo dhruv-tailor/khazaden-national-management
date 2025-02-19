@@ -21,7 +21,13 @@ function App() {
         navigate('/NewGame');
       }
     },
-    {label: 'Load', icon: 'pi pi-fw pi-folder'},
+    {
+      label: 'Load', 
+      icon: 'pi pi-fw pi-folder',
+      command: () => {
+        navigate('/LoadGame');
+      }
+    },
     {label: 'Quit', icon: 'pi pi-fw pi-times'}
   ];
 
