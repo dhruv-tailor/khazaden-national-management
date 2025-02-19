@@ -5,15 +5,21 @@ import 'primeflex/primeflex.css'; // flex
 
 import { Menu } from 'primereact/menu';
 import { MenuItem } from 'primereact/menuitem';
+import { useNavigate } from "react-router";
+
 
 function App() {
+
+  let navigate = useNavigate();
 
   let items: MenuItem[] = [
     {separator: true},
     {
       label: 'New', 
       icon: 'pi pi-fw pi-plus',
-      url: '/NewGame'
+      command: () => {
+        navigate('/NewGame');
+      }
     },
     {label: 'Load', icon: 'pi pi-fw pi-folder'},
     {label: 'Quit', icon: 'pi pi-fw pi-times'}
