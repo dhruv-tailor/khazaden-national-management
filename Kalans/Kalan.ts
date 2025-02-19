@@ -1,5 +1,5 @@
 import { Development } from '../Components/Development_Component'
-import { Military } from './Military'
+import { Military } from '../Military/Military'
 import { Clerics } from './Clerics';
 import { Good } from '../Good';
 import { Merchants } from './Merchants';
