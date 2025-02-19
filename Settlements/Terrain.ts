@@ -1,4 +1,4 @@
-class Terrain {
+export class Terrain {
     name: string;
     reference_pop_cap: number;
     food_and_water: number;
@@ -66,7 +66,7 @@ class Terrain {
     }
 }
 
-enum TerrainType {
+export enum TerrainType {
     Mountain,
     Forest,
     Enchanted_Forest,

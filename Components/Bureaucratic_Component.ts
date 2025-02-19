@@ -1,4 +1,4 @@
-class BureaucraticComponent {
+export class BureaucraticComponent {
 
     focus: BureaucraticFocus = BureaucraticFocus.None
     labor: number = 0
@@ -14,7 +14,7 @@ class BureaucraticComponent {
 
 }
 
-enum BureaucraticFocus {
+export enum BureaucraticFocus {
     Kibil,
     Dush,
     Baraz,

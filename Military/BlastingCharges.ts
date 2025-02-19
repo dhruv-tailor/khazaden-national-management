@@ -1,3 +1,6 @@
+import { Regiment } from './Regiment'
+import { EliteVarients } from './Military'
+
 class BlastingCharges extends Regiment {
     pop_type: string = 'Felak'
     pop_consumed: number = 20

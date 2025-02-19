@@ -1,4 +1,7 @@
-class Settlement {
+import { Terrain } from "./Terrain";
+
+
+export class Settlement {
     name: string;
     terrain_type: Terrain;
     tier: SettlementTier;
@@ -40,7 +43,7 @@ class Settlement {
     }
 }
 
-enum SettlementTier {
+export enum SettlementTier {
     Hamlet,
     Village,
     Town,

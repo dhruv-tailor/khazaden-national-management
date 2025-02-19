@@ -1,4 +1,4 @@
-class Development {
+export class Development {
     fp_invested: number = 0
     development_level: DevelopmentLevel = DevelopmentLevel.Terrible
 
@@ -27,7 +27,7 @@ class Development {
     }
 }
 
-enum DevelopmentLevel {
+export enum DevelopmentLevel {
     Terrible,
     Low,
     Moderate,

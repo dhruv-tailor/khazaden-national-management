@@ -1,4 +1,4 @@
-class ForeignNation {
+export class ForeignNation {
     name: string;
     recognition_status: RecognitionStatus = RecognitionStatus.None;
     trade_agreement_status: TradeAgreementStatus = TradeAgreementStatus.Embargoed;
@@ -26,14 +26,14 @@ class ForeignNation {
 }
 
 
-enum RecognitionStatus {
+export enum RecognitionStatus {
     None,
     Secret,
     Limited,
     Full
 }
 
-enum TradeAgreementStatus {
+export enum TradeAgreementStatus {
     Embargoed,
     HighTariffs,
     ModerateTariffs,
@@ -41,13 +41,13 @@ enum TradeAgreementStatus {
     FreeTrade
 }
 
-enum MigrationStatus {
+export enum MigrationStatus {
     ClosedBorders,
     ControlledBorders,
     OpenBorders
 }
 
-enum CombatantStatus {
+export enum CombatantStatus {
     Neutral,
     Allied,
     LowIntensityConflict,
@@ -55,7 +55,7 @@ enum CombatantStatus {
     ConventionalWarfare
 }
 
-enum AllianceStatus {
+export enum AllianceStatus {
     Neutral,
     Overlord,
     Allied,
@@ -65,7 +65,7 @@ enum AllianceStatus {
     Subject
 }
 
-enum VassalStatus {
+export enum VassalStatus {
     None,
     Colony,
     Puppet,
@@ -74,7 +74,7 @@ enum VassalStatus {
     Protectorate
 }
 
-enum MilitaryAccessStatus {
+export enum MilitaryAccessStatus {
     Prohibited,
     Limited,
     Granted

@@ -1,4 +1,7 @@
-class Slayers extends Regiment {
+import { Regiment } from './Regiment'
+import { EliteVarients } from './Military'
+
+export class Slayers extends Regiment {
     pop_type: string = 'Zaharn'
     pop_consumed: number = 10
     turns_to_levy: number = 1

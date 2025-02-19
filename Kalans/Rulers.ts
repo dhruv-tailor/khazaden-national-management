@@ -1,4 +1,8 @@
-class Rulers extends Kalan {
+import { Kalan } from './Kalan'
+import { BureaucraticComponent, BureaucraticFocus } from '../Components/Bureaucratic_Component'
+import {Good} from '../Good'
+
+export class Rulers extends Kalan {
     direct_tax_points: number = 100
     unmodified_loyalty: number = 4
     unmodified_efficency: number = 5

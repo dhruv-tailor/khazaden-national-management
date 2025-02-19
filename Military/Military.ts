@@ -1,4 +1,6 @@
-class Military {
+import { Regiment } from './Regiment';
+
+export class Military {
     elite_varients: Map<string,EliteVarients> = new Map<string,EliteVarients>();
     upkeep_chart: Map<string,number> = new Map<string,number>();
 
@@ -51,7 +53,7 @@ class Military {
     
 }
 
-interface EliteVarients {
+export interface EliteVarients {
     type: string,
     standard_multiplier: number,
     enchanted_armaments_increase: number,

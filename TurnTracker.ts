@@ -1,5 +1,5 @@
 
-class TurnTracker {
+export class TurnTracker {
     turns_passed: number = 1;
     month: number;
     year: number;

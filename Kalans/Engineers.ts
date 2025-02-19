@@ -1,4 +1,9 @@
-class Engineers extends Kalan {
+import { Kalan } from './Kalan'
+import { BureaucraticComponent, BureaucraticFocus } from '../Components/Bureaucratic_Component'
+import {Good} from '../Good'
+import { Military } from './Military'
+
+export class Engineers extends Kalan {
 
     direct_tax_points: number = 100
     bureaucratic_component: BureaucraticComponent = new BureaucraticComponent([

@@ -1,4 +1,7 @@
-class DwarfWarriors extends Regiment {
+import { Regiment } from './Regiment'
+import { EliteVarients } from './Military'
+
+export class DwarfWarriors extends Regiment {
     pop_type: string = 'Baruk'
     pop_consumed: number = 5
     turns_to_levy: number = 2

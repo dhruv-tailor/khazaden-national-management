@@ -1,4 +1,13 @@
-class Miners extends Kalan {
+import { Kalan } from './Kalan'
+import { BureaucraticComponent, BureaucraticFocus } from '../Components/Bureaucratic_Component'
+import {Good} from '../Good'
+import { Archivists } from './Archivists'
+import { Rulers } from './Rulers'
+import { Military } from './Military'
+import { Clerics } from './Clerics'
+import { Merchants } from './Merchants'
+
+export class Miners extends Kalan {
 
     direct_tax_points: number = 100
     taxed_goods: number = 0

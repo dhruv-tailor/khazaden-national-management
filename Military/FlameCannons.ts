@@ -1,4 +1,7 @@
-class FlameCannons extends Regiment {
+import { Regiment } from './Regiment'
+import { EliteVarients } from './Military'
+
+export class FlameCannons extends Regiment {
     pop_type: string = 'Kheled'
     pop_consumed: number = 6
     turns_to_levy: number = 6

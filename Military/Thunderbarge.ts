@@ -1,4 +1,7 @@
-class Thunderbarge extends Regiment {
+import { Regiment } from './Regiment'
+import { EliteVarients } from './Military'
+
+export class Thunderbarge extends Regiment {
     pop_type: string = 'Kheled'
     pop_consumed: number = 50
     turns_to_levy: number = 12

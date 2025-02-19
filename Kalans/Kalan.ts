@@ -1,4 +1,11 @@
-class Kalan {
+import { Development } from '../Components/Development_Component'
+import { Military } from './Military'
+import { Clerics } from './Clerics';
+import { Good } from '../Good';
+import { Merchants } from './Merchants';
+import { Rulers } from './Rulers';
+
+export class Kalan {
     tax_rate: TaxRates = TaxRates.medium;
     tax_rates:Map<TaxRates,number> = new Map<TaxRates,number>();
 

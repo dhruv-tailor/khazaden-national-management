@@ -1,4 +1,6 @@
-class Regiment {
+import { EliteVarients } from './Military'
+
+export class Regiment {
     name: string
     pop_type: string = ''
     pop_consumed: number = 0

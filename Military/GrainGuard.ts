@@ -1,4 +1,7 @@
-class GrainGuard extends Regiment {
+import { Regiment } from './Regiment'
+import { EliteVarients } from './Military'
+
+export class GrainGuard extends Regiment {
     pop_type: string = 'Zaram'
     pop_consumed: number = 20
     turns_to_levy: number = 1

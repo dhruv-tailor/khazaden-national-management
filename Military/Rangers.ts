@@ -1,4 +1,7 @@
-class Rangers extends Regiment {
+import { Regiment } from './Regiment'
+import { EliteVarients } from './Military'
+
+export class Rangers extends Regiment {
     pop_type: string = 'Hund'
     pop_consumed: number = 20
     turns_to_levy: number = 2

@@ -1,4 +1,7 @@
-class GrudgeThrowers extends Regiment {
+import { Regiment } from './Regiment'
+import { EliteVarients } from './Military'
+
+export class GrudgeThrowers extends Regiment {
     pop_type: string = 'Kheled'
     pop_consumed: number = 4
     turns_to_levy: number = 3

@@ -1,4 +1,7 @@
-class BugmansRangers extends Regiment {
+import { Regiment } from './Regiment'
+import { EliteVarients } from './Military'
+
+export class BugmansRangers extends Regiment {
     pop_type: string = 'Hund'
     pop_consumed: number = 40
     turns_to_levy: number = 3
