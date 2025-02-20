@@ -1,19 +1,17 @@
-import { load } from "@tauri-apps/plugin-store";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect , useState } from "react";
+import { getSavegames } from "./utilities/SaveData";
 
 function LoadGame() {
     const [savegames, setSavegames] = useState<string[]>([]);
+
+    const getSaves = async () => {
+        const results = await getSavegames();
+        setSavegames(results);
+        console.log('results', results);
+    }
     
-    useLayoutEffect(() => {
-        async function fetchSavegames() {
-            const store = await load('savegames.json', {autoSave: false});
-            const savedGames = await store.get<string[]>('savegames');
-            if (savedGames) {
-                setSavegames(savedGames);
-            }
-        }
-        fetchSavegames();
-        console.log(savegames);
+    useEffect(() => {
+        getSaves()
     }, []);
     return (
         <div>
