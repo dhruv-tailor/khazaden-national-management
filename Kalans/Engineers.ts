@@ -1,7 +1,7 @@
 import { Kalan } from './Kalan'
 import { BureaucraticComponent, BureaucraticFocus } from '../Components/Bureaucratic_Component'
 import {Good} from '../Good'
-import { Military } from './Military'
+import { Military } from '../Military/Military'
 
 export class Engineers extends Kalan {
 
@@ -15,6 +15,17 @@ export class Engineers extends Kalan {
     ],30)
 
     productivity_rate_modifier: number = 6
+
+    goods_consumed: string[] = [
+        'Food and Water',
+        'Beer',
+        'Leather and Textiles',
+        'Artisanal Goods',
+        'Ornamental Luxuries',
+        'Livestock',
+        'Runes',
+        'Books'
+    ]
 
     constructor() {
         super()

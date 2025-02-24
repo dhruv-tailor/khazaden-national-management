@@ -3,7 +3,7 @@ import { BureaucraticComponent, BureaucraticFocus } from '../Components/Bureaucr
 import {Good} from '../Good'
 import { Archivists } from './Archivists'
 import { Rulers } from './Rulers'
-import { Military } from './Military'
+import { Military } from '../Military/Military'
 import {Clerics} from './Clerics'
 import {Merchants} from './Merchants'
 
@@ -13,6 +13,14 @@ export class Criminals extends Kalan {
     base_loyalty: number = -3
     unmodified_loyalty: number = 2
     cl_points_gained: number = 0
+
+    goods_consumed: string[] = [
+        'Food and Water',
+        'Beer',
+        'Leather and Textiles',
+        'Artisanal Goods',
+        'Tools'
+    ]
 
     constructor() {
         super()

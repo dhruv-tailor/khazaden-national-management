@@ -11,6 +11,21 @@ export class RuneSmiths extends Kalan {
     direct_tax_points: number = 100
     taxed_goods: number = 0
     productivity_rate_modifier: number = 5
+
+    goods_consumed: string[] = [
+        'Food and Water',
+        'Beer',
+        'Leather and Textiles',
+        'Artisanal Goods',
+        'Ornamental Luxuries',
+        'Livestock',
+        'Rare Ores',
+        'Gems',
+        'Books',
+        'Enchanted Charcoal'
+    ]
+
+    goods_produced_breakdown: string[] = ['Runes','Enchanted Armaments','Enchanted Luxuries']
     
 
     constructor() {

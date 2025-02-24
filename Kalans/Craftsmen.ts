@@ -1,5 +1,5 @@
 import { Kalan } from './Kalan'
-import { BureaucraticComponent, BureaucraticFocus } from '../Components/Bureaucratic_Component'
+import { BureaucraticFocus } from '../Components/Bureaucratic_Component'
 import {Good} from '../Good'
 import { Archivists } from './Archivists'
 import { Rulers } from './Rulers'
@@ -15,6 +15,19 @@ export class Craftsmen extends Kalan {
     unmodified_productivity: number = 110
     unmodified_development_growth: number = 13
     unmodified_population_growth: number = 31
+
+    goods_consumed: string[] = [
+        'Food and Water',
+        'Beer',
+        'Leather and Textiles',
+        'Artisanal Goods',
+        'Ornamental Luxuries',
+        'Timber',
+        'Common Ores',
+        'Gems'
+    ]
+
+    goods_produced_breakdown: string[] = ['Artisanal Goods','Ornamental Luxuries','Tools','Armanents']
 
     constructor() {
         super()

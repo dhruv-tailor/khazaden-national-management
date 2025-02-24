@@ -63,6 +63,30 @@ export class Kalan {
     pops_added_from_pop_growth:number = 0
     education_cost:number = 0
 
+    goods_consumed: string[] = [
+        'Food and Water',
+        'Beer',
+        'Leather and Textiles',
+        'Artisanal Goods',
+        'Ornamental Luxuries',
+        'Livestock',
+        'Enchanted Luxuries',
+        'Timber',
+        'Tools',
+        'Common Ores',
+        'Medical Supplies',
+        'Rare Ores',
+        'Gems',
+        'Livestock',
+        'Runes',
+        'Armaments',
+        'Books',
+        'Enchanted Armaments',
+        'Enchanted Charcoal'
+    ]
+
+    goods_produced_breakdown: string[] = []
+
     constructor() {
         this.tax_rates.set(TaxRates.none,0)
         this.tax_rates.set(TaxRates.very_low,0.2)

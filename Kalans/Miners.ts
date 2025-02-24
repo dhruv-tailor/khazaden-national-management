@@ -3,7 +3,7 @@ import { BureaucraticComponent, BureaucraticFocus } from '../Components/Bureaucr
 import {Good} from '../Good'
 import { Archivists } from './Archivists'
 import { Rulers } from './Rulers'
-import { Military } from './Military'
+import { Military } from '../Military/Military'
 import { Clerics } from './Clerics'
 import { Merchants } from './Merchants'
 
@@ -19,6 +19,16 @@ export class Miners extends Kalan {
     unmodified_development_growth: number = 16
     unmodified_population_growth: number = 37
     cl_points_gained: number = 0
+
+    goods_consumed: string[] = [
+        'Food and Water',
+        'Beer',
+        'Leather and Textiles',
+        'Artisanal Goods',
+        'Tools'
+    ]
+
+    goods_produced_breakdown: string[] = ['Common Ores','Rare Ores','Gems']
 
     constructor() {
         super()

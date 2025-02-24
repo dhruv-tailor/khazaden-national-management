@@ -3,7 +3,7 @@ import { BureaucraticComponent, BureaucraticFocus } from '../Components/Bureaucr
 import {Good} from '../Good'
 import { Archivists } from './Archivists'
 import { Rulers } from './Rulers'
-import { Military } from './Military'
+import { Military } from '../Military/Military'
 import { Clerics } from './Clerics'
 import { Merchants } from './Merchants'
 
@@ -13,6 +13,15 @@ export class Foresters extends Kalan {
     taxed_goods: number = 0
     corvee_labor: number = 0
     cl_points_gained: number = 0
+
+    goods_consumed: string[] = [
+        'Food and Water',
+        'Beer',
+        'Leather and Textiles',
+        'Artisanal Goods'
+    ]
+
+    goods_produced_breakdown: string[] = ['Food and Water','Artisanal Goods','Timber','Enchanted Charcoal']
 
     constructor() {
         super()

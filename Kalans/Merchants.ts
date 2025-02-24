@@ -25,6 +25,15 @@ export class Merchants extends Kalan {
     initial_population:number = 1
     productivity_rate_modifier: number = 4
 
+    goods_consumed: string[] = [
+        'Food and Water',
+        'Beer',
+        'Leather and Textiles',
+        'Artisanal Goods',
+        'Ornamental Luxuries',
+        'Livestock'
+    ]
+
     constructor() {
         super()
     }

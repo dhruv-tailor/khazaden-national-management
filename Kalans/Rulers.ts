@@ -20,6 +20,17 @@ export class Rulers extends Kalan {
 
     productivity_rate_modifier: number = 8
 
+    goods_consumed: string[] = [
+        'Food and Water',
+        'Beer',
+        'Leather and Textiles',
+        'Artisanal Goods',
+        'Ornamental Luxuries',
+        'Livestock',
+        'Enchanted Luxuries',
+        'Books',
+    ]
+
     constructor() {
         super()
     }

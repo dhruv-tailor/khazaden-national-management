@@ -18,6 +18,19 @@ export class Archivists extends Kalan {
 
     productivity_rate_modifier: number = 6
 
+    goods_consumed: string[] = [
+        'Food and Water',
+        'Beer',
+        'Leather and Textiles',
+        'Artisanal Goods',
+        'Ornamental Luxuries',
+        'Livestock',
+        'Rare Ores',
+        'Runes'
+    ]
+
+    goods_produced_breakdown: string[] = ['Books']
+
     constructor() {
         super()
     }
