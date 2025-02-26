@@ -1,4 +1,4 @@
-import 'primereact/resources/themes/lara-dark-teal/theme.css'; //theme
+import 'primereact/resources/themes/soho-dark/theme.css'; //theme
 import 'primereact/resources/primereact.min.css'; //core css
 import 'primeicons/primeicons.css'; //icons
 import 'primeflex/primeflex.css'; // flex
@@ -33,8 +33,10 @@ function App() {
 
   return (
    <>
-    <div className='flex align-content-center justify-content-center w-full'>
+    <div className='flex flex-column overflow-hidden align-items-center'>
+      <div className="flex flex-grow-1"></div>
       <Menu model={items} />
+      <div className="flex flex-grow-1"></div>
     </div>
    </>
   );

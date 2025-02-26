@@ -13,6 +13,7 @@ function NewGame() {
 
     const startGame = async () => {
         await createNewSave(saveName)
+        navigate(`/game/${saveName}`)
     }
 
 
