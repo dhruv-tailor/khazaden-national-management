@@ -4,7 +4,7 @@ import {  readDir, BaseDirectory, remove } from "@tauri-apps/plugin-fs";
 import { productName } from "../../src-tauri/tauri.conf.json"
 import { type } from '@tauri-apps/plugin-os'
 import { TerrainType } from "../Settlement/TerrainInterface";
-import { newSettlement, setLoyalties } from "../Settlement/SettlementInterface";
+import { newSettlement, updateGoodsProduction } from "../Settlement/SettlementInterface";
 
 const fileSeperator = () => {
     const osType = type();
@@ -48,6 +48,7 @@ export const createNewSave = async (saveName: string)  => {
     new LazyStore(saveFile,{autoSave: false}); 
     const store = await load(saveFile, {autoSave: false});
     let initial_settlement = newSettlement('Skarduhn', TerrainType.Mountain);
+    store.set('settlements', [initial_settlement]);
     // Initial Stock
     initial_settlement.food_and_water.stock = 150
     initial_settlement.beer.stock = 150
@@ -73,7 +74,8 @@ export const createNewSave = async (saveName: string)  => {
     initial_settlement.miners.population = 2
     initial_settlement.farmers.population = 6
     // good productions
-    setLoyalties(initial_settlement)
+    updateGoodsProduction(initial_settlement)
+    
     store.set('settlements', [initial_settlement]);
     await store.save();
     store.close();

@@ -24,6 +24,9 @@ export const newCraftsmen = () => {
         tax_rate: 0.6,
         loyalty: 0,
         efficency: 0,
+        taxed_productivity: 0,
+        goods_produced: 0,
+        productivity_rate: 5,
     }
 
     craftsmen.common_ores.consumption_rate = 5

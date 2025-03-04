@@ -1,20 +1,20 @@
 import { ClanInterface, setGoodInteraction } from "./ClanInterface";
 
-export const newArchivists = () => {
-    let archivists: ClanInterface = {
+export const newClerics = () => {
+    let clerics: ClanInterface = {
         population: 0,
         food_and_water: setGoodInteraction(true, false),
         beer: setGoodInteraction(true, false),
         leather_and_textiles: setGoodInteraction(true, false),
         artisanal_goods: setGoodInteraction(true, false),
         ornamental_luxuries: setGoodInteraction(true, false),
-        livestock: setGoodInteraction(true, false),
+        livestock: setGoodInteraction(false, false),
         enchanted_luxuries: setGoodInteraction(false, false),
         timber: setGoodInteraction(false, false),
         tools: setGoodInteraction(false, false),
         common_ores: setGoodInteraction(false, false),
-        medical_supplies: setGoodInteraction(false, false),
-        rare_ores: setGoodInteraction(true, false),
+        medical_supplies: setGoodInteraction(false, true),
+        rare_ores: setGoodInteraction(false, false),
         gems: setGoodInteraction(false, false),
         runes: setGoodInteraction(true, false),
         armaments: setGoodInteraction(false, false),
@@ -26,7 +26,7 @@ export const newArchivists = () => {
         efficency: 0,
         taxed_productivity: 0,
         goods_produced: 0,
-        productivity_rate: 6,
+        productivity_rate: 4,
     }
-    return archivists;
+    return clerics;
 }
