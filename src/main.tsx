@@ -7,6 +7,7 @@ import { Routes, Route } from 'react-router';
 import NewGame from './NewGame';
 import Game from './Game';
 import LoadGame from './LoadGame/LoadGame';
+import SettlementDetailed from './Settlement/Detailed/SettlementDetailed';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
@@ -16,6 +17,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           <Route index element={<App />} />
           <Route path="NewGame" element={<NewGame/>} />
           <Route path="game/:game" element={<Game/>} />
+          <Route path="game/:game/settlement/:settlement" element={<SettlementDetailed/>} />
           <Route path="LoadGame" element={<LoadGame/>} />
         </Routes>
       </BrowserRouter>

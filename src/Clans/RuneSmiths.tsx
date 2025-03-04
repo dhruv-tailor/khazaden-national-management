@@ -2,6 +2,7 @@ import { ClanInterface, setGoodInteraction } from "./ClanInterface";
 
 export const newRuneSmiths = () => {
     let runeSmiths: ClanInterface = {
+        name: 'Rune Smiths',
         population: 0,
         food_and_water: setGoodInteraction(true, false),
         beer: setGoodInteraction(true, false),

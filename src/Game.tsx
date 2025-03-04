@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { SettlementInterface } from "./Settlement/SettlementInterface";
 import Settlement from "./Settlement/Settlement";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { load } from "@tauri-apps/plugin-store";
 import { saveLocation } from "./utilities/SaveData";
 
 function Game() {
     const gameId = useParams().game;
+    let navigate = useNavigate();
 
     const [settlements, setSettlements] = useState<SettlementInterface[]>([]);
 
@@ -18,6 +19,10 @@ function Game() {
         }
     }
 
+    const navigateSettlement = (name: string) => {
+        navigate(`settlement/${name}`)
+    }
+
     useEffect(() => {
         getSettlements();
     }, []);
@@ -25,7 +30,7 @@ function Game() {
     return (
         <div>
             <h1>{settlements.map(settlement => {
-                return <Settlement key={settlement.name} settlement={settlement}/>
+                return <Settlement key={settlement.name} settlement={settlement} navigateSettlement={navigateSettlement}/>
             })}</h1>
         </div>
     );

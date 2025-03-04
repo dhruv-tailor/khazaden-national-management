@@ -1,4 +1,4 @@
-import { ClanInterface } from "../Clans/ClanInterface";
+import { ClanInterface, emptyClanInterface } from "../Clans/ClanInterface";
 import { TerrainData, TerrainType } from "./TerrainInterface";
 import { newRulerClan } from "../Clans/Rulers";
 import { newArchivists } from "../Clans/Archivists";
@@ -53,13 +53,6 @@ export interface SettlementInterface {
     criminals: ClanInterface;
 }
 
-interface settlementGoodsInfo {
-    production_cap: number;
-    stock: number;
-    consumption_rate: number;
-    deficit: number;
-}
-
 export enum SettlementTier {
     Hamlet = 1,
     Village,
@@ -67,6 +60,61 @@ export enum SettlementTier {
     City,
     Metropolis,
 }
+
+interface settlementGoodsInfo {
+    production_cap: number;
+    stock: number;
+    consumption_rate: number;
+    deficit: number;
+}
+
+const emptySettlementGoodsInfo: settlementGoodsInfo = {
+    production_cap: 0,
+    stock: 0,
+    consumption_rate: 0,
+    deficit: 0
+}
+
+export const emptySettlement: SettlementInterface = {
+    name: '',
+    terrain_type: TerrainType.Enchanted_Forest,
+    pop_cap: 0,
+    tier: SettlementTier.City,
+
+    food_and_water: emptySettlementGoodsInfo,
+    beer: emptySettlementGoodsInfo,
+    leather_and_textiles: emptySettlementGoodsInfo,
+    artisinal_goods: emptySettlementGoodsInfo,
+    livestock: emptySettlementGoodsInfo,
+    ornamental_luxuries: emptySettlementGoodsInfo,
+    enchanted_luxuries: emptySettlementGoodsInfo,
+    timber: emptySettlementGoodsInfo,
+    tools: emptySettlementGoodsInfo,
+    enchanted_charcoal: emptySettlementGoodsInfo,
+    common_ores: emptySettlementGoodsInfo,
+    medical_supplies: emptySettlementGoodsInfo,
+    gems: emptySettlementGoodsInfo,
+    runes: emptySettlementGoodsInfo,
+    armaments: emptySettlementGoodsInfo,
+    books: emptySettlementGoodsInfo,
+    enchanted_armaments: emptySettlementGoodsInfo,
+    rare_ores: emptySettlementGoodsInfo,
+
+    rulers: emptyClanInterface,
+    archivists: emptyClanInterface,
+    engineers: emptyClanInterface,
+    rune_smiths: emptyClanInterface,
+    craftsmen: emptyClanInterface,
+    merchants: emptyClanInterface,
+    clerics: emptyClanInterface,
+    miners: emptyClanInterface,
+    farmers: emptyClanInterface,
+    warriors: emptyClanInterface,
+    foresters: emptyClanInterface,
+    criminals: emptyClanInterface,
+}
+
+
 
 export const SettlementTierDetails = {
     [SettlementTier.Hamlet]: { name: 'Hamlet', value: SettlementTier.Hamlet },

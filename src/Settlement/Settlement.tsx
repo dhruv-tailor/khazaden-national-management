@@ -7,12 +7,23 @@ import { PiCowFill } from "react-icons/pi";
 import { FaGem, FaTools, FaBriefcaseMedical, FaBook, FaShieldAlt } from "react-icons/fa";
 import { LuHandCoins } from "react-icons/lu";
 import PlusMinus from '../components/PlusMinus';
+import { Button } from 'primereact/button';
 
-function Settlement({settlement}: {settlement: SettlementInterface}) {
+function Settlement({settlement, navigateSettlement}: {settlement: SettlementInterface, navigateSettlement: (name: string) => void}) {
+
+  const gotoSettlement = () => {
+    navigateSettlement(settlement.name)
+  }
+
+  const footer = (
+    <>
+      <Button label='Go To Settlement' icon="pi pi-arrow-right" onClick={gotoSettlement} />
+    </>
+  );
     
   return (
     <>
-      <Card className="md:w-25rem" title={settlement.name} subTitle={SettlementTierDetails[settlement.tier].name}>
+      <Card className="md:w-25rem" title={settlement.name} subTitle={SettlementTierDetails[settlement.tier].name} footer={footer}>
         <p><IoIosPeople />{
           settlement.archivists.population + 
           settlement.clerics.population +

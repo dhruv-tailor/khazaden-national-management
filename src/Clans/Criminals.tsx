@@ -2,6 +2,7 @@ import { ClanInterface, setGoodInteraction } from "./ClanInterface";
 
 export const newCriminals = () => {
     let foresters: ClanInterface = {
+        name: 'Criminals',
         population: 0,
         food_and_water: setGoodInteraction(true, false),
         beer: setGoodInteraction(true, false),

@@ -17,3 +17,15 @@ FaBook = books
 GiRuneStone = runes
 FaShieldAlt = armaments
 GiMagicShield = enchanted armaments
+
+BiSolidCrown = Rulers
+FaArchive = Archivists
+MdEngineering = engineers
+FaHammer = Craftsmen
+TbMoneybag = merchants
+MdChurch = Clerics
+TbPick = Miners
+GiFarmer = farmers
+LuSword = warriors
+GiAxeInStump  = foresters
+RiCriminalFill = criminals
