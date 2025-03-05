@@ -2,21 +2,22 @@ IoIosPeople = population
 IoFastFood = food and water
 GiBeerStein = beer
 GiClothes = leather and textiles
-PiCowFill = livestock
-GiWoodPile = timber
-GiThrownCharcoal = enchanted charcoal
-GiCoalWagon = common ores
-GiGems = gems
-FaGem = rare ores
 LuHandCoins = artisinal goods
+PiCowFill = livestock
 GiPouringChalice = ornamental luxuries
 GiCrystalBall = enchanted luxuries
+
+GiWoodPile = timber
 FaTools = tools
+GiCoalWagon = common ores
 FaBriefcaseMedical = medical supplies
-FaBook = books
+FaGem = rare ores
+GiGems = gems
 GiRuneStone = runes
 FaShieldAlt = armaments
+FaBook = books
 GiMagicShield = enchanted armaments
+GiThrownCharcoal = enchanted charcoal
 
 BiSolidCrown = Rulers
 FaArchive = Archivists
@@ -29,3 +30,6 @@ GiFarmer = farmers
 LuSword = warriors
 GiAxeInStump  = foresters
 RiCriminalFill = criminals
+
+FaHeart = loyalty
+FaGear = Efficency

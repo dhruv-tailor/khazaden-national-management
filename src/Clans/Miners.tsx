@@ -28,6 +28,7 @@ export const newMiners = () => {
         taxed_productivity: 0,
         goods_produced: 0,
         productivity_rate: 3,
+        loyalty_modifiers: [],
     }
     return miners;
 }

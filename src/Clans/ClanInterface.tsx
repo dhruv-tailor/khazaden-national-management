@@ -27,28 +27,39 @@ export interface ClanInterface {
     // taxed_productivity = ((loyalty + efficency)/20) * 40 * productivty_rate * population * tax_rate
     tax_rate: number;
     loyalty: number;
+    loyalty_modifiers: modifier[]; 
     efficency: number;
     taxed_productivity: number;
     goods_produced: number;
     productivity_rate: number;
 }
 
+interface modifier {
+    name: string;
+    value: number;
+}
+
 export interface goodInteraction {
     is_consumed: boolean;
     is_produced: boolean;
     consumption_rate: number;
-    production_rate: number;
+    produced: number;
 }
 
 export const setGoodInteraction = (isConsumed : boolean, isProduced: boolean) : goodInteraction => {
-    return {is_consumed: isConsumed, is_produced: isProduced, consumption_rate: isConsumed ? 1 : 0, production_rate: isProduced ? 1 : 0}
+    return {
+        is_consumed: isConsumed, 
+        is_produced: isProduced, 
+        consumption_rate: isConsumed ? 1 : 0, 
+        produced: 0,
+    }
 }
 
 const emptyGoodInteraction: goodInteraction = {
     is_consumed: true,
     is_produced: true,
     consumption_rate: 0,
-    production_rate: 0
+    produced: 0,
 }
 
 export const emptyClanInterface: ClanInterface = {
@@ -82,4 +93,5 @@ export const emptyClanInterface: ClanInterface = {
     taxed_productivity: 0,
     goods_produced: 0,
     productivity_rate: 0,
+    loyalty_modifiers: [],
 }

@@ -16,9 +16,14 @@ function NewGame() {
         navigate(`/game/${saveName}`)
     }
 
+    const goBack = () => {
+        navigate('/')
+    }
+
 
     return (
         <div className="card flex justify-content-center">
+            <Button label={'Go Back'} icon="pi pi-arrow-left" size='small' onClick={goBack}/>
            <form onSubmit={e => {
             e.preventDefault()
             startGame()

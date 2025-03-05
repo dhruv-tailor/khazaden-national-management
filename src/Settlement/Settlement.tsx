@@ -1,13 +1,13 @@
 import { Card } from 'primereact/card';
 import { SettlementInterface, SettlementTierDetails } from './SettlementInterface';
-import { IoFastFood  } from "react-icons/io5";
 import { IoIosPeople } from "react-icons/io";
+import { Button } from 'primereact/button';
 import { GiBeerStein, GiClothes, GiWoodPile, GiThrownCharcoal,GiCoalWagon, GiGems, GiPouringChalice, GiCrystalBall, GiRuneStone, GiMagicShield } from "react-icons/gi";
 import { PiCowFill } from "react-icons/pi";
 import { FaGem, FaTools, FaBriefcaseMedical, FaBook, FaShieldAlt } from "react-icons/fa";
 import { LuHandCoins } from "react-icons/lu";
 import PlusMinus from '../components/PlusMinus';
-import { Button } from 'primereact/button';
+import { IoFastFood  } from "react-icons/io5";
 
 function Settlement({settlement, navigateSettlement}: {settlement: SettlementInterface, navigateSettlement: (name: string) => void}) {
 
@@ -40,7 +40,7 @@ function Settlement({settlement, navigateSettlement}: {settlement: SettlementInt
         } / {settlement.pop_cap}
         </p>
         <div className='flex flex-row gap-3'>
-          <div className='flex flex-column gap-2'>
+        <div className='flex flex-column gap-2'>
             <div className='flex flex-row gap-1'>
               <IoFastFood/>
               {settlement.food_and_water.stock}

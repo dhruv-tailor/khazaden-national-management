@@ -12,7 +12,7 @@ export const newForesters = () => {
         livestock: setGoodInteraction(false, false),
         enchanted_luxuries: setGoodInteraction(false, false),
         timber: setGoodInteraction(false, true),
-        tools: setGoodInteraction(false, false),
+        tools: setGoodInteraction(true, false),
         common_ores: setGoodInteraction(false, false),
         medical_supplies: setGoodInteraction(false, false),
         rare_ores: setGoodInteraction(false, false),
@@ -28,6 +28,7 @@ export const newForesters = () => {
         taxed_productivity: 0,
         goods_produced: 0,
         productivity_rate: 1,
+        loyalty_modifiers: [], 
     }
     return foresters;
 }

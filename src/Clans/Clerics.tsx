@@ -28,6 +28,7 @@ export const newClerics = () => {
         taxed_productivity: 0,
         goods_produced: 0,
         productivity_rate: 4,
+        loyalty_modifiers: [], 
     }
     return clerics;
 }

@@ -19,7 +19,7 @@ export const newRulerClan = () => {
         gems: setGoodInteraction(false, false),
         runes: setGoodInteraction(false, false),
         armaments: setGoodInteraction(false, false),
-        books: setGoodInteraction(false, false),
+        books: setGoodInteraction(true, false),
         enchanted_armaments: setGoodInteraction(false, false),
         enchanted_charcoal: setGoodInteraction(false, false),
         tax_rate: 0.6,
@@ -28,6 +28,7 @@ export const newRulerClan = () => {
         taxed_productivity: 0,
         goods_produced: 0,
         productivity_rate: 8,
+        loyalty_modifiers: [], 
     }
     return rulers;
 }

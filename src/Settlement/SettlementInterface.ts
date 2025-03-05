@@ -277,18 +277,18 @@ const setTaxedProductivity = (settlement: SettlementInterface) => {
     settlement.foresters.taxed_productivity = calcTaxedProductivity(settlement.foresters,settlement)
     settlement.criminals.taxed_productivity = calcTaxedProductivity(settlement.criminals,settlement)
     
-    settlement.rulers.goods_produced = settlement.rulers.taxed_productivity * 0.25
-    settlement.archivists.goods_produced = settlement.archivists.taxed_productivity * 0.25
-    settlement.engineers.goods_produced = settlement.engineers.taxed_productivity * 0.25
-    settlement.rune_smiths.goods_produced = settlement.rune_smiths.taxed_productivity * 0.25
-    settlement.craftsmen.goods_produced = settlement.craftsmen.taxed_productivity * 0.25
-    settlement.merchants.goods_produced = settlement.merchants.taxed_productivity * 0.25
-    settlement.clerics.goods_produced = settlement.clerics.taxed_productivity * 0.25
-    settlement.miners.goods_produced = settlement.miners.taxed_productivity * 0.25
-    settlement.farmers.goods_produced = settlement.farmers.taxed_productivity * 0.25
-    settlement.warriors.goods_produced = settlement.warriors.taxed_productivity * 0.25
-    settlement.foresters.goods_produced = settlement.foresters.taxed_productivity * 0.25
-    settlement.criminals.goods_produced = settlement.criminals.taxed_productivity * 0.25
+    settlement.rulers.goods_produced = Math.round(settlement.rulers.taxed_productivity * 0.25)
+    settlement.archivists.goods_produced = Math.round(settlement.archivists.taxed_productivity * 0.25)
+    settlement.engineers.goods_produced = Math.round(settlement.engineers.taxed_productivity * 0.25)
+    settlement.rune_smiths.goods_produced = Math.round(settlement.rune_smiths.taxed_productivity * 0.25)
+    settlement.craftsmen.goods_produced = Math.round(settlement.craftsmen.taxed_productivity * 0.25)
+    settlement.merchants.goods_produced = Math.round(settlement.merchants.taxed_productivity * 0.25)
+    settlement.clerics.goods_produced = Math.round(settlement.clerics.taxed_productivity * 0.25)
+    settlement.miners.goods_produced = Math.round(settlement.miners.taxed_productivity * 0.25)
+    settlement.farmers.goods_produced = Math.round(settlement.farmers.taxed_productivity * 0.25)
+    settlement.warriors.goods_produced = Math.round(settlement.warriors.taxed_productivity * 0.25)
+    settlement.foresters.goods_produced = Math.round(settlement.foresters.taxed_productivity * 0.25)
+    settlement.criminals.goods_produced = Math.round(settlement.criminals.taxed_productivity * 0.25)
 }
 
 const calcTaxedProductivity = (clan: ClanInterface, settlement: SettlementInterface) : number => {
@@ -335,7 +335,11 @@ const calcLoylaty = (clan: ClanInterface, settlement: SettlementInterface): numb
         loyalty += 1 - ensureNumber(settlement.enchanted_luxuries.deficit / settlement.enchanted_luxuries.consumption_rate)
         total_goods_counted += 1
     }
-    loyalty /= total_goods_counted * 6
+    loyalty = ensureNumber(loyalty / total_goods_counted)
+    loyalty *= 6
+    clan.loyalty_modifiers.forEach(modifier => {
+        loyalty += modifier.value
+    })
     loyalty = Math.floor(Math.max(0,taxation_modifier + loyalty))
     loyalty = Math.min(10,loyalty)
     return loyalty;
@@ -387,6 +391,10 @@ const calcEfficency = (clan: ClanInterface, settlement: SettlementInterface): nu
         efficency += 1 - ensureNumber(settlement.gems.deficit / settlement.gems.consumption_rate)
         total_goods_counted += 1
     }
+    if(clan.livestock.is_consumed) {
+        efficency += 1 - ensureNumber(settlement.livestock.deficit / settlement.livestock.consumption_rate)
+        total_goods_counted += 1
+    }
     if(clan.runes.is_consumed) {
         efficency += 1 - ensureNumber(settlement.runes.deficit / settlement.runes.consumption_rate)
         total_goods_counted += 1
@@ -407,9 +415,9 @@ const calcEfficency = (clan: ClanInterface, settlement: SettlementInterface): nu
         efficency += 1 - ensureNumber(settlement.enchanted_charcoal.deficit / settlement.enchanted_charcoal.consumption_rate)
         total_goods_counted += 1
     }
-    console.log(efficency)
-    efficency /= ensureNumber(total_goods_counted * 5)
-    efficency = Math.max(efficency,0)
+    efficency = ensureNumber(efficency / total_goods_counted)
+    efficency *= 5
+    efficency = Math.max(efficency + 1,0)
     efficency = Math.floor(efficency)
     return efficency;
 }

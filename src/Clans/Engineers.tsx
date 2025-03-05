@@ -28,6 +28,7 @@ export const newEngineers = () => {
         taxed_productivity: 0,
         goods_produced: 0,
         productivity_rate: 6,
+        loyalty_modifiers: [], 
     }
     return engineers;
 }
