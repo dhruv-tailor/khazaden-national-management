@@ -1,6 +1,9 @@
+import { clans } from "../Goods/good";
+
 export interface ClanInterface {
     name: string;
     population: number;
+    id: clans;
     
     // Consumption and Production
     food_and_water: goodInteraction;
@@ -65,6 +68,7 @@ const emptyGoodInteraction: goodInteraction = {
 export const emptyClanInterface: ClanInterface = {
     name: '',
     population: 0,
+    id: clans.archivists,
     food_and_water: emptyGoodInteraction,
     beer: emptyGoodInteraction,
     leather_and_textiles: emptyGoodInteraction,

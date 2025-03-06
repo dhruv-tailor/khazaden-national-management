@@ -10,10 +10,21 @@ import GoodAllocator from "./GoodAllocator";
 import { GiBeerStein, GiClothes, GiCoalWagon, GiCrystalBall, GiGems, GiMagicShield, GiPouringChalice, GiRuneStone, GiThrownCharcoal, GiWoodPile } from "react-icons/gi";
 import { PiCowFill } from "react-icons/pi";
 import { LuHandCoins } from "react-icons/lu";
-import { Button } from "primereact/button";
+import { saveLocation } from "../../utilities/SaveData";
+import { useParams } from "react-router";
+import { SettlementInterface } from "../SettlementInterface";
+import { load } from "@tauri-apps/plugin-store";
+import { clans } from "../../Goods/good";
 
 
-export default function ClanInfo({clan,icon}: {clan: ClanInterface,icon:ReactNode}) {
+export default function ClanInfo(
+    {clan,icon,resources,updateParent}: 
+    {
+        clan: ClanInterface,
+        icon:ReactNode,
+        resources: number[],
+        updateParent: () => Promise<void>
+    }) {
     const [goodsAssigned, setGoodsAssigned] = useState<number>(0);
     const [food,setFood] = useState<number>(clan.food_and_water.produced);
     const [beer,setBeer] = useState<number>(clan.beer.produced);
@@ -34,6 +45,9 @@ export default function ClanInfo({clan,icon}: {clan: ClanInterface,icon:ReactNod
     const [enchantedArms,setEnchantedArms] = useState<number>(clan.enchanted_armaments.produced);
     const [charcoal,setCharcoal] = useState<number>(clan.enchanted_charcoal.produced);
 
+    const gameId = useParams().game
+    const settlementId = useParams().settlement
+
 
     const header = (
         <div className="flex flex-row gap-1">
@@ -47,10 +61,13 @@ export default function ClanInfo({clan,icon}: {clan: ClanInterface,icon:ReactNod
         assigned += luxuries + timber + tools + commonOres + rareOres + medical
         assigned += gems + runes + arms + books + enchantedArms + charcoal
         setGoodsAssigned(clan.goods_produced - assigned)
+        updateSave();
+        
     }
 
     useEffect(() => {
         unassignedGoods()
+        updateParent();
     },
     [food, beer, leather, artisanal, ornamental, livestock, 
         luxuries, timber, tools, commonOres, rareOres, medical, 
@@ -61,6 +78,54 @@ export default function ClanInfo({clan,icon}: {clan: ClanInterface,icon:ReactNod
     },[])
 
     const valueTemplate = (value: number) => (<>{value / 10}</>)
+
+    const updateSave = async () => {
+        const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
+        const settlments = (await store.get<SettlementInterface[]>('settlements') ?? [])
+        settlments.forEach(settle => {
+            if(settle.name !== (settlementId ?? '')) {return}
+            if (clan.id === clans.archivists) {
+                settle.archivists.books.produced = books
+            }
+            else if (clan.id === clans.runeSmiths) {
+                settle.rune_smiths.enchanted_luxuries.produced = luxuries
+                settle.rune_smiths.runes.produced = runes
+                settle.rune_smiths.enchanted_armaments.produced = enchantedArms
+            }
+            else if (clan.id === clans.craftsmen) {
+                settle.craftsmen.artisanal_goods.produced = artisanal
+                settle.craftsmen.ornamental_luxuries.produced = ornamental
+                settle.craftsmen.tools.produced = tools
+                settle.craftsmen.armaments.produced = arms
+            }
+            else if (clan.id === clans.clerics) {
+                settle.clerics.medical_supplies.produced = medical
+                settle.clerics.books.produced = books
+            }
+            else if (clan.id === clans.miners) {
+                settle.miners.common_ores.produced = commonOres
+                settle.miners.rare_ores.produced = rareOres
+                settle.miners.gems.produced = gems
+            }
+            else if (clan.id === clans.farmers) {
+                settle.farmers.food_and_water.produced = food
+                settle.farmers.beer.produced = beer
+                settle.farmers.leather_and_textiles.produced = leather
+                settle.farmers.livestock.produced = livestock
+            }
+            else if (clan.id === clans.foresters) {
+                settle.foresters.food_and_water.produced = food
+                settle.foresters.artisanal_goods.produced = artisanal
+                settle.foresters.timber.produced = timber
+                settle.foresters.enchanted_charcoal.produced = charcoal
+            }
+        })
+        store.set('settlements', settlments);
+        await store.save();
+    }
+
+    // const footer = (<Button label="Save Changes" icon="pi pi-check" size="small" onClick={updateSave}/>)
+
 
     return(
         <>
@@ -80,20 +145,22 @@ export default function ClanInfo({clan,icon}: {clan: ClanInterface,icon:ReactNod
             </div>
 
             <div className="flex flex-column gap-2">
-                <p>Unassigned Production: {goodsAssigned}</p>
+                {goodsAssigned !== 0 ? <p>Unassigned Production: {goodsAssigned}</p> : null}
                 <div className="flex flex-row flex-wrap gap-2">
                     {clan.food_and_water.is_produced ? 
                         <GoodAllocator
                             capacity={goodsAssigned} 
                             assigned={food} 
                             setter={setFood} 
+                            natCap={resources[0]}
                             icon={<IoFastFood/>}
                             /> : null}
                     {clan.beer.is_produced ? 
                         <GoodAllocator
                             capacity={goodsAssigned} 
                             assigned={beer} 
-                            setter={setBeer} 
+                            setter={setBeer}
+                            natCap={resources[1]}
                             icon={<GiBeerStein/>}
                             /> : null}
                     {clan.leather_and_textiles.is_produced ? 
@@ -101,6 +168,7 @@ export default function ClanInfo({clan,icon}: {clan: ClanInterface,icon:ReactNod
                             capacity={goodsAssigned} 
                             assigned={leather} 
                             setter={setLeather} 
+                            natCap={resources[2]}
                             icon={<GiClothes/>}
                             /> : null}
                     {clan.artisanal_goods.is_produced ? 
@@ -115,6 +183,7 @@ export default function ClanInfo({clan,icon}: {clan: ClanInterface,icon:ReactNod
                             capacity={goodsAssigned} 
                             assigned={livestock} 
                             setter={setLivestock} 
+                            natCap={resources[3]}
                             icon={<PiCowFill/>}
                             /> : null}
                     {clan.ornamental_luxuries.is_produced ? 
@@ -136,6 +205,7 @@ export default function ClanInfo({clan,icon}: {clan: ClanInterface,icon:ReactNod
                             capacity={goodsAssigned} 
                             assigned={timber} 
                             setter={setTimber} 
+                            natCap={resources[4]}
                             icon={<GiWoodPile/>}
                             /> : null}
                     {clan.tools.is_produced ? 
@@ -150,6 +220,7 @@ export default function ClanInfo({clan,icon}: {clan: ClanInterface,icon:ReactNod
                             capacity={goodsAssigned} 
                             assigned={commonOres} 
                             setter={setCommonOres} 
+                            natCap={resources[6]}
                             icon={<GiCoalWagon/>}
                             /> : null}
                     {clan.medical_supplies.is_produced ? 
@@ -164,6 +235,7 @@ export default function ClanInfo({clan,icon}: {clan: ClanInterface,icon:ReactNod
                             capacity={goodsAssigned} 
                             assigned={rareOres} 
                             setter={setRareOres} 
+                            natCap={resources[8]}
                             icon={<FaGem/>}
                             /> : null}
                     {clan.gems.is_produced ? 
@@ -171,6 +243,7 @@ export default function ClanInfo({clan,icon}: {clan: ClanInterface,icon:ReactNod
                             capacity={goodsAssigned} 
                             assigned={gems} 
                             setter={setGems} 
+                            natCap={resources[7]}
                             icon={<GiGems/>}
                             /> : null}
                     {clan.runes.is_produced ? 
@@ -206,12 +279,12 @@ export default function ClanInfo({clan,icon}: {clan: ClanInterface,icon:ReactNod
                             capacity={goodsAssigned} 
                             assigned={charcoal} 
                             setter={setCharcoal} 
+                            natCap={resources[5]}
                             icon={<GiThrownCharcoal/>}
                             /> : null}
                 </div>
-                {goodsAssigned === 0  ? <Button label="Save Changes" size="small" icon="pi pi-check"/>: null}
+                
             </div>
-
         </Card>
         </>
     )

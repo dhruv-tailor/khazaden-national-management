@@ -1,9 +1,11 @@
+import { clans } from "../Goods/good";
 import { ClanInterface, setGoodInteraction } from "./ClanInterface";
 
 export const newForesters = () => {
     let foresters: ClanInterface = {
         name: 'Foresters',
         population: 0,
+        id: clans.foresters,
         food_and_water: setGoodInteraction(true, true),
         beer: setGoodInteraction(true, false),
         leather_and_textiles: setGoodInteraction(true, false),

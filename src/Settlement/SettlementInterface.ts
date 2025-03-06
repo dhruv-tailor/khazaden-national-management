@@ -149,7 +149,7 @@ export const newSettlement = (name: string, terrain_type: TerrainType) => {
             deficit: 0,
         },
         artisinal_goods: {
-            production_cap: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].food_and_water_balancing),
+            production_cap: -1,
             stock: 0,
             consumption_rate: 0,
             deficit: 0,
@@ -162,13 +162,13 @@ export const newSettlement = (name: string, terrain_type: TerrainType) => {
             deficit: 0,
         },
         ornamental_luxuries:{
-            production_cap: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].livestock_balancing),
+            production_cap: -1,
             stock: 0,
             consumption_rate: 0,
             deficit: 0,
         },
         enchanted_luxuries: {
-            production_cap: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].livestock_balancing),
+            production_cap: -1,
             stock: 0,
             consumption_rate: 0,
             deficit: 0,
@@ -180,7 +180,7 @@ export const newSettlement = (name: string, terrain_type: TerrainType) => {
             deficit: 0,
         },
         tools: {
-            production_cap: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].livestock_balancing),
+            production_cap: -1,
             stock: 0,
             consumption_rate: 0,
             deficit: 0,
@@ -198,7 +198,7 @@ export const newSettlement = (name: string, terrain_type: TerrainType) => {
             deficit: 0,
         },
         medical_supplies: {
-            production_cap: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].livestock_balancing),
+            production_cap: -1,
             stock: 0,
             consumption_rate: 0,
             deficit: 0,
@@ -216,25 +216,25 @@ export const newSettlement = (name: string, terrain_type: TerrainType) => {
             deficit: 0,
         },
         books: {
-            production_cap: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].livestock_balancing),
+            production_cap: -1,
             stock: 0,
             consumption_rate: 0,
             deficit: 0,
         },
         runes: {
-            production_cap: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].livestock_balancing),
+            production_cap: -1,
             stock: 0,
             consumption_rate: 0,
             deficit: 0,
         },
         armaments: {
-            production_cap: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].livestock_balancing),
+            production_cap: -1,
             stock: 0,
             consumption_rate: 0,
             deficit: 0,
         },
         enchanted_armaments: {
-            production_cap: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].livestock_balancing),
+            production_cap: -1,
             stock: 0,
             consumption_rate: 0,
             deficit: 0,
