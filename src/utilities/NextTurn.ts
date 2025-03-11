@@ -152,7 +152,52 @@ export const NextTurn = async (game: string) => {
         updateGoodsProduction(settlement)
 
         // Validate that there's no overproduction
-        
+        if (settlement.archivists.books.produced > settlement.archivists.goods_produced) {
+            settlement.archivists.books.produced = settlement.archivists.goods_produced
+        }
+        if ((settlement.rune_smiths.enchanted_luxuries.produced + settlement.rune_smiths.runes.produced + settlement.rune_smiths.enchanted_armaments.produced) > settlement.rune_smiths.goods_produced) {
+            const total = (settlement.rune_smiths.enchanted_luxuries.produced + settlement.rune_smiths.runes.produced + settlement.rune_smiths.enchanted_armaments.produced)
+            settlement.rune_smiths.enchanted_luxuries.produced = Math.floor((settlement.rune_smiths.enchanted_luxuries.produced/total) * settlement.rune_smiths.goods_produced)
+            settlement.rune_smiths.runes.produced = Math.floor((settlement.rune_smiths.runes.produced / total) * settlement.rune_smiths.goods_produced)
+            settlement.rune_smiths.enchanted_armaments.produced = Math.floor((settlement.rune_smiths.enchanted_armaments.produced/total) * settlement.rune_smiths.goods_produced)
+        }
+        if ((settlement.craftsmen.artisanal_goods.produced + settlement.craftsmen.ornamental_luxuries.produced + settlement.craftsmen.tools.produced + settlement.craftsmen.armaments.produced) > settlement.craftsmen.goods_produced) {
+            const total = (settlement.craftsmen.artisanal_goods.produced + settlement.craftsmen.ornamental_luxuries.produced + settlement.craftsmen.tools.produced + settlement.craftsmen.armaments.produced)
+            const max = settlement.craftsmen.goods_produced
+            settlement.craftsmen.artisanal_goods.produced = Math.floor((settlement.craftsmen.artisanal_goods.produced/total) * max)
+            settlement.craftsmen.ornamental_luxuries.produced = Math.floor((settlement.craftsmen.ornamental_luxuries.produced/total) * max)
+            settlement.craftsmen.tools.produced = Math.floor((settlement.craftsmen.tools.produced/total) * max)
+            settlement.craftsmen.armaments.produced = Math.floor((settlement.craftsmen.armaments.produced/total) * max)
+        }
+        if((settlement.clerics.medical_supplies.produced + settlement.clerics.books.produced) > settlement.clerics.goods_produced) {
+            const total = (settlement.clerics.medical_supplies.produced + settlement.clerics.books.produced)
+            const max = settlement.clerics.goods_produced
+            settlement.clerics.medical_supplies.produced = Math.floor((settlement.clerics.medical_supplies.produced/total)*max)
+            settlement.clerics.books.produced = Math.floor((settlement.clerics.books.produced/total)*max)
+        }
+        if((settlement.miners.common_ores.produced + settlement.miners.rare_ores.produced + settlement.miners.gems.produced) > settlement.miners.goods_produced){
+            const total = (settlement.miners.common_ores.produced + settlement.miners.rare_ores.produced + settlement.miners.gems.produced)
+            const max = settlement.miners.goods_produced
+            settlement.miners.common_ores.produced = Math.floor((settlement.miners.common_ores.produced/total)*max)
+            settlement.miners.rare_ores.produced = Math.floor((settlement.miners.rare_ores.produced/total)*max)
+            settlement.miners.gems.produced = Math.floor((settlement.miners.gems.produced/total)*max)
+        }
+        if((settlement.farmers.food_and_water.produced + settlement.farmers.beer.produced + settlement.farmers.leather_and_textiles.produced + settlement.farmers.livestock.produced) > settlement.farmers.goods_produced) {
+            const total = (settlement.farmers.food_and_water.produced + settlement.farmers.beer.produced + settlement.farmers.leather_and_textiles.produced + settlement.farmers.livestock.produced)
+            const max = settlement.farmers.goods_produced
+            settlement.farmers.food_and_water.produced = Math.floor((settlement.farmers.food_and_water.produced/total)*max)
+            settlement.farmers.beer.produced = Math.floor((settlement.farmers.beer.produced/total)*max)
+            settlement.farmers.leather_and_textiles.produced = Math.floor((settlement.farmers.leather_and_textiles.produced/total)*max)
+            settlement.farmers.livestock.produced = Math.floor((settlement.farmers.livestock.produced/total)*max)
+        }
+        if((settlement.foresters.food_and_water.produced + settlement.foresters.artisanal_goods.produced + settlement.foresters.timber.produced + settlement.foresters.enchanted_charcoal.produced) > settlement.foresters.goods_produced){
+            const total = (settlement.foresters.food_and_water.produced + settlement.foresters.artisanal_goods.produced + settlement.foresters.timber.produced + settlement.foresters.enchanted_charcoal.produced)
+            const max = settlement.foresters.goods_produced
+            settlement.foresters.food_and_water.produced = Math.floor((settlement.foresters.food_and_water.produced/total)*max)
+            settlement.foresters.artisanal_goods.produced = Math.floor((settlement.foresters.artisanal_goods.produced/total)*max)
+            settlement.foresters.timber.produced = Math.floor((settlement.foresters.timber.produced/total)*max)
+            settlement.foresters.enchanted_charcoal.produced = Math.floor((settlement.foresters.enchanted_charcoal.produced/total)*max)
+        }
 
     })
     store.set('settlements',settlements)
