@@ -31,6 +31,7 @@ export const newRuneSmiths = () => {
         goods_produced: 0,
         productivity_rate: 5,
         loyalty_modifiers: [], 
+        total_productivity: 0,
     }
 
     runeSmiths.rare_ores.consumption_rate = 5

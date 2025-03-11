@@ -15,6 +15,9 @@ import { useParams } from "react-router";
 import { SettlementInterface } from "../SettlementInterface";
 import { load } from "@tauri-apps/plugin-store";
 import { clans } from "../../Goods/good";
+import { Slider } from 'primereact/slider';
+import { InputText } from "primereact/inputtext";
+import { Divider } from 'primereact/divider';
 
 
 export default function ClanInfo(
@@ -44,6 +47,7 @@ export default function ClanInfo(
     const [books,setBooks] = useState<number>(clan.books.produced);
     const [enchantedArms,setEnchantedArms] = useState<number>(clan.enchanted_armaments.produced);
     const [charcoal,setCharcoal] = useState<number>(clan.enchanted_charcoal.produced);
+    const [taxRate, setTaxRate] = useState<number>(clan.tax_rate)
 
     const gameId = useParams().game
     const settlementId = useParams().settlement
@@ -76,6 +80,11 @@ export default function ClanInfo(
     useEffect(() => {
         unassignedGoods()
     },[])
+
+    useEffect(() => {
+        updateFinances()
+        updateParent()
+    },[taxRate])
 
     const valueTemplate = (value: number) => (<>{value / 10}</>)
 
@@ -124,6 +133,27 @@ export default function ClanInfo(
         await store.save();
     }
 
+    const updateFinances = async () => {
+        const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
+        const settlments = (await store.get<SettlementInterface[]>('settlements') ?? [])
+        settlments.forEach(settle => {
+            if(settle.name !== (settlementId ?? '')) {return}
+            if ( clan.id === clans.rulers ) {settle.rulers.tax_rate = taxRate}
+            else if (clan.id === clans.archivists) {settle.archivists.tax_rate = taxRate}
+            else if (clan.id === clans.engineers) {settle.engineers.tax_rate = taxRate}
+            else if (clan.id === clans.runeSmiths) {settle.rune_smiths.tax_rate = taxRate}
+            else if (clan.id === clans.craftsmen) { settle.craftsmen.tax_rate = taxRate }
+            else if (clan.id === clans.merchants) {settle.merchants.tax_rate = taxRate}
+            else if (clan.id === clans.clerics) { settle.clerics.tax_rate = taxRate }
+            else if (clan.id === clans.miners) { settle.miners.tax_rate = taxRate }
+            else if (clan.id === clans.farmers) { settle.farmers.tax_rate = taxRate }
+            else if (clan.id === clans.warriors) { settle.warriors.tax_rate = taxRate }
+            else if (clan.id === clans.foresters) { settle.foresters.tax_rate = taxRate }
+        })
+        store.set('settlements', settlments);
+        await store.save();
+    }
+
     // const footer = (<Button label="Save Changes" icon="pi pi-check" size="small" onClick={updateSave}/>)
 
 
@@ -143,9 +173,17 @@ export default function ClanInfo(
                 <FaGear /> Efficency
                 <ProgressBar value={clan.efficency * 10} displayValueTemplate={valueTemplate}></ProgressBar>
             </div>
+            <Divider />
+            <div>
+                <label htmlFor="tax-rate">Tax Rate</label>
+                <InputText id="tax-rate" value={Math.round((taxRate * 100)).toString()}/>
+                <Slider value={taxRate * 100} onChange={(e) => setTaxRate((e.value as number)/100)} step={1}/>
+            </div>
+
+            <Divider />
 
             <div className="flex flex-column gap-2">
-                {goodsAssigned !== 0 ? <p>Unassigned Production: {goodsAssigned}</p> : null}
+            Unassigned Production: {goodsAssigned}
                 <div className="flex flex-row flex-wrap gap-2">
                     {clan.food_and_water.is_produced ? 
                         <GoodAllocator

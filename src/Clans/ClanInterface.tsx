@@ -35,6 +35,7 @@ export interface ClanInterface {
     taxed_productivity: number;
     goods_produced: number;
     productivity_rate: number;
+    total_productivity: number;
 }
 
 interface modifier {
@@ -98,4 +99,5 @@ export const emptyClanInterface: ClanInterface = {
     goods_produced: 0,
     productivity_rate: 0,
     loyalty_modifiers: [],
+    total_productivity: 0,
 }

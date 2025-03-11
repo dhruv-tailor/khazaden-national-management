@@ -4,6 +4,8 @@ import Settlement from "./Settlement/Settlement";
 import { useNavigate, useParams } from "react-router";
 import { load } from "@tauri-apps/plugin-store";
 import { saveLocation } from "./utilities/SaveData";
+import { Button } from "primereact/button";
+import { NextTurn } from "./utilities/NextTurn";
 
 function Game() {
     const gameId = useParams().game;
@@ -27,11 +29,19 @@ function Game() {
         getSettlements();
     }, []);
 
+    const processNextTurn = async () => {
+        await NextTurn(gameId ?? '');
+        getSettlements();
+    }
+
     return (
-        <div>
-            <h1>{settlements.map(settlement => {
-                return <Settlement key={settlement.name} settlement={settlement} navigateSettlement={navigateSettlement}/>
-            })}</h1>
+        <div className="flex flex-column gap-2">
+            <Button label="Next Turn" onClick={processNextTurn} size="small" icon="pi pi-angle-double-right"/>
+            <div className="flex flex-row flex-wrap">
+                {settlements.map(settlement => {
+                    return <Settlement key={settlement.name} settlement={settlement} navigateSettlement={navigateSettlement}/>
+                })}
+            </div>
         </div>
     );
 }

@@ -19,6 +19,8 @@ export interface SettlementInterface {
     terrain_type: TerrainType;
     pop_cap: number;
     tier: SettlementTier;
+    finance_points: number;
+    projected_pop: number;
 
     food_and_water: settlementGoodsInfo;
     beer: settlementGoodsInfo;
@@ -77,9 +79,11 @@ const emptySettlementGoodsInfo: settlementGoodsInfo = {
 
 export const emptySettlement: SettlementInterface = {
     name: '',
+    finance_points: 0,
     terrain_type: TerrainType.Enchanted_Forest,
     pop_cap: 0,
     tier: SettlementTier.City,
+    projected_pop: 0,
 
     food_and_water: emptySettlementGoodsInfo,
     beer: emptySettlementGoodsInfo,
@@ -129,6 +133,8 @@ export const newSettlement = (name: string, terrain_type: TerrainType) => {
         name: name,
         terrain_type: terrain_type,
         tier: SettlementTier.Hamlet,
+        finance_points: 0,
+        projected_pop: 0,
         pop_cap: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].reference_pop_cap),
         food_and_water: {
             production_cap: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].food_and_water_balancing),
@@ -261,6 +267,26 @@ export const updateGoodsProduction = (settlement: SettlementInterface) => {
     setLoyalties(settlement)
     setEfficency(settlement)
     setTaxedProductivity(settlement)
+    setTotalProductivity(settlement)
+}
+
+const setTotalProductivity = (settlement: SettlementInterface) => {
+    settlement.rulers.total_productivity = calcTotalProductivity(settlement.rulers)
+    settlement.archivists.total_productivity = calcTotalProductivity(settlement.archivists)
+    settlement.engineers.total_productivity = calcTotalProductivity(settlement.engineers)
+    settlement.rune_smiths.total_productivity = calcTotalProductivity(settlement.rune_smiths)
+    settlement.craftsmen.total_productivity = calcTotalProductivity(settlement.craftsmen)
+    settlement.merchants.total_productivity = calcTotalProductivity(settlement.merchants)
+    settlement.clerics.total_productivity = calcTotalProductivity(settlement.clerics)
+    settlement.miners.total_productivity = calcTotalProductivity(settlement.miners)
+    settlement.farmers.total_productivity = calcTotalProductivity(settlement.farmers)
+    settlement.warriors.total_productivity = calcTotalProductivity(settlement.warriors)
+    settlement.foresters.total_productivity = calcTotalProductivity(settlement.foresters)
+    settlement.criminals.total_productivity = calcTotalProductivity(settlement.criminals)
+}
+
+const calcTotalProductivity = (clan: ClanInterface): number => {
+    return Math.round(((clan.loyalty + clan.efficency)/20) * 40 * clan.productivity_rate * clan.population)
 }
 
 const setTaxedProductivity = (settlement: SettlementInterface) => {
@@ -425,4 +451,43 @@ const calcEfficency = (clan: ClanInterface, settlement: SettlementInterface): nu
 
 const tierModifier = (tier: SettlementTier) => {
     return (2 ** (tier - 1))
+}
+
+export const popGrowth = (settlement: SettlementInterface) => {
+    const K = settlement.projected_pop
+    const P0 = (settlement.archivists.population + 
+        settlement.clerics.population +
+        settlement.craftsmen.population +
+        settlement.criminals.population +
+        settlement.engineers.population +
+        settlement.farmers.population +
+        settlement.foresters.population +
+        settlement.merchants.population +
+        settlement.miners.population +
+        settlement.rulers.population +
+        settlement.rune_smiths.population +
+        settlement.warriors.population)
+    let gained_pg = (
+        (settlement.archivists.total_productivity - settlement.archivists.taxed_productivity) + 
+        (settlement.clerics.total_productivity - settlement.clerics.taxed_productivity) +
+        (settlement.craftsmen.total_productivity - settlement.craftsmen.taxed_productivity) +
+        (settlement.criminals.total_productivity - settlement.criminals.taxed_productivity) +
+        (settlement.engineers.total_productivity - settlement.engineers.taxed_productivity) +
+        (settlement.farmers.total_productivity - settlement.farmers.taxed_productivity) +
+        (settlement.foresters.total_productivity - settlement.foresters.taxed_productivity) +
+        (settlement.merchants.total_productivity - settlement.merchants.taxed_productivity) +
+        (settlement.miners.total_productivity - settlement.miners.taxed_productivity) +
+        (settlement.rulers.total_productivity - settlement.rulers.taxed_productivity) +
+        (settlement.rune_smiths.total_productivity - settlement.rune_smiths.taxed_productivity) +
+        (settlement.warriors.total_productivity - settlement.warriors.taxed_productivity)) * 0.7 * 0.7
+    // Slower growth from starving Civilians
+    gained_pg *= Math.max(0,1 - (settlement.food_and_water.deficit/settlement.food_and_water.consumption_rate))
+    // Pops dying from starving
+    gained_pg -= Math.round(0.1 * (settlement.food_and_water.deficit/settlement.food_and_water.consumption_rate) / 75 * P0)
+    // Hard Coded Immigration
+    const MGM = 0.025
+    const avg_growth = P0 * 17.5226452905812 - 113.226452905812
+
+    const pop_final = (settlement.pop_cap * K * Math.exp(MGM*gained_pg/avg_growth))/(settlement.pop_cap + K * (Math.exp(MGM * gained_pg/avg_growth)-1))
+    settlement.projected_pop = pop_final
 }

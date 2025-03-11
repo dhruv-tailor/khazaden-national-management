@@ -31,6 +31,7 @@ export const newMiners = () => {
         goods_produced: 0,
         productivity_rate: 3,
         loyalty_modifiers: [],
+        total_productivity: 0,
     }
     return miners;
 }

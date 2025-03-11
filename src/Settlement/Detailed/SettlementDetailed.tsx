@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Panel } from "primereact/panel";
 import ClanInfo from "./ClanInfo";
 import { BiSolidCrown } from "react-icons/bi";
-import { FaArchive, FaGem, FaHammer  } from "react-icons/fa";
+import { FaArchive, FaCoins, FaGem, FaHammer  } from "react-icons/fa";
 import { MdEngineering, MdChurch } from "react-icons/md";
 import { GiBlacksmith, GiFarmer, GiAxeInStump, GiBeerStein, GiWoodPile, GiThrownCharcoal, GiCoalWagon, GiGems, GiClothes } from "react-icons/gi";
 import { TbMoneybag, TbPick } from "react-icons/tb";
@@ -16,6 +16,7 @@ import { LuSword } from "react-icons/lu";
 import { Button } from "primereact/button";
 import { IoFastFood } from "react-icons/io5";
 import { PiCowFill } from "react-icons/pi";
+import PlusMinus from "../../components/PlusMinus";
 
 export default function SettlementDetailed() {
     const gameId = useParams().game
@@ -71,6 +72,26 @@ export default function SettlementDetailed() {
                 <Button label={'Back to All Settlements'} icon="pi pi-arrow-left" size='small' onClick={goBack}/>
 
                 <div className="flex flex-row gap-2">
+
+                    <Panel header={'Finances'} toggleable>
+                        <div className="flex flex-row gap-1">
+                            <FaCoins/>
+                            {settlement.finance_points}
+                            <PlusMinus value={
+                                Math.round((settlement.rulers.tax_rate * settlement.rulers.taxed_productivity) +
+                                (settlement.archivists.tax_rate * settlement.archivists.taxed_productivity) +
+                                (settlement.engineers.tax_rate * settlement.engineers.taxed_productivity) +
+                                (settlement.rune_smiths.tax_rate * settlement.rune_smiths.taxed_productivity) +
+                                (settlement.craftsmen.tax_rate * settlement.craftsmen.taxed_productivity) +
+                                (settlement.merchants.tax_rate * settlement.merchants.taxed_productivity) +
+                                (settlement.clerics.tax_rate * settlement.clerics.taxed_productivity) +
+                                (settlement.miners.tax_rate * settlement.miners.taxed_productivity) +
+                                (settlement.farmers.tax_rate * settlement.farmers.taxed_productivity) +
+                                (settlement.warriors.tax_rate * settlement.warriors.taxed_productivity) +
+                                (settlement.foresters.tax_rate * settlement.foresters.taxed_productivity))
+                            }/>
+                        </div>
+                    </Panel>
 
                     <Panel header={'Current resources'} toggleable>
                         <ShowAllGoods settlement={settlement}/>

@@ -9,7 +9,7 @@ export default function ShowGood({stock,consumption,icon}: {stock: number, consu
             <div className='flex flex-row gap-1'>
                 {icon}
                 {stock}
-                <PlusMinus value={-consumption}/>
+                <PlusMinus value={consumption}/>
             </div> : null
         }
         </>

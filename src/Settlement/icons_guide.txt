@@ -33,3 +33,5 @@ RiCriminalFill = criminals
 
 FaHeart = loyalty
 FaGear = Efficency
+
+FaCoins = Finanace Points

@@ -31,6 +31,7 @@ export const newCraftsmen = () => {
         goods_produced: 0,
         productivity_rate: 5,
         loyalty_modifiers: [], 
+        total_productivity: 0,
     }
 
     craftsmen.common_ores.consumption_rate = 5

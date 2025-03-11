@@ -75,6 +75,9 @@ export const createNewSave = async (saveName: string)  => {
     initial_settlement.farmers.population = 6
     // good productions
     updateGoodsProduction(initial_settlement)
+    // Finances
+    initial_settlement.finance_points = 2000
+    initial_settlement.projected_pop = 10
     
     store.set('settlements', [initial_settlement]);
     await store.save();
