@@ -5,9 +5,10 @@ import { popGrowth, SettlementInterface, updateGoodsProduction } from "../Settle
 export const NextTurn = async (game: string) => {
     const store = await load(await saveLocation(game), {autoSave: false});
     const settlements = await store.get<SettlementInterface[]>('settlements');
+    let federal_finance = (await store.get<number>('Finance Points')) ?? 0;
     settlements?.forEach(settlement =>{
         // First update Taxation gained
-        settlement.finance_points += Math.round((settlement.rulers.tax_rate * settlement.rulers.taxed_productivity) +
+        const baseTax = Math.round((settlement.rulers.tax_rate * settlement.rulers.taxed_productivity) +
         (settlement.archivists.tax_rate * settlement.archivists.taxed_productivity) +
         (settlement.engineers.tax_rate * settlement.engineers.taxed_productivity) +
         (settlement.rune_smiths.tax_rate * settlement.rune_smiths.taxed_productivity) +
@@ -18,7 +19,10 @@ export const NextTurn = async (game: string) => {
         (settlement.farmers.tax_rate * settlement.farmers.taxed_productivity) +
         (settlement.warriors.tax_rate * settlement.warriors.taxed_productivity) +
         (settlement.foresters.tax_rate * settlement.foresters.taxed_productivity))
-        console.log(settlement.finance_points)
+
+        // The Federal Government Takes its cut
+        settlement.finance_points += Math.round(baseTax * (1 - settlement.settlment_tax))
+        federal_finance += Math.round((baseTax * settlement.settlment_tax))
 
         // Update Goods Stocked
         settlement.food_and_water.stock += settlement.farmers.food_and_water.produced + settlement.foresters.food_and_water.produced - settlement.food_and_water.consumption_rate
@@ -114,7 +118,6 @@ export const NextTurn = async (game: string) => {
 
         // Calculate Pop Growth
         popGrowth(settlement)
-        console.log(settlement.projected_pop)
 
         const P0 = (settlement.archivists.population + 
             settlement.clerics.population +
@@ -201,5 +204,6 @@ export const NextTurn = async (game: string) => {
 
     })
     store.set('settlements',settlements)
+    store.set('Finance Points', federal_finance)
     store.save()
 }

@@ -80,6 +80,7 @@ export const createNewSave = async (saveName: string)  => {
     initial_settlement.projected_pop = 10
     
     store.set('settlements', [initial_settlement]);
+    store.set('Finance Points',0)
     await store.save();
     store.close();
 }

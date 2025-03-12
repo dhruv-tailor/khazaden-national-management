@@ -21,6 +21,7 @@ export interface SettlementInterface {
     tier: SettlementTier;
     finance_points: number;
     projected_pop: number;
+    settlment_tax: number;
 
     food_and_water: settlementGoodsInfo;
     beer: settlementGoodsInfo;
@@ -84,6 +85,7 @@ export const emptySettlement: SettlementInterface = {
     pop_cap: 0,
     tier: SettlementTier.City,
     projected_pop: 0,
+    settlment_tax: 0,
 
     food_and_water: emptySettlementGoodsInfo,
     beer: emptySettlementGoodsInfo,
@@ -135,6 +137,7 @@ export const newSettlement = (name: string, terrain_type: TerrainType) => {
         tier: SettlementTier.Hamlet,
         finance_points: 0,
         projected_pop: 0,
+        settlment_tax: 0,
         pop_cap: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].reference_pop_cap),
         food_and_water: {
             production_cap: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].food_and_water_balancing),
@@ -449,7 +452,7 @@ const calcEfficency = (clan: ClanInterface, settlement: SettlementInterface): nu
 }
 
 
-const tierModifier = (tier: SettlementTier) => {
+export const tierModifier = (tier: SettlementTier) => {
     return (2 ** (tier - 1))
 }
 

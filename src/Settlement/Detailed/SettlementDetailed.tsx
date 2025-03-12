@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router"
 import { saveLocation } from "../../utilities/SaveData";
 import { load } from "@tauri-apps/plugin-store";
-import { emptySettlement, SettlementInterface } from "../SettlementInterface";
+import { emptySettlement, SettlementInterface, SettlementTier, tierModifier } from "../SettlementInterface";
 import { useEffect, useState } from "react";
 import { Panel } from "primereact/panel";
 import ClanInfo from "./ClanInfo";
@@ -17,6 +17,9 @@ import { Button } from "primereact/button";
 import { IoFastFood } from "react-icons/io5";
 import { PiCowFill } from "react-icons/pi";
 import PlusMinus from "../../components/PlusMinus";
+import { TerrainData } from "../TerrainInterface";
+import BureaucraticFocus from "./BureaucraticFocus";
+import { clans } from "../../Goods/good";
 
 export default function SettlementDetailed() {
     const gameId = useParams().game
@@ -67,9 +70,42 @@ export default function SettlementDetailed() {
         getSettlementData()
     },[settlement])
 
+    const upgradeSettlement = async () => {
+        const cost = (settlement.tier ** 2) * 4000
+        const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
+        const settlements = await store.get<SettlementInterface[]>('settlements');
+        settlements?.forEach(s => {
+            if (s.name === settlementId) {
+                s.finance_points -= cost
+                s.tier += 1
+            }
+            s.pop_cap = Math.round(tierModifier(s.tier) * TerrainData[s.terrain_type].reference_pop_cap)
+            s.food_and_water.production_cap = Math.round(tierModifier(s.tier) * TerrainData[s.terrain_type].food_and_water_balancing)
+            s.beer.production_cap = Math.round(tierModifier(s.tier) * TerrainData[s.terrain_type].beer_balancing)
+            s.leather_and_textiles.production_cap = Math.round(tierModifier(s.tier) * TerrainData[s.terrain_type].leather_and_textiles_balancing)
+            s.livestock.production_cap = Math.round(tierModifier(s.tier) * TerrainData[s.terrain_type].livestock_balancing)
+            s.timber.production_cap = Math.round(tierModifier(s.tier) * TerrainData[s.terrain_type].timber_balancing)
+            s.enchanted_charcoal.production_cap = Math.round(tierModifier(s.tier) * TerrainData[s.terrain_type].enchanted_charcoal_balancing)
+            s.common_ores.production_cap = Math.round(tierModifier(s.tier) * TerrainData[s.terrain_type].common_ores_balancing)
+            s.gems.production_cap = Math.round(tierModifier(s.tier) * TerrainData[s.terrain_type].gems_balancing)
+            s.rare_ores.production_cap = Math.round(tierModifier(s.tier) * TerrainData[s.terrain_type].rare_ores_balancing)
+        })
+        store.set('settlements',settlements)
+        store.save()
+        getSettlementData()
+    }
+
     return(
         <div className="flex flex-column gap-2">
                 <Button label={'Back to All Settlements'} icon="pi pi-arrow-left" size='small' onClick={goBack}/>
+                {(settlement.tier < SettlementTier.Metropolis) && (settlement.finance_points >= ((settlement.tier ** 2) * 4000))?
+                <Button severity="success" icon="pi pi-angle-double-up" onClick={upgradeSettlement}>
+                    <div className="flex flex-row gap-2">
+                    Upgrade Settlement
+                    <FaCoins/>
+                    {(settlement.tier ** 2) * 4000}
+                    </div>
+                </Button>: null}
 
                 <div className="flex flex-row gap-2">
 
@@ -78,7 +114,7 @@ export default function SettlementDetailed() {
                             <FaCoins/>
                             {settlement.finance_points}
                             <PlusMinus value={
-                                Math.round((settlement.rulers.tax_rate * settlement.rulers.taxed_productivity) +
+                                Math.round(((settlement.rulers.tax_rate * settlement.rulers.taxed_productivity) +
                                 (settlement.archivists.tax_rate * settlement.archivists.taxed_productivity) +
                                 (settlement.engineers.tax_rate * settlement.engineers.taxed_productivity) +
                                 (settlement.rune_smiths.tax_rate * settlement.rune_smiths.taxed_productivity) +
@@ -88,7 +124,7 @@ export default function SettlementDetailed() {
                                 (settlement.miners.tax_rate * settlement.miners.taxed_productivity) +
                                 (settlement.farmers.tax_rate * settlement.farmers.taxed_productivity) +
                                 (settlement.warriors.tax_rate * settlement.warriors.taxed_productivity) +
-                                (settlement.foresters.tax_rate * settlement.foresters.taxed_productivity))
+                                (settlement.foresters.tax_rate * settlement.foresters.taxed_productivity)) * (1-settlement.settlment_tax))
                             }/>
                         </div>
                     </Panel>
@@ -139,6 +175,59 @@ export default function SettlementDetailed() {
                     </Panel>
 
                 </div>
+
+                <Panel header={'Bureaucracy'} toggleable>
+                    <div className="flex flex-row flex-wrap gap-2">
+                        <BureaucraticFocus 
+                            type={'Efficiency'}
+                            allowlist={[
+                                {
+                                    id: clans.none,
+                                    name: 'None'
+                                },
+                                {
+                                    id: clans.engineers,
+                                    name: 'Engineers',
+                                    icon: <MdEngineering/>
+                                },
+                                {
+                                    id: clans.merchants,
+                                    name: 'Merchants',
+                                    icon: <TbMoneybag/>
+                                },
+                                {
+                                    id: clans.miners,
+                                    name: 'Miners',
+                                    icon: <TbPick/>
+                                },
+                                {
+                                    id: clans.farmers,
+                                    name: 'Farmers',
+                                    icon: <GiFarmer/>
+                                },
+                                {
+                                    id: clans.warriors,
+                                    name: 'Warriors',
+                                    icon: <LuSword/>
+                                },
+                                {
+                                    id: clans.foresters,
+                                    name: 'Foresters',
+                                    icon: <GiAxeInStump/>
+                                },
+                                {
+                                    id: clans.criminals,
+                                    name: 'Criminals',
+                                    icon: <RiCriminalFill/>
+                                }
+                            ]}
+                        />
+                        {/* <BureaucraticFocus type={'Loyalty'}/> */}
+                        {/* <BureaucraticFocus type={'Corvee Labor'}/> */}
+                        {/* <BureaucraticFocus type={'Development Growth'}/> */}
+                        {/* <BureaucraticFocus type={'Population Growth'}/> */}
+                    </div>
+                </Panel>
 
 
                 <Panel header={'Clans'} toggleable>

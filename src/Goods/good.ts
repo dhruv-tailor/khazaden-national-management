@@ -31,5 +31,6 @@ export enum clans {
     farmers,
     warriors,
     foresters,
-    criminals
+    criminals,
+    none
 }
