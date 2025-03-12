@@ -30,8 +30,11 @@ GiFarmer = farmers
 LuSword = warriors
 GiAxeInStump  = foresters
 RiCriminalFill = criminals
+GiBlacksmith = Rune Smiths
 
 FaHeart = loyalty
 FaGear = Efficency
+GiSlaveryWhip = Corvee Labor
+BsBuildingFillUp = development growth
 
 FaCoins = Finanace Points

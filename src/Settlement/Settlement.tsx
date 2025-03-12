@@ -34,7 +34,6 @@ function Settlement(
   );
 
   const updateTaxes = async () => {
-    console.log(gameId)
     const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
     const settlements = await store.get<SettlementInterface[]>('settlements');
     settlements?.forEach(s => {if(s.name === settlement.name) {s.settlment_tax = taxRate}})

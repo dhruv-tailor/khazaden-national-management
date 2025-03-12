@@ -13,6 +13,7 @@ import { newWarriors } from "../Clans/Warriors";
 import { newForesters } from "../Clans/Foresters";
 import { newCriminals } from "../Clans/Criminals";
 import { setConsumptionRates } from "./ConsumptionRate";
+import { clans } from "../Goods/good";
 
 export interface SettlementInterface {
     name: string;
@@ -54,6 +55,12 @@ export interface SettlementInterface {
     warriors: ClanInterface;
     foresters: ClanInterface;
     criminals: ClanInterface;
+
+    efficency_bonus: clans;
+    loyalty_bonus: clans;
+    corvee_bonus: clans;
+    development_growth_bonus: clans;
+    population_growth_bonus: clans;
 }
 
 export enum SettlementTier {
@@ -118,6 +125,12 @@ export const emptySettlement: SettlementInterface = {
     warriors: emptyClanInterface,
     foresters: emptyClanInterface,
     criminals: emptyClanInterface,
+
+    efficency_bonus: clans.none,
+    loyalty_bonus: clans.none,
+    corvee_bonus: clans.none,
+    development_growth_bonus: clans.none,
+    population_growth_bonus: clans.none
 }
 
 
@@ -261,6 +274,12 @@ export const newSettlement = (name: string, terrain_type: TerrainType) => {
         warriors: newWarriors(),
         foresters: newForesters(),
         criminals: newCriminals(),
+
+        efficency_bonus: clans.none,
+        loyalty_bonus: clans.none,
+        corvee_bonus: clans.none,
+        development_growth_bonus: clans.none,
+        population_growth_bonus: clans.none,
     }
     return settlement;
 }
@@ -369,8 +388,15 @@ const calcLoylaty = (clan: ClanInterface, settlement: SettlementInterface): numb
     clan.loyalty_modifiers.forEach(modifier => {
         loyalty += modifier.value
     })
+    let bureaucratic_bonus = 0
+    if (settlement.loyalty_bonus === clan.id) {
+        bureaucratic_bonus = settlement.archivists.taxed_productivity * 17
+        const base_productivity = ensureNumber((clan.loyalty + clan.efficency)/20) * 40 * clan.productivity_rate * clan.population
+        bureaucratic_bonus = ensureNumber(bureaucratic_bonus/base_productivity)
+        bureaucratic_bonus = ensureNumber(Math.floor(bureaucratic_bonus))
+    }
     loyalty = Math.floor(Math.max(0,taxation_modifier + loyalty))
-    loyalty = Math.min(10,loyalty)
+    loyalty = Math.min(10,loyalty+bureaucratic_bonus)
     return loyalty;
 }
 
@@ -444,10 +470,21 @@ const calcEfficency = (clan: ClanInterface, settlement: SettlementInterface): nu
         efficency += 1 - ensureNumber(settlement.enchanted_charcoal.deficit / settlement.enchanted_charcoal.consumption_rate)
         total_goods_counted += 1
     }
+    let bureaucratic_bonus = 0
+    if (settlement.efficency_bonus === clan.id) {
+        bureaucratic_bonus = settlement.rulers.taxed_productivity * 13
+        const base_productivity = ensureNumber((clan.loyalty + clan.efficency)/20) * 40 * clan.productivity_rate * clan.population
+        bureaucratic_bonus = ensureNumber(bureaucratic_bonus/base_productivity)
+        bureaucratic_bonus = ensureNumber(Math.sqrt(bureaucratic_bonus))
+
+    }
+    else {
+        bureaucratic_bonus = 1
+    }
     efficency = ensureNumber(efficency / total_goods_counted)
     efficency *= 5
     efficency = Math.max(efficency + 1,0)
-    efficency = Math.floor(efficency)
+    efficency = Math.floor(efficency*bureaucratic_bonus)
     return efficency;
 }
 
@@ -470,19 +507,64 @@ export const popGrowth = (settlement: SettlementInterface) => {
         settlement.rulers.population +
         settlement.rune_smiths.population +
         settlement.warriors.population)
+    let bureaucratic_bonus = 7 * settlement.clerics.taxed_productivity
     let gained_pg = (
-        (settlement.archivists.total_productivity - settlement.archivists.taxed_productivity) + 
+        ((settlement.archivists.total_productivity - settlement.archivists.taxed_productivity) +
         (settlement.clerics.total_productivity - settlement.clerics.taxed_productivity) +
-        (settlement.craftsmen.total_productivity - settlement.craftsmen.taxed_productivity) +
-        (settlement.criminals.total_productivity - settlement.criminals.taxed_productivity) +
         (settlement.engineers.total_productivity - settlement.engineers.taxed_productivity) +
-        (settlement.farmers.total_productivity - settlement.farmers.taxed_productivity) +
-        (settlement.foresters.total_productivity - settlement.foresters.taxed_productivity) +
         (settlement.merchants.total_productivity - settlement.merchants.taxed_productivity) +
-        (settlement.miners.total_productivity - settlement.miners.taxed_productivity) +
-        (settlement.rulers.total_productivity - settlement.rulers.taxed_productivity) +
-        (settlement.rune_smiths.total_productivity - settlement.rune_smiths.taxed_productivity) +
-        (settlement.warriors.total_productivity - settlement.warriors.taxed_productivity)) * 0.7 * 0.7
+        (settlement.rulers.total_productivity - settlement.rulers.taxed_productivity)) * 0.7
+    )
+    if (settlement.population_growth_bonus === clans.craftsmen) {
+        bureaucratic_bonus = ensureNumber(bureaucratic_bonus/((settlement.craftsmen.total_productivity - settlement.craftsmen.taxed_productivity) * 0.7))
+        gained_pg += (settlement.craftsmen.total_productivity - settlement.craftsmen.taxed_productivity) * 0.7 * bureaucratic_bonus
+    }
+    else {
+        gained_pg += (settlement.craftsmen.total_productivity - settlement.craftsmen.taxed_productivity) * 0.7
+    }
+    if (settlement.population_growth_bonus === clans.criminals) {
+        bureaucratic_bonus = ensureNumber(bureaucratic_bonus/((settlement.criminals.total_productivity - settlement.criminals.taxed_productivity) * 0.7))
+        gained_pg += (settlement.criminals.total_productivity - settlement.criminals.taxed_productivity) * 0.7 * bureaucratic_bonus
+    }
+    else {
+        gained_pg += (settlement.criminals.total_productivity - settlement.criminals.taxed_productivity) * 0.7
+    }
+    if (settlement.population_growth_bonus === clans.farmers) {
+        bureaucratic_bonus = ensureNumber(bureaucratic_bonus/((settlement.farmers.total_productivity - settlement.farmers.taxed_productivity) * 0.7))
+        gained_pg += (settlement.farmers.total_productivity - settlement.farmers.taxed_productivity) * 0.7 * bureaucratic_bonus
+    }
+    else {
+        gained_pg += (settlement.farmers.total_productivity - settlement.farmers.taxed_productivity) * 0.7
+    }
+    if (settlement.population_growth_bonus === clans.foresters) {
+        bureaucratic_bonus = ensureNumber(bureaucratic_bonus/((settlement.foresters.total_productivity - settlement.foresters.taxed_productivity) * 0.7))
+        gained_pg += (settlement.foresters.total_productivity - settlement.foresters.taxed_productivity) * 0.7 * bureaucratic_bonus
+    }
+    else {
+        gained_pg += (settlement.foresters.total_productivity - settlement.foresters.taxed_productivity) * 0.7
+    }
+    if (settlement.population_growth_bonus === clans.miners) {
+        bureaucratic_bonus = ensureNumber(bureaucratic_bonus/((settlement.miners.total_productivity - settlement.miners.taxed_productivity) * 0.7))
+        gained_pg += (settlement.miners.total_productivity - settlement.miners.taxed_productivity) * 0.7 * bureaucratic_bonus
+    }
+    else {
+        gained_pg += (settlement.miners.total_productivity - settlement.miners.taxed_productivity) * 0.7
+    }
+    if (settlement.population_growth_bonus === clans.runeSmiths) {
+        bureaucratic_bonus = ensureNumber(bureaucratic_bonus/((settlement.rune_smiths.total_productivity - settlement.rune_smiths.taxed_productivity) * 0.7))
+        gained_pg += (settlement.rune_smiths.total_productivity - settlement.rune_smiths.taxed_productivity) * 0.7 * bureaucratic_bonus
+    }
+    else {
+        gained_pg += (settlement.rune_smiths.total_productivity - settlement.rune_smiths.taxed_productivity) * 0.7
+    }
+    if (settlement.population_growth_bonus === clans.warriors) {
+        bureaucratic_bonus = ensureNumber(bureaucratic_bonus/((settlement.warriors.total_productivity - settlement.warriors.taxed_productivity) * 0.7))
+        gained_pg += (settlement.warriors.total_productivity - settlement.warriors.taxed_productivity) * 0.7 * bureaucratic_bonus
+    }
+    else {
+        gained_pg += (settlement.warriors.total_productivity - settlement.warriors.taxed_productivity) * 0.7
+    }
+    gained_pg *= 0.7
     // Slower growth from starving Civilians
     gained_pg *= Math.max(0,1 - (settlement.food_and_water.deficit/settlement.food_and_water.consumption_rate))
     // Pops dying from starving
