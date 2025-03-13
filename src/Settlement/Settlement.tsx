@@ -21,6 +21,7 @@ function Settlement(
   {settlement: SettlementInterface, navigateSettlement: (name: string) => void, updateParent: () => void}) {
 
   const [taxRate,setTaxRate] = useState<number>(settlement.settlment_tax);
+  const [productionQuota,setProductionQuota] = useState<number>(settlement.production_quota);
   const gameId = useParams().game;
 
   const gotoSettlement = () => {
@@ -36,7 +37,10 @@ function Settlement(
   const updateTaxes = async () => {
     const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
     const settlements = await store.get<SettlementInterface[]>('settlements');
-    settlements?.forEach(s => {if(s.name === settlement.name) {s.settlment_tax = taxRate}})
+    settlements?.forEach(s => {if(s.name === settlement.name) {
+      s.settlment_tax = taxRate
+      s.production_quota = productionQuota
+    }})
     store.set('settlements',settlements)
     store.save()
     updateParent();
@@ -44,11 +48,11 @@ function Settlement(
 
   useEffect(() => {
     updateTaxes();
-  },[taxRate])
+  },[taxRate,productionQuota])
     
   return (
     <>
-      <Card className="md:w-25rem" title={settlement.name} subTitle={SettlementTierDetails[settlement.tier].name} footer={footer}>
+      <Card className="md:w-25rem" title={settlement.visable_name} subTitle={SettlementTierDetails[settlement.tier].name} footer={footer}>
         <div className='flex flex-row gap-3'>
           <div className='flex flex-row gap-1'>
             <IoIosPeople />
@@ -90,100 +94,100 @@ function Settlement(
             <div className='flex flex-row gap-1'>
               <IoFastFood/>
               {settlement.food_and_water.stock}
-              <PlusMinus value={settlement.farmers.food_and_water.produced + settlement.foresters.food_and_water.produced 
+              <PlusMinus value={Math.round((settlement.farmers.food_and_water.produced + settlement.foresters.food_and_water.produced) * (1-settlement.production_quota))
                     - settlement.food_and_water.consumption_rate}/>
             </div>
             <div className='flex flex-row gap-1'>
               <GiBeerStein/>
               {settlement.beer.stock}
-              <PlusMinus value={settlement.farmers.beer.produced - settlement.beer.consumption_rate}/>
+              <PlusMinus value={Math.round(settlement.farmers.beer.produced * (1-settlement.production_quota)) - settlement.beer.consumption_rate}/>
             </div>
             <div className='flex flex-row gap-1'>
               <GiClothes/>
               {settlement.leather_and_textiles.stock}
-              <PlusMinus value={settlement.farmers.leather_and_textiles.produced - settlement.leather_and_textiles.consumption_rate}/>
+              <PlusMinus value={Math.round(settlement.farmers.leather_and_textiles.produced * (1-settlement.production_quota)) - settlement.leather_and_textiles.consumption_rate}/>
             </div>
             <div className='flex flex-row gap-1'>
               <LuHandCoins/>
               {settlement.artisinal_goods.stock}
-              <PlusMinus value={settlement.craftsmen.artisanal_goods.produced + settlement.foresters.artisanal_goods.produced 
+              <PlusMinus value={Math.round((settlement.craftsmen.artisanal_goods.produced + settlement.foresters.artisanal_goods.produced)* (1-settlement.production_quota))
                     - settlement.artisinal_goods.consumption_rate}/>
             </div>
             <div className='flex flex-row gap-1'>
               <PiCowFill/>
               {settlement.livestock.stock}
-              <PlusMinus value={settlement.farmers.livestock.produced - settlement.livestock.consumption_rate}/>
+              <PlusMinus value={Math.round((settlement.farmers.livestock.produced) * (1-settlement.production_quota)) - settlement.livestock.consumption_rate}/>
             </div>
           </div>
           <div className='flex flex-column gap-2'>
             <div className='flex flex-row gap-1'>
               <GiPouringChalice />
               {settlement.ornamental_luxuries.stock}
-              <PlusMinus value={settlement.craftsmen.ornamental_luxuries.produced - settlement.ornamental_luxuries.consumption_rate}/>
+              <PlusMinus value={Math.round(settlement.craftsmen.ornamental_luxuries.produced * (1-settlement.production_quota)) - settlement.ornamental_luxuries.consumption_rate}/>
             </div>
             <div className='flex flex-row gap-1'>
               <GiCrystalBall />
               {settlement.enchanted_luxuries.stock}
-              <PlusMinus value={settlement.rune_smiths.enchanted_luxuries.produced - settlement.enchanted_luxuries.consumption_rate}/>
+              <PlusMinus value={Math.round(settlement.rune_smiths.enchanted_luxuries.produced * (1-settlement.production_quota)) - settlement.enchanted_luxuries.consumption_rate}/>
             </div>
             <div className='flex flex-row gap-1'>
               <GiWoodPile />
               {settlement.timber.stock}
-              <PlusMinus value={settlement.foresters.timber.produced - settlement.timber.consumption_rate}/>
+              <PlusMinus value={Math.round(settlement.foresters.timber.produced * (1-settlement.production_quota)) - settlement.timber.consumption_rate}/>
             </div>
             <div className='flex flex-row gap-1'>
               <FaTools />
               {settlement.tools.stock}
-              <PlusMinus value={settlement.craftsmen.tools.produced - settlement.tools.consumption_rate}/>
+              <PlusMinus value={Math.round(settlement.craftsmen.tools.produced * (1-settlement.production_quota)) - settlement.tools.consumption_rate}/>
             </div>
             <div className='flex flex-row gap-1'>
               <GiThrownCharcoal />
               {settlement.enchanted_charcoal.stock}
-              <PlusMinus value={settlement.foresters.enchanted_charcoal.produced - settlement.enchanted_charcoal.consumption_rate}/>
+              <PlusMinus value={Math.round(settlement.foresters.enchanted_charcoal.produced * (1-settlement.production_quota)) - settlement.enchanted_charcoal.consumption_rate}/>
             </div>
           </div>
           <div className='flex flex-column gap-2'>
             <div className='flex flex-row gap-1'>
               <GiCoalWagon />
               {settlement.common_ores.stock}
-              <PlusMinus value={settlement.miners.common_ores.produced - settlement.common_ores.consumption_rate}/>
+              <PlusMinus value={Math.round(settlement.miners.common_ores.produced * (1-settlement.production_quota)) - settlement.common_ores.consumption_rate}/>
             </div>
             <div className='flex flex-row gap-1'>
               <FaBriefcaseMedical />
               {settlement.medical_supplies.stock}
-              <PlusMinus value={settlement.clerics.medical_supplies.produced - settlement.medical_supplies.consumption_rate}/>
+              <PlusMinus value={Math.round(settlement.clerics.medical_supplies.produced * (1-settlement.production_quota)) - settlement.medical_supplies.consumption_rate}/>
             </div>
             <div className='flex flex-row gap-1'>
               <GiGems />
               {settlement.gems.stock}
-              <PlusMinus value={settlement.miners.gems.produced - settlement.gems.consumption_rate}/>
+              <PlusMinus value={Math.round(settlement.miners.gems.produced * (1-settlement.production_quota)) - settlement.gems.consumption_rate}/>
             </div>
             <div className='flex flex-row gap-1'>
               <FaGem />
               {settlement.rare_ores.stock}
-              <PlusMinus value={settlement.miners.rare_ores.produced - settlement.rare_ores.consumption_rate}/>
+              <PlusMinus value={Math.round(settlement.miners.rare_ores.produced * (1-settlement.production_quota)) - settlement.rare_ores.consumption_rate}/>
             </div>
             <div className='flex flex-row gap-1'>
               <FaBook />
               {settlement.books.stock}
-              <PlusMinus value={settlement.clerics.books.produced + settlement.archivists.books.produced - settlement.books.consumption_rate}/>
+              <PlusMinus value={Math.round((settlement.clerics.books.produced + settlement.archivists.books.produced) * (1-settlement.production_quota)) - settlement.books.consumption_rate}/>
             </div>
           </div>
           <div className='flex flex-column gap-2'>
             <div className='flex flex-row gap-1'>
               <GiRuneStone />
               {settlement.runes.stock}
-              <PlusMinus value={settlement.rune_smiths.runes.produced - settlement.runes.consumption_rate}/>
+              <PlusMinus value={Math.round(settlement.rune_smiths.runes.produced * (1-settlement.production_quota)) - settlement.runes.consumption_rate}/>
             </div>
             <div className='flex flex-row gap-1'>
               <FaShieldAlt />
               {settlement.armaments.stock}
-              <PlusMinus value={settlement.craftsmen.armaments.produced - settlement.armaments.consumption_rate}/>
+              <PlusMinus value={Math.round(settlement.craftsmen.armaments.produced * (1-settlement.production_quota)) - settlement.armaments.consumption_rate}/>
             </div>
             <div className='flex flex-row gap-1'>
               <GiMagicShield />
               {settlement.enchanted_armaments.stock}
-              <PlusMinus value={settlement.rune_smiths.enchanted_armaments.produced - settlement.enchanted_armaments.consumption_rate}/>
+              <PlusMinus value={Math.round(settlement.rune_smiths.enchanted_armaments.produced * (1-settlement.production_quota)) - settlement.enchanted_armaments.consumption_rate}/>
             </div>
           </div>
         </div>
@@ -192,7 +196,12 @@ function Settlement(
           <label htmlFor="tax-rate">Settlement Tax</label>
           <InputText id="tax-rate" value={Math.round((taxRate * 100)).toString()}/>
           <Slider value={taxRate * 100} onChange={(e) => setTaxRate((e.value as number)/100)} step={1}/>
-      </div>
+        </div>
+        <div>
+          <label htmlFor="production-quota">Production Quota</label>
+          <InputText id="production-quota" value={Math.round((productionQuota * 100)).toString()}/>
+          <Slider value={productionQuota * 100} onChange={(e) => setProductionQuota((e.value as number)/100)} step={1}/>
+        </div>
       </Card>
     </>
   );

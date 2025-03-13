@@ -5,6 +5,7 @@ import { productName } from "../../src-tauri/tauri.conf.json"
 import { type } from '@tauri-apps/plugin-os'
 import { TerrainType } from "../Settlement/TerrainInterface";
 import { newSettlement, updateGoodsProduction } from "../Settlement/SettlementInterface";
+import { empty_goodsdist } from "../components/ResourceDistribution";
 
 const fileSeperator = () => {
     const osType = type();
@@ -80,7 +81,7 @@ export const createNewSave = async (saveName: string)  => {
     initial_settlement.projected_pop = 10
     
     store.set('settlements', [initial_settlement]);
-    store.set('Finance Points',0)
+    store.set('Federal Reserve',empty_goodsdist)
     await store.save();
     store.close();
 }

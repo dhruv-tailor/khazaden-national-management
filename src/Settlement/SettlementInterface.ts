@@ -17,12 +17,14 @@ import { clans } from "../Goods/good";
 
 export interface SettlementInterface {
     name: string;
+    visable_name: string;
     terrain_type: TerrainType;
     pop_cap: number;
     tier: SettlementTier;
     finance_points: number;
     projected_pop: number;
     settlment_tax: number;
+    production_quota: number;
 
     food_and_water: settlementGoodsInfo;
     beer: settlementGoodsInfo;
@@ -87,6 +89,7 @@ const emptySettlementGoodsInfo: settlementGoodsInfo = {
 
 export const emptySettlement: SettlementInterface = {
     name: '',
+    visable_name: '',
     finance_points: 0,
     terrain_type: TerrainType.Enchanted_Forest,
     pop_cap: 0,
@@ -130,7 +133,8 @@ export const emptySettlement: SettlementInterface = {
     loyalty_bonus: clans.none,
     corvee_bonus: clans.none,
     development_growth_bonus: clans.none,
-    population_growth_bonus: clans.none
+    population_growth_bonus: clans.none,
+    production_quota: 0,
 }
 
 
@@ -143,9 +147,10 @@ export const SettlementTierDetails = {
     [SettlementTier.Metropolis]: { name: 'Metropolis', value: SettlementTier.Metropolis },
 };
 
-export const newSettlement = (name: string, terrain_type: TerrainType) => {
+export const newSettlement = (name: string, terrain_type: TerrainType, visable_name?: string) => {
     let settlement: SettlementInterface = {
         name: name,
+        visable_name: visable_name ? visable_name : name,
         terrain_type: terrain_type,
         tier: SettlementTier.Hamlet,
         finance_points: 0,
@@ -280,6 +285,7 @@ export const newSettlement = (name: string, terrain_type: TerrainType) => {
         corvee_bonus: clans.none,
         development_growth_bonus: clans.none,
         population_growth_bonus: clans.none,
+        production_quota: 0,
     }
     return settlement;
 }

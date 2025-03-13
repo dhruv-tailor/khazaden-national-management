@@ -23,6 +23,8 @@ import { clans } from "../../Goods/good";
 import { FaGear } from "react-icons/fa6";
 import { BsBuildingFillUp } from "react-icons/bs";
 import { IoIosPeople } from "react-icons/io";
+import { Dialog } from "primereact/dialog";
+import { InputText } from "primereact/inputtext";
 
 interface allowProp {
     id: clans,
@@ -54,6 +56,9 @@ export default function SettlementDetailed() {
     const [corveeBonus,setCorveeBonus] = useState<allowProp>({id: clans.none, name: 'None'})
     const [developmentGrowthBonus, setDevelopmentGrowthBonus] = useState<allowProp>({id: clans.none, name: 'None'})
     const [popGrowthBonus, setPopGrowthBonus] = useState<allowProp>({id: clans.none, name: 'None'})
+
+    const [renameSettlementDialog,setRenameSettlmentDialog] = useState<boolean>(false);
+    const [settlmentName, setSettlementName] = useState<string>('');
 
 
     const getSettlementData = async () => {
@@ -171,6 +176,7 @@ export default function SettlementDetailed() {
         getSettlementData()
     },[settlement])
 
+    // Upgrade Settlment to Next Tier
     const upgradeSettlement = async () => {
         const cost = (settlement.tier ** 2) * 4000
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
@@ -196,10 +202,43 @@ export default function SettlementDetailed() {
         getSettlementData()
     }
 
+    // Renames the Settlement
+    const renameSettlment = async (new_name: string) => {
+        const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
+        const settlements = await store.get<SettlementInterface[]>('settlements');
+        settlements?.forEach(s => {if (s.name === settlementId) {s.visable_name = new_name}})
+        store.set('settlements',settlements)
+        store.save()
+        getSettlementData()
+    }
+
 
     return(
         <div className="flex flex-column gap-2">
                 <Button label={'Back to All Settlements'} icon="pi pi-arrow-left" size='small' onClick={goBack}/>
+                {/* Settlement Name */}
+                <div className="flex flex-row gap-2">
+                    <h1>{settlement.visable_name}</h1>
+                    <Button size="small" icon="pi pi-pencil" rounded text onClick={()=>setRenameSettlmentDialog(true)}/>
+                    <Dialog 
+                    header="Rename Settlement"
+                    visible={renameSettlementDialog}
+                    closable={false}
+                    onHide={()=>{
+                        setRenameSettlmentDialog(false)
+                        setSettlementName('')
+                    }}
+                    >  
+                        <div className="p-inputgroup flex-1">
+                            <InputText value={settlmentName} onChange={e => setSettlementName(e.target.value)}/>
+                            <Button className="p-button-success" icon="pi pi-check" onClick={() => {
+                                renameSettlment(settlmentName)
+                                setRenameSettlmentDialog(false)
+                            }}/>
+                        </div>
+                    </Dialog>
+                </div>
+                {/* Upgrade Settlement Button */}
                 {(settlement.tier < SettlementTier.Metropolis) && (settlement.finance_points >= ((settlement.tier ** 2) * 4000))?
                 <Button severity="success" icon="pi pi-angle-double-up" onClick={upgradeSettlement}>
                     <div className="flex flex-row gap-2">
@@ -277,7 +316,7 @@ export default function SettlementDetailed() {
                     </Panel>
 
                 </div>
-
+                {/*  Bureaucacy Bonus Panel */}
                 <Panel header={'Bureaucracy Bonus'} toggleable>
                     <div className="flex flex-row flex-wrap gap-3">
                         {settlement.rulers.population > 0 ? <BureaucraticFocus 

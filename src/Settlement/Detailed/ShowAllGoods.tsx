@@ -12,97 +12,97 @@ export default function ShowAllGoods({settlement}: {settlement :SettlementInterf
             <ShowGood 
                 stock={settlement.food_and_water.stock}
                 consumption={
-                    settlement.farmers.food_and_water.produced + settlement.foresters.food_and_water.produced 
+                    Math.round((settlement.farmers.food_and_water.produced + settlement.foresters.food_and_water.produced) * (1-settlement.production_quota))
                     - settlement.food_and_water.consumption_rate
                 }
                 icon={<IoFastFood/>}
             />
             <ShowGood 
                 stock={settlement.beer.stock}
-                consumption={settlement.farmers.beer.produced - settlement.beer.consumption_rate}
+                consumption={Math.round(settlement.farmers.beer.produced * (1-settlement.production_quota)) - settlement.beer.consumption_rate}
                 icon={<GiBeerStein/>}
             />
             <ShowGood 
                 stock={settlement.leather_and_textiles.stock}
-                consumption={settlement.farmers.leather_and_textiles.produced - settlement.leather_and_textiles.consumption_rate}
+                consumption={Math.round(settlement.farmers.leather_and_textiles.produced * (1-settlement.production_quota)) - settlement.leather_and_textiles.consumption_rate}
                 icon={<GiClothes/>}
             />
             <ShowGood 
                 stock={settlement.artisinal_goods.stock}
                 consumption={
-                    settlement.craftsmen.artisanal_goods.produced + settlement.foresters.artisanal_goods.produced 
+                    Math.round((settlement.craftsmen.artisanal_goods.produced + settlement.foresters.artisanal_goods.produced)* (1-settlement.production_quota))
                     - settlement.artisinal_goods.consumption_rate
                 }
                 icon={<LuHandCoins/>}
             />
             <ShowGood 
                 stock={settlement.livestock.stock}
-                consumption={settlement.farmers.livestock.produced - settlement.livestock.consumption_rate}
+                consumption={Math.round((settlement.farmers.livestock.produced) * (1-settlement.production_quota)) - settlement.livestock.consumption_rate}
                 icon={<PiCowFill/>}
             />
             <ShowGood 
                 stock={settlement.ornamental_luxuries.stock}
-                consumption={settlement.craftsmen.ornamental_luxuries.produced - settlement.ornamental_luxuries.consumption_rate}
+                consumption={Math.round(settlement.craftsmen.ornamental_luxuries.produced * (1-settlement.production_quota)) - settlement.ornamental_luxuries.consumption_rate}
                 icon={<GiPouringChalice/>}
             />
             <ShowGood 
                 stock={settlement.enchanted_luxuries.stock}
-                consumption={settlement.rune_smiths.enchanted_luxuries.produced - settlement.enchanted_luxuries.consumption_rate}
+                consumption={Math.round(settlement.rune_smiths.enchanted_luxuries.produced * (1-settlement.production_quota)) - settlement.enchanted_luxuries.consumption_rate}
                 icon={<GiCrystalBall/>}
             />
             <ShowGood 
                 stock={settlement.timber.stock}
-                consumption={settlement.foresters.timber.produced - settlement.timber.consumption_rate}
+                consumption={Math.round(settlement.foresters.timber.produced * (1-settlement.production_quota)) - settlement.timber.consumption_rate}
                 icon={<GiWoodPile/>}
             />
             <ShowGood 
                 stock={settlement.tools.stock}
-                consumption={settlement.craftsmen.tools.produced - settlement.tools.consumption_rate}
+                consumption={Math.round(settlement.craftsmen.tools.produced * (1-settlement.production_quota)) - settlement.tools.consumption_rate}
                 icon={<FaTools/>}
             />
             <ShowGood 
                 stock={settlement.common_ores.stock}
-                consumption={settlement.miners.common_ores.produced - settlement.common_ores.consumption_rate}
+                consumption={Math.round(settlement.miners.common_ores.produced * (1-settlement.production_quota)) - settlement.common_ores.consumption_rate}
                 icon={<GiCoalWagon/>}
             />
             <ShowGood 
                 stock={settlement.medical_supplies.stock}
-                consumption={settlement.clerics.medical_supplies.produced - settlement.medical_supplies.consumption_rate}
+                consumption={Math.round(settlement.clerics.medical_supplies.produced * (1-settlement.production_quota)) - settlement.medical_supplies.consumption_rate}
                 icon={<FaBriefcaseMedical/>}
             />
             <ShowGood 
                 stock={settlement.rare_ores.stock}
-                consumption={settlement.miners.rare_ores.produced - settlement.rare_ores.consumption_rate}
+                consumption={Math.round(settlement.miners.rare_ores.produced * (1-settlement.production_quota)) - settlement.rare_ores.consumption_rate}
                 icon={<FaGem/>}
             />
             <ShowGood 
                 stock={settlement.gems.stock}
-                consumption={settlement.miners.gems.produced - settlement.gems.consumption_rate}
+                consumption={Math.round(settlement.miners.gems.produced * (1-settlement.production_quota)) - settlement.gems.consumption_rate}
                 icon={<GiGems/>}
             />
             <ShowGood 
                 stock={settlement.runes.stock}
-                consumption={settlement.rune_smiths.runes.produced - settlement.runes.consumption_rate}
+                consumption={Math.round(settlement.rune_smiths.runes.produced * (1-settlement.production_quota)) - settlement.runes.consumption_rate}
                 icon={<GiRuneStone/>}
             />
             <ShowGood 
                 stock={settlement.armaments.stock}
-                consumption={settlement.craftsmen.armaments.produced - settlement.armaments.consumption_rate}
+                consumption={Math.round(settlement.craftsmen.armaments.produced * (1-settlement.production_quota)) - settlement.armaments.consumption_rate}
                 icon={<FaShieldAlt/>}
             />
             <ShowGood 
                 stock={settlement.books.stock}
-                consumption={settlement.clerics.books.produced + settlement.archivists.books.produced - settlement.books.consumption_rate}
+                consumption={Math.round((settlement.clerics.books.produced + settlement.archivists.books.produced) * (1-settlement.production_quota)) - settlement.books.consumption_rate}
                 icon={<FaBook/>}
             />
             <ShowGood 
                 stock={settlement.enchanted_armaments.stock}
-                consumption={settlement.rune_smiths.enchanted_armaments.produced - settlement.enchanted_armaments.consumption_rate}
+                consumption={Math.round(settlement.rune_smiths.enchanted_armaments.produced * (1-settlement.production_quota)) - settlement.enchanted_armaments.consumption_rate}
                 icon={<GiMagicShield/>}
             />
             <ShowGood 
                 stock={settlement.enchanted_charcoal.stock}
-                consumption={settlement.foresters.enchanted_charcoal.produced - settlement.enchanted_charcoal.consumption_rate}
+                consumption={Math.round(settlement.foresters.enchanted_charcoal.produced * (1-settlement.production_quota)) - settlement.enchanted_charcoal.consumption_rate}
                 icon={<GiThrownCharcoal/>}
             />
         </div>
