@@ -1,11 +1,18 @@
 import { load } from "@tauri-apps/plugin-store";
 import { saveLocation } from "./SaveData";
 import { popGrowth, SettlementInterface, updateGoodsProduction } from "../Settlement/SettlementInterface";
+import { goodsdist } from "../components/ResourceDistribution";
+
+// Calcualtes How much a settlement's stock changes
+const calcStockChange = (produced: number, consumed: number, quota: number) => Math.round((produced * (1 - quota)) - consumed)
 
 export const NextTurn = async (game: string) => {
     const store = await load(await saveLocation(game), {autoSave: false});
     const settlements = await store.get<SettlementInterface[]>('settlements');
-    let federal_finance = (await store.get<number>('Finance Points')) ?? 0;
+    const next_goodsdist = await store.get<goodsdist>('Federal Reserve');
+    if (!next_goodsdist) {
+        throw new Error('Failed to load Federal Reserve goods distribution');
+    }
     settlements?.forEach(settlement =>{
         // First update Taxation gained
         const baseTax = Math.round((settlement.rulers.tax_rate * settlement.rulers.taxed_productivity) +
@@ -22,99 +29,118 @@ export const NextTurn = async (game: string) => {
 
         // The Federal Government Takes its cut
         settlement.finance_points += Math.round(baseTax * (1 - settlement.settlment_tax))
-        federal_finance += Math.round((baseTax * settlement.settlment_tax))
+        next_goodsdist.money += Math.round((baseTax * settlement.settlment_tax))
 
         // Update Goods Stocked
-        settlement.food_and_water.stock += settlement.farmers.food_and_water.produced + settlement.foresters.food_and_water.produced - settlement.food_and_water.consumption_rate
+        settlement.food_and_water.stock += calcStockChange(settlement.farmers.food_and_water.produced + settlement.foresters.food_and_water.produced, settlement.food_and_water.consumption_rate, settlement.production_quota)
         if (settlement.food_and_water.stock < 0) {
             settlement.food_and_water.deficit = Math.abs(settlement.food_and_water.stock)
             settlement.food_and_water.stock = 0
         }
-        settlement.beer.stock += settlement.farmers.beer.produced - settlement.beer.consumption_rate
+        settlement.beer.stock += calcStockChange(settlement.farmers.beer.produced, settlement.beer.consumption_rate, settlement.production_quota)
         if (settlement.beer.stock < 0) {
             settlement.beer.deficit = Math.abs(settlement.beer.stock)
             settlement.beer.stock = 0
         }
-        settlement.leather_and_textiles.stock += settlement.farmers.leather_and_textiles.produced - settlement.leather_and_textiles.consumption_rate
+        settlement.leather_and_textiles.stock += calcStockChange(settlement.farmers.leather_and_textiles.produced, settlement.leather_and_textiles.consumption_rate, settlement.production_quota)
         if (settlement.leather_and_textiles.stock < 0) {
             settlement.leather_and_textiles.deficit = Math.abs(settlement.leather_and_textiles.stock)
             settlement.leather_and_textiles.stock = 0
         }
-        settlement.artisinal_goods.stock += settlement.craftsmen.artisanal_goods.produced + settlement.foresters.artisanal_goods.produced - settlement.artisinal_goods.consumption_rate
+        settlement.artisinal_goods.stock += calcStockChange(settlement.craftsmen.artisanal_goods.produced + settlement.foresters.artisanal_goods.produced, settlement.artisinal_goods.consumption_rate, settlement.production_quota)
         if (settlement.artisinal_goods.stock < 0) {
             settlement.artisinal_goods.deficit = Math.abs(settlement.artisinal_goods.stock)
             settlement.artisinal_goods.stock = 0
         }
-        settlement.livestock.stock += settlement.farmers.livestock.produced - settlement.livestock.consumption_rate
+        settlement.livestock.stock += calcStockChange(settlement.farmers.livestock.produced, settlement.livestock.consumption_rate, settlement.production_quota)
         if (settlement.livestock.stock < 0) {
             settlement.livestock.deficit = Math.abs(settlement.livestock.stock)
             settlement.livestock.stock = 0
         }
-        settlement.ornamental_luxuries.stock += settlement.craftsmen.ornamental_luxuries.produced - settlement.ornamental_luxuries.consumption_rate
+        settlement.ornamental_luxuries.stock += calcStockChange(settlement.craftsmen.ornamental_luxuries.produced, settlement.ornamental_luxuries.consumption_rate, settlement.production_quota)
         if (settlement.ornamental_luxuries.stock < 0) {
             settlement.ornamental_luxuries.deficit = Math.abs(settlement.ornamental_luxuries.stock)
             settlement.ornamental_luxuries.stock = 0
         }
-        settlement.enchanted_luxuries.stock += settlement.rune_smiths.enchanted_luxuries.produced - settlement.enchanted_luxuries.consumption_rate
+        settlement.enchanted_luxuries.stock += calcStockChange(settlement.rune_smiths.enchanted_luxuries.produced, settlement.enchanted_luxuries.consumption_rate, settlement.production_quota)
         if (settlement.enchanted_luxuries.stock < 0) {
             settlement.enchanted_luxuries.deficit = Math.abs(settlement.enchanted_luxuries.stock)
             settlement.enchanted_luxuries.stock = 0
         }
-        settlement.timber.stock += settlement.foresters.timber.produced - settlement.timber.consumption_rate
+        settlement.timber.stock += calcStockChange(settlement.foresters.timber.produced, settlement.timber.consumption_rate, settlement.production_quota)
         if (settlement.timber.stock < 0) {
             settlement.timber.deficit = Math.abs(settlement.timber.stock)
             settlement.timber.stock = 0
         }
-        settlement.tools.stock += settlement.craftsmen.tools.produced - settlement.tools.consumption_rate
+        settlement.tools.stock += calcStockChange(settlement.craftsmen.tools.produced, settlement.tools.consumption_rate, settlement.production_quota)
         if (settlement.tools.stock < 0) {
             settlement.tools.deficit = Math.abs(settlement.tools.stock)
             settlement.tools.stock = 0
         }
-        settlement.common_ores.stock += settlement.miners.common_ores.produced - settlement.common_ores.consumption_rate
+        settlement.common_ores.stock += calcStockChange(settlement.miners.common_ores.produced, settlement.common_ores.consumption_rate, settlement.production_quota)
         if (settlement.common_ores.stock < 0) {
             settlement.common_ores.deficit = Math.abs(settlement.common_ores.stock)
             settlement.common_ores.stock = 0
         }
-        settlement.medical_supplies.stock += settlement.clerics.medical_supplies.produced - settlement.medical_supplies.consumption_rate
+        settlement.medical_supplies.stock += calcStockChange(settlement.clerics.medical_supplies.produced, settlement.medical_supplies.consumption_rate, settlement.production_quota)
         if (settlement.medical_supplies.stock < 0) {
             settlement.medical_supplies.deficit = Math.abs(settlement.medical_supplies.stock)
             settlement.medical_supplies.stock = 0
         }
-        settlement.rare_ores.stock += settlement.miners.rare_ores.produced - settlement.rare_ores.consumption_rate
+        settlement.rare_ores.stock += calcStockChange(settlement.miners.rare_ores.produced, settlement.rare_ores.consumption_rate, settlement.production_quota)
         if (settlement.rare_ores.stock < 0) {
             settlement.rare_ores.deficit = Math.abs(settlement.rare_ores.stock)
             settlement.rare_ores.stock = 0
         }
-        settlement.gems.stock += settlement.miners.gems.produced - settlement.gems.consumption_rate
+        settlement.gems.stock += calcStockChange(settlement.miners.gems.produced, settlement.gems.consumption_rate, settlement.production_quota)
         if (settlement.gems.stock < 0) {
             settlement.gems.deficit = Math.abs(settlement.gems.stock)
             settlement.gems.stock = 0
         }
-        settlement.runes.stock += settlement.rune_smiths.runes.produced - settlement.runes.consumption_rate
+        settlement.runes.stock += calcStockChange(settlement.rune_smiths.runes.produced, settlement.runes.consumption_rate, settlement.production_quota)
         if (settlement.runes.stock < 0) {
             settlement.runes.deficit = Math.abs(settlement.runes.stock)
             settlement.runes.stock = 0
         }
-        settlement.armaments.stock += settlement.craftsmen.armaments.produced - settlement.armaments.consumption_rate
+        settlement.armaments.stock += calcStockChange(settlement.craftsmen.armaments.produced, settlement.armaments.consumption_rate, settlement.production_quota)
         if (settlement.armaments.stock < 0) {
             settlement.armaments.deficit = Math.abs(settlement.armaments.stock)
             settlement.armaments.stock = 0
         }
-        settlement.books.stock += settlement.clerics.books.produced + settlement.archivists.books.produced - settlement.books.consumption_rate
+        settlement.books.stock += calcStockChange(settlement.clerics.books.produced + settlement.archivists.books.produced, settlement.books.consumption_rate, settlement.production_quota)
         if (settlement.books.stock < 0) {
             settlement.books.deficit = Math.abs(settlement.books.stock)
             settlement.books.stock = 0
         }
-        settlement.enchanted_armaments.stock += settlement.rune_smiths.enchanted_armaments.produced - settlement.enchanted_armaments.consumption_rate
+        settlement.enchanted_armaments.stock += calcStockChange(settlement.rune_smiths.enchanted_armaments.produced, settlement.enchanted_armaments.consumption_rate, settlement.production_quota)
         if (settlement.enchanted_armaments.stock < 0) {
             settlement.enchanted_armaments.deficit = Math.abs(settlement.enchanted_armaments.stock)
             settlement.enchanted_armaments.stock = 0
         }
-        settlement.enchanted_charcoal.stock += settlement.foresters.enchanted_charcoal.produced - settlement.enchanted_charcoal.consumption_rate
+        settlement.enchanted_charcoal.stock += calcStockChange(settlement.foresters.enchanted_charcoal.produced, settlement.enchanted_charcoal.consumption_rate, settlement.production_quota)
         if (settlement.enchanted_charcoal.stock < 0) {
             settlement.enchanted_charcoal.deficit = Math.abs(settlement.enchanted_charcoal.stock)
             settlement.enchanted_charcoal.stock = 0
         }
+
+        next_goodsdist.food += Math.round((settlement.farmers.food_and_water.produced + settlement.foresters.food_and_water.produced) * (settlement.production_quota))
+        next_goodsdist.beer += Math.round(settlement.farmers.beer.produced * settlement.production_quota)
+        next_goodsdist.leather += Math.round(settlement.farmers.leather_and_textiles.produced * settlement.production_quota)
+        next_goodsdist.artisinal += Math.round((settlement.craftsmen.artisanal_goods.produced + settlement.foresters.artisanal_goods.produced) * settlement.production_quota)
+        next_goodsdist.livestock += Math.round((settlement.farmers.livestock.produced) * settlement.production_quota)
+        next_goodsdist.ornamental += Math.round(settlement.craftsmen.ornamental_luxuries.produced * settlement.production_quota)
+        next_goodsdist.enchanted += Math.round(settlement.rune_smiths.enchanted_luxuries.produced * settlement.production_quota)
+        next_goodsdist.timber += Math.round(settlement.foresters.timber.produced * settlement.production_quota)
+        next_goodsdist.tools += Math.round(settlement.craftsmen.tools.produced * settlement.production_quota)
+        next_goodsdist.common_ores += Math.round(settlement.miners.common_ores.produced * settlement.production_quota)
+        next_goodsdist.medical += Math.round(settlement.clerics.medical_supplies.produced * settlement.production_quota)
+        next_goodsdist.rare_ores += Math.round(settlement.miners.rare_ores.produced * settlement.production_quota)
+        next_goodsdist.gems += Math.round(settlement.miners.gems.produced * settlement.production_quota)
+        next_goodsdist.runes += Math.round(settlement.rune_smiths.runes.produced * settlement.production_quota)
+        next_goodsdist.arms += Math.round(settlement.craftsmen.armaments.produced * settlement.production_quota)
+        next_goodsdist.books += Math.round((settlement.clerics.books.produced + settlement.archivists.books.produced) * settlement.production_quota)
+        next_goodsdist.enchanted_arms += Math.round(settlement.rune_smiths.enchanted_armaments.produced * settlement.production_quota)
+        next_goodsdist.charcoal += Math.round(settlement.foresters.enchanted_charcoal.produced * settlement.production_quota)
 
         // Calculate Pop Growth
         popGrowth(settlement)
@@ -204,6 +230,6 @@ export const NextTurn = async (game: string) => {
 
     })
     store.set('settlements',settlements)
-    store.set('Finance Points', federal_finance)
+    store.set('Federal Reserve', next_goodsdist)
     store.save()
 }

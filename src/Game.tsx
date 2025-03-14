@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { newSettlement, SettlementInterface, SettlementTier } from "./Settlement/SettlementInterface";
+import { newSettlement, SettlementInterface, updateGoodsProduction } from "./Settlement/SettlementInterface";
 import Settlement from "./Settlement/Settlement";
 import { useNavigate, useParams } from "react-router";
 import { load } from "@tauri-apps/plugin-store";
@@ -17,7 +17,7 @@ import { RadioButton } from "primereact/radiobutton";
 import PopDistribution, { default_popdist, popdist } from "./components/Popdistribution";
 import { InputNumber } from "primereact/inputnumber";
 import { Slider } from "primereact/slider";
-import { goodsdist, empty_goodsdist } from "./components/ResourceDistribution";
+import ResourceDistribuition, { goodsdist, empty_goodsdist } from "./components/ResourceDistribution";
 import { IoFastFood } from "react-icons/io5";
 import { GiBeerStein, GiClothes, GiCoalWagon, GiCrystalBall, GiGems, GiMagicShield, GiPouringChalice, GiRuneStone, GiThrownCharcoal, GiWoodPile } from "react-icons/gi";
 import { LuHandCoins } from "react-icons/lu";
@@ -36,12 +36,13 @@ function Game() {
     const [settlements, setSettlements] = useState<SettlementInterface[]>([]);
     const [newSettlementVisable,setNewSettlementVisable] = useState<boolean>(false);
     const [terrainOptions, setTerrainOptions] = useState<selectButtonTerrainInterface[]>([])
-    const [selectedTerrain, setSelectedTerrain] = useState(null)
+    const [selectedTerrain, setSelectedTerrain] = useState<TerrainType>(TerrainType.Mountain)
     const [newSettlmentName, setNewSettlementName] = useState<string>('');
     const [intialSettlerType,setInitalSettlerType] = useState<string>('');
     const [initialPops,setIntialPops] = useState<popdist>(default_popdist);
     const [resourceType,setResourceType] = useState<string>('');
     const [percentageGive, setPercentageGive] = useState<number>(0);
+    const [resourceDistribution, setResourceDistribution] = useState<goodsdist>(empty_goodsdist);
 
     // Federal Reserve
     const [reserveGoods,setReserveGoods] = useState<goodsdist>(empty_goodsdist);
@@ -125,10 +126,117 @@ function Game() {
         getSettlements();
     }
 
-    const createNewSettlement = () => {
-        const values = Object.values(TerrainType).filter(value => typeof value === "number") as number[];
-        const randomValue = values[Math.floor(Math.random() * values.length)];
-        const new_settlement = newSettlement(`settlement${settlements.length+1}`,randomValue as TerrainType)
+    const createNewSettlement = async () => {
+        const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
+        const new_settlement = newSettlement(`settlement${settlements.length+1}`,selectedTerrain)
+        
+        // Give Intial Resources
+        if(resourceType === 'Percentage') {
+            new_settlement.finance_points = Math.round(reserveGoods.money * percentageGive)
+            new_settlement.food_and_water.stock = Math.round(reserveGoods.food * percentageGive)
+            new_settlement.beer.stock = Math.round(reserveGoods.beer * percentageGive)
+            new_settlement.leather_and_textiles.stock = Math.round(reserveGoods.leather * percentageGive)
+            new_settlement.artisinal_goods.stock = Math.round(reserveGoods.artisinal * percentageGive)
+            new_settlement.livestock.stock = Math.round(reserveGoods.livestock * percentageGive)
+            new_settlement.ornamental_luxuries.stock = Math.round(reserveGoods.ornamental * percentageGive)
+            new_settlement.enchanted_luxuries.stock = Math.round(reserveGoods.enchanted * percentageGive)
+            new_settlement.timber.stock = Math.round(reserveGoods.timber * percentageGive)
+            new_settlement.tools.stock = Math.round(reserveGoods.tools * percentageGive)
+            new_settlement.common_ores.stock = Math.round(reserveGoods.common_ores * percentageGive)
+            new_settlement.medical_supplies.stock = Math.round(reserveGoods.medical * percentageGive)
+            new_settlement.rare_ores.stock = Math.round(reserveGoods.rare_ores * percentageGive)
+            new_settlement.gems.stock = Math.round(reserveGoods.gems * percentageGive)
+            new_settlement.runes.stock = Math.round(reserveGoods.runes * percentageGive)
+            new_settlement.armaments.stock = Math.round(reserveGoods.arms * percentageGive)
+            new_settlement.books.stock = Math.round(reserveGoods.books * percentageGive)
+            new_settlement.enchanted_armaments.stock = Math.round(reserveGoods.enchanted_arms * percentageGive)
+            new_settlement.enchanted_charcoal.stock = Math.round(reserveGoods.charcoal * percentageGive)
+        } else if (resourceType === 'Discrete') {
+            new_settlement.finance_points = resourceDistribution.money
+            new_settlement.food_and_water.stock = resourceDistribution.food
+            new_settlement.beer.stock = resourceDistribution.beer
+            new_settlement.leather_and_textiles.stock = resourceDistribution.leather
+            new_settlement.artisinal_goods.stock = resourceDistribution.artisinal
+            new_settlement.livestock.stock = resourceDistribution.livestock
+            new_settlement.ornamental_luxuries.stock = resourceDistribution.ornamental
+            new_settlement.enchanted_luxuries.stock = resourceDistribution.enchanted
+            new_settlement.timber.stock = resourceDistribution.timber
+            new_settlement.tools.stock = resourceDistribution.tools
+            new_settlement.common_ores.stock = resourceDistribution.common_ores
+            new_settlement.medical_supplies.stock = resourceDistribution.medical
+            new_settlement.rare_ores.stock = resourceDistribution.rare_ores
+            new_settlement.gems.stock = resourceDistribution.gems
+            new_settlement.runes.stock = resourceDistribution.runes
+            new_settlement.armaments.stock = resourceDistribution.arms
+            new_settlement.books.stock = resourceDistribution.books
+            new_settlement.enchanted_armaments.stock = resourceDistribution.enchanted_arms
+            new_settlement.enchanted_charcoal.stock = resourceDistribution.charcoal
+        }
+        setReserveGoods({
+            money: reserveGoods.money - new_settlement.finance_points,
+            food: reserveGoods.food - new_settlement.food_and_water.stock,
+            beer: reserveGoods.beer - new_settlement.beer.stock,
+            leather: reserveGoods.leather - new_settlement.leather_and_textiles.stock,
+            artisinal: reserveGoods.artisinal - new_settlement.artisinal_goods.stock,
+            livestock: reserveGoods.livestock - new_settlement.livestock.stock,
+            ornamental: reserveGoods.ornamental - new_settlement.ornamental_luxuries.stock,
+            enchanted: reserveGoods.enchanted - new_settlement.enchanted_luxuries.stock,
+            timber: reserveGoods.timber - new_settlement.timber.stock,
+            tools: reserveGoods.tools - new_settlement.tools.stock,
+            common_ores: reserveGoods.common_ores - new_settlement.common_ores.stock,
+            medical: reserveGoods.medical - new_settlement.medical_supplies.stock,
+            rare_ores: reserveGoods.rare_ores - new_settlement.rare_ores.stock,
+            gems: reserveGoods.gems - new_settlement.gems.stock,
+            runes: reserveGoods.runes - new_settlement.runes.stock,
+            arms: reserveGoods.arms - new_settlement.armaments.stock,
+            books: reserveGoods.books - new_settlement.books.stock,
+            enchanted_arms: reserveGoods.enchanted - new_settlement.enchanted_armaments.stock,
+            charcoal: reserveGoods.charcoal - new_settlement.enchanted_charcoal.stock})
+        // Give Inital Population
+        if(intialSettlerType === 'Default') {
+            new_settlement.craftsmen.population = 1
+            new_settlement.merchants.population = 1
+            new_settlement.miners.population = 2
+            new_settlement.farmers.population = 6
+        }
+        else if (intialSettlerType === "I'm Feeling Lucky") {
+            for (let index = 0; index < 10; index++) {
+                const rand = Math.floor(Math.random() * 12);
+                if(rand === 0) {new_settlement.rulers.population += 1}
+                if(rand === 1) {new_settlement.archivists.population += 1}
+                if(rand === 2) {new_settlement.engineers.population += 1}
+                if(rand === 3) {new_settlement.rune_smiths.population += 1}
+                if(rand === 4) {new_settlement.craftsmen.population += 1}
+                if(rand === 5) {new_settlement.merchants.population += 1}
+                if(rand === 6) {new_settlement.clerics.population += 1}
+                if(rand === 7) {new_settlement.miners.population += 1}
+                if(rand === 8) {new_settlement.farmers.population += 1}
+                if(rand === 9) {new_settlement.warriors.population += 1}
+                if(rand === 10) {new_settlement.foresters.population += 1}
+                if(rand === 11) {new_settlement.criminals.population += 1}
+            }
+        }
+        else if (intialSettlerType === 'Custom') {
+            new_settlement.rulers.population = initialPops.rulers
+            new_settlement.archivists.population = initialPops.archivists
+            new_settlement.engineers.population = initialPops.engineers
+            new_settlement.rune_smiths.population = initialPops.runeSmiths
+            new_settlement.craftsmen.population = initialPops.craftsmen
+            new_settlement.merchants.population = initialPops.merchants
+            new_settlement.clerics.population = initialPops.clerics
+            new_settlement.miners.population = initialPops.miners
+            new_settlement.farmers.population = initialPops.farmers
+            new_settlement.warriors.population = initialPops.warriors
+            new_settlement.foresters.population = initialPops.foresters
+            new_settlement.criminals.population = initialPops.criminals
+        }
+        updateGoodsProduction(new_settlement)
+        new_settlement.projected_pop = 10
+        new_settlement.visable_name = newSettlmentName
+        store.set('settlements', [...settlements,new_settlement]);
+        store.set('Federal Reserve',reserveGoods)
+        store.save()
+        getSettlements()
     }
 
     const setNewSettlmentOptions = () => {
@@ -137,8 +245,7 @@ function Game() {
         const randVal = () => terrain_count[Math.floor(Math.random() * terrain_count.length)]
         const t1 = randVal() as TerrainType
         const t2 = randVal() as TerrainType
-        const t3 = randVal() as TerrainType
-        setTerrainOptions([{name: TerrainData[t1].name,value: t1},{name: TerrainData[t2].name,value: t2},{name: TerrainData[t3].name,value: t3}])
+        setTerrainOptions([{name: TerrainData[TerrainType.Mountain].name,value: TerrainType.Mountain},{name: TerrainData[t1].name,value: t1},{name: TerrainData[t2].name,value: t2}])
         setNewSettlementVisable(true)
 
     }
@@ -257,7 +364,9 @@ function Game() {
                     />
                 })}
                 {/* New Settlement Function */}
+                {reserveGoods.money < ((settlements.length ** 2) * 4500) ? 
                 <Button icon="pi pi-plus" onClick={()=>{
+                    setReserveGoods({...reserveGoods,money: reserveGoods.money - ((settlements.length ** 2) * 4500)})
                     setNewSettlmentOptions()
                 }}>
                     <div className="flex flex-row gap-1">
@@ -265,15 +374,14 @@ function Game() {
                         <FaCoins/>
                         {(settlements.length ** 2) * 4500}
                     </div>
-                </Button>
+                </Button>: null}
                 <Dialog 
                     header={'New Settlement'}
                     visible={newSettlementVisable} 
-                    closable
                     onHide={()=>{
                         setNewSettlementVisable(false)
                         setTerrainOptions([])
-                        setSelectedTerrain(null)
+                        setSelectedTerrain(TerrainType.Mountain)
                         setNewSettlementName('')
                         setInitalSettlerType('')
                     }}>
@@ -320,8 +428,38 @@ function Game() {
                             <InputNumber value={percentageGive} onChange={e => setPercentageGive(e.value ?? 0)} min={0} max={100}/>
                             <Slider value={percentageGive} onChange={e => setPercentageGive(Array.isArray(e.value) ? e.value[0] : e.value)}/>
                         </>: null}
-                        
-                        <Button label="Settle Location" />
+                        {resourceType === 'Discrete' ? <ResourceDistribuition goods_cap={reserveGoods} updateFunc={setResourceDistribution}/>:null}
+                        {(newSettlmentName !== '') && (intialSettlerType !== '') && (resourceType !== '')?
+                        <Button label="Settle Location" onClick={() => {
+                            createNewSettlement()
+                            setNewSettlementVisable(false)
+                            setTerrainOptions([])
+                            setSelectedTerrain(TerrainType.Mountain)
+                            setNewSettlementName('')
+                            setInitalSettlerType('')
+                            setIntialPops({...default_popdist})
+                            setResourceType('')
+                            setPercentageGive(0)
+                            setResourceDistribution({money: 0,
+                                food: 0,
+                                beer: 0,
+                                leather: 0,
+                                artisinal: 0,
+                                livestock: 0,
+                                ornamental: 0,
+                                enchanted: 0,
+                                timber: 0,
+                                tools: 0,
+                                common_ores: 0,
+                                medical: 0,
+                                rare_ores: 0,
+                                gems: 0,
+                                runes: 0,
+                                arms: 0,
+                                books: 0,
+                                enchanted_arms: 0,
+                                charcoal: 0})
+                        }}/> : null}
                     </div>
                 </Dialog>
             </div>
