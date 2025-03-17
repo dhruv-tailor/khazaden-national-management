@@ -32,6 +32,7 @@ export const newWarriors = () => {
         productivity_rate: 1,
         loyalty_modifiers: [], 
         total_productivity: 0,
+        development: 0,
     }
     return warriors;
 }

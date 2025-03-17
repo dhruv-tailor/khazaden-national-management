@@ -1,8 +1,8 @@
 import { Card } from "primereact/card";
-import { ClanInterface } from "../../Clans/ClanInterface";
+import { ClanInterface, developmentBonus } from "../../Clans/ClanInterface";
 import { ReactNode, useEffect, useState } from "react";
 import { ProgressBar } from "primereact/progressbar";
-import { FaBook, FaBriefcaseMedical, FaGem, FaHeart, FaShieldAlt, FaTools } from "react-icons/fa";
+import { FaBook, FaBriefcaseMedical, FaCoins, FaGem, FaHeart, FaShieldAlt, FaTools } from "react-icons/fa";
 import { FaGear } from "react-icons/fa6";
 import { IoIosPeople } from "react-icons/io";
 import { IoFastFood } from "react-icons/io5";
@@ -18,15 +18,21 @@ import { clans } from "../../Goods/good";
 import { Slider } from 'primereact/slider';
 import { InputText } from "primereact/inputtext";
 import { Divider } from 'primereact/divider';
+import { InputNumber } from "primereact/inputnumber";
+import { BsBuildingFillGear } from "react-icons/bs";
+import { Button } from "primereact/button";
+import { Dialog } from "primereact/dialog";
 
 
 export default function ClanInfo(
-    {clan,icon,resources,updateParent}: 
+    {clan,icon,resources,updateParent,funds,updateFunds}: 
     {
         clan: ClanInterface,
         icon:ReactNode,
         resources: number[],
-        updateParent: () => Promise<void>
+        updateParent: () => Promise<void>,
+        funds: number,
+        updateFunds: (id: clans, amount: number) => Promise<void>
     }) {
     const [goodsAssigned, setGoodsAssigned] = useState<number>(0);
     const [food,setFood] = useState<number>(clan.food_and_water.produced);
@@ -48,6 +54,8 @@ export default function ClanInfo(
     const [enchantedArms,setEnchantedArms] = useState<number>(clan.enchanted_armaments.produced);
     const [charcoal,setCharcoal] = useState<number>(clan.enchanted_charcoal.produced);
     const [taxRate, setTaxRate] = useState<number>(clan.tax_rate)
+    const [invest, setInvest] = useState<number>(0)
+    const [showInvest, setShowInvest] = useState<boolean>(false)
 
     const gameId = useParams().game
     const settlementId = useParams().settlement
@@ -87,6 +95,7 @@ export default function ClanInfo(
     },[taxRate])
 
     const valueTemplate = (value: number) => (<>{value / 10}</>)
+    const developmentTemplate = (value: number) => (<>{Math.round(value / 25)}</>)
 
     const updateSave = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
@@ -172,6 +181,10 @@ export default function ClanInfo(
             <div>
                 <FaGear /> Efficency
                 <ProgressBar value={clan.efficency * 10} displayValueTemplate={valueTemplate}></ProgressBar>
+            </div>
+            <div>
+            <BsBuildingFillGear /> Development
+                <ProgressBar value={developmentBonus(clan) * 25} displayValueTemplate={developmentTemplate}></ProgressBar>
             </div>
             <Divider />
             <div>
@@ -321,8 +334,32 @@ export default function ClanInfo(
                             icon={<GiThrownCharcoal/>}
                             /> : null}
                 </div>
-                
             </div>
+            <Divider />
+            <Button label="Invest in Clan" onClick={()=>setShowInvest(true)}/>
+            <Dialog 
+                header={<>Invest in {icon} {clan.name}</>}
+                visible={showInvest}
+                onHide={() => {
+                    setShowInvest(false)
+                    setInvest(0)
+                }}
+                >
+                <div className="flex flex-column gap-1">
+                    <div>
+                        Funds Available: <FaCoins/> {funds}
+                    </div>
+                    <div>
+                        <FaCoins/>
+                        <InputNumber min={0} max={funds} size={15} showButtons id="investment" value={invest} onChange={e => setInvest(e.value ?? 0)}/>
+                    </div>
+                    <Button label="Invest" onClick={() => {
+                        updateFunds(clan.id,invest)
+                        setShowInvest(false)
+                        setInvest(0)
+                    }}/>
+                </div>
+            </Dialog>
         </Card>
         </>
     )

@@ -73,6 +73,8 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
         charcoal: 0
     });
 
+    const [boxSize,setBoxSize] = useState<number>(3);
+
     useEffect(()=>{updateFunc(goods)},[goods]);
 
     return(
@@ -90,7 +92,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                 <div>
                     <IoFastFood/>
                     <InputNumber 
-                        size={2} 
+                        size={boxSize} 
                         value={goods.food} 
                         onValueChange={e => setGoods({...goods,food: e.value ?? 0})} 
                         showButtons 
@@ -100,7 +102,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                 <div>
                     <GiBeerStein/>
                     <InputNumber 
-                        size={2} 
+                        size={boxSize} 
                         value={goods.beer} 
                         onValueChange={e => setGoods({...goods,beer: e.value ?? 0})} 
                         showButtons 
@@ -110,7 +112,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                 <div>
                     <GiClothes/>
                     <InputNumber 
-                        size={2} 
+                        size={boxSize} 
                         value={goods.leather} 
                         onValueChange={e => setGoods({...goods,leather: e.value ?? 0})} 
                         showButtons 
@@ -122,7 +124,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                 <div>
                     <LuHandCoins/>
                     <InputNumber 
-                        size={2} 
+                        size={boxSize} 
                         value={goods.artisinal} 
                         onValueChange={e => setGoods({...goods,artisinal: e.value ?? 0})} 
                         showButtons 
@@ -132,7 +134,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                 <div>
                     <PiCowFill/>
                     <InputNumber 
-                        size={2} 
+                        size={boxSize} 
                         value={goods.livestock} 
                         onValueChange={e => setGoods({...goods,livestock: e.value ?? 0})} 
                         showButtons 
@@ -142,7 +144,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                 <div>
                     <GiPouringChalice/>
                     <InputNumber 
-                        size={2} 
+                        size={boxSize} 
                         value={goods.ornamental} 
                         onValueChange={e => setGoods({...goods,ornamental: e.value ?? 0})} 
                         showButtons 
@@ -154,7 +156,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                 <div>
                     <GiCrystalBall/>
                     <InputNumber 
-                        size={2} 
+                        size={boxSize} 
                         value={goods.enchanted} 
                         onValueChange={e => setGoods({...goods,enchanted: e.value ?? 0})} 
                         showButtons 
@@ -164,7 +166,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                 <div>
                     <GiWoodPile/>
                     <InputNumber 
-                        size={2} 
+                        size={boxSize} 
                         value={goods.timber} 
                         onValueChange={e => setGoods({...goods,timber: e.value ?? 0})} 
                         showButtons 
@@ -174,7 +176,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                 <div>
                     <FaTools/>
                     <InputNumber 
-                        size={2} 
+                        size={boxSize} 
                         value={goods.tools} 
                         onValueChange={e => setGoods({...goods,tools: e.value ?? 0})} 
                         showButtons 
@@ -186,7 +188,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                 <div>
                     <GiCoalWagon/>
                     <InputNumber 
-                        size={2} 
+                        size={boxSize} 
                         value={goods.common_ores} 
                         onValueChange={e => setGoods({...goods,common_ores: e.value ?? 0})} 
                         showButtons 
@@ -196,7 +198,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                 <div>
                     <FaBriefcaseMedical/>
                     <InputNumber 
-                        size={2} 
+                        size={boxSize} 
                         value={goods.medical} 
                         onValueChange={e => setGoods({...goods,medical: e.value ?? 0})} 
                         showButtons 
@@ -206,7 +208,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                 <div>
                     <FaGem/>
                     <InputNumber 
-                        size={2} 
+                        size={boxSize} 
                         value={goods.rare_ores} 
                         onValueChange={e => setGoods({...goods,rare_ores: e.value ?? 0})} 
                         showButtons 
@@ -218,7 +220,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                 <div>
                     <GiGems/>
                     <InputNumber 
-                        size={2} 
+                        size={boxSize} 
                         value={goods.gems} 
                         onValueChange={e => setGoods({...goods,gems: e.value ?? 0})} 
                         showButtons 
@@ -228,7 +230,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                 <div>
                     <GiRuneStone/>
                     <InputNumber 
-                        size={2} 
+                        size={boxSize} 
                         value={goods.runes} 
                         onValueChange={e => setGoods({...goods,runes: e.value ?? 0})} 
                         showButtons 
@@ -238,7 +240,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                 <div>
                     <FaShieldAlt/>
                     <InputNumber 
-                        size={2} 
+                        size={boxSize} 
                         value={goods.arms} 
                         onValueChange={e => setGoods({...goods,arms: e.value ?? 0})} 
                         showButtons 
@@ -250,7 +252,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                 <div>
                     <FaBook/>
                     <InputNumber 
-                        size={2} 
+                        size={boxSize} 
                         value={goods.books} 
                         onValueChange={e => setGoods({...goods,books: e.value ?? 0})} 
                         showButtons 
@@ -260,7 +262,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                 <div>
                     <GiMagicShield/>
                     <InputNumber 
-                        size={2} 
+                        size={boxSize} 
                         value={goods.enchanted_arms} 
                         onValueChange={e => setGoods({...goods,enchanted_arms: e.value ?? 0})} 
                         showButtons 
@@ -270,7 +272,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                 <div>
                     <GiThrownCharcoal/>
                     <InputNumber 
-                        size={2} 
+                        size={boxSize} 
                         value={goods.charcoal} 
                         onValueChange={e => setGoods({...goods,charcoal: e.value ?? 0})} 
                         showButtons 

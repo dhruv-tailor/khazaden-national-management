@@ -43,6 +43,9 @@ function Game() {
     const [resourceType,setResourceType] = useState<string>('');
     const [percentageGive, setPercentageGive] = useState<number>(0);
     const [resourceDistribution, setResourceDistribution] = useState<goodsdist>(empty_goodsdist);
+    const [giveGoodsVisable,setGiveGoodsVisable] = useState<boolean>(false);
+    //Who are you giving the stimulus package to
+    const [whoToGive,setWhoToGive] = useState<string>('');
 
     // Federal Reserve
     const [reserveGoods,setReserveGoods] = useState<goodsdist>(empty_goodsdist);
@@ -250,6 +253,70 @@ function Game() {
 
     }
 
+    const giveGoods = (name:string) => {
+        setWhoToGive(name)
+        setGiveGoodsVisable(true)
+    }
+
+    const sendStimulus = async () => {
+        setGiveGoodsVisable(false)
+        setWhoToGive('')
+        // Remove the Goods from the Federal Reserve
+        setReserveGoods({
+            money: reserveGoods.money - resourceDistribution.money,
+            food: reserveGoods.food - resourceDistribution.food,
+            beer: reserveGoods.beer - resourceDistribution.beer,
+            leather: reserveGoods.leather - resourceDistribution.leather,
+            artisinal: reserveGoods.artisinal - resourceDistribution.artisinal,
+            livestock: reserveGoods.livestock - resourceDistribution.livestock,
+            ornamental: reserveGoods.ornamental - resourceDistribution.ornamental,
+            enchanted: reserveGoods.enchanted - resourceDistribution.enchanted,
+            timber: reserveGoods.timber - resourceDistribution.timber,
+            tools: reserveGoods.tools - resourceDistribution.tools,
+            common_ores: reserveGoods.common_ores - resourceDistribution.common_ores,
+            medical: reserveGoods.medical - resourceDistribution.medical,
+            rare_ores: reserveGoods.rare_ores - resourceDistribution.rare_ores,
+            gems: reserveGoods.gems - resourceDistribution.gems,
+            runes: reserveGoods.runes - resourceDistribution.runes,
+            arms: reserveGoods.arms - resourceDistribution.arms,
+            books: reserveGoods.books - resourceDistribution.books,
+            enchanted_arms: reserveGoods.enchanted_arms - resourceDistribution.enchanted_arms,
+            charcoal: reserveGoods.charcoal - resourceDistribution.charcoal})
+        // Give the Goods to the Settlement
+        const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
+        const settlements = await store.get<SettlementInterface[]>('settlements');
+        settlements?.forEach(settlement => {
+            if (settlement.name === whoToGive) {
+                settlement.finance_points += resourceDistribution.money
+                settlement.food_and_water.stock += resourceDistribution.food
+                settlement.beer.stock += resourceDistribution.beer
+                settlement.leather_and_textiles.stock += resourceDistribution.leather
+                settlement.artisinal_goods.stock += resourceDistribution.artisinal
+                settlement.livestock.stock += resourceDistribution.livestock
+                settlement.ornamental_luxuries.stock += resourceDistribution.ornamental
+                settlement.enchanted_luxuries.stock += resourceDistribution.enchanted
+                settlement.timber.stock += resourceDistribution.timber
+                settlement.tools.stock += resourceDistribution.tools
+                settlement.common_ores.stock += resourceDistribution.common_ores
+                settlement.medical_supplies.stock += resourceDistribution.medical
+                settlement.rare_ores.stock += resourceDistribution.rare_ores
+                settlement.gems.stock += resourceDistribution.gems
+                settlement.runes.stock += resourceDistribution.runes
+                settlement.armaments.stock += resourceDistribution.arms
+                settlement.books.stock += resourceDistribution.books
+                settlement.enchanted_armaments.stock += resourceDistribution.enchanted_arms
+                settlement.enchanted_charcoal.stock += resourceDistribution.charcoal
+            }})
+        store.set('settlements',settlements)
+        store.set('Federal Reserve',reserveGoods)
+        store.save()
+
+        setGiveGoodsVisable(false)
+        setWhoToGive('')
+        setResourceDistribution({...empty_goodsdist})
+        getSettlements()
+    }
+
     return (
         <div className="flex flex-column gap-2">
             <Button label="Next Turn" onClick={processNextTurn} size="small" icon="pi pi-angle-double-right"/>
@@ -361,10 +428,11 @@ function Game() {
                         settlement={settlement} 
                         navigateSettlement={navigateSettlement}
                         updateParent={getSettlements}
+                        stimulus={giveGoods}
                     />
                 })}
                 {/* New Settlement Function */}
-                {reserveGoods.money < ((settlements.length ** 2) * 4500) ? 
+                {reserveGoods.money >= ((settlements.length ** 2) * 4500) ? 
                 <Button icon="pi pi-plus" onClick={()=>{
                     setReserveGoods({...reserveGoods,money: reserveGoods.money - ((settlements.length ** 2) * 4500)})
                     setNewSettlmentOptions()
@@ -375,8 +443,10 @@ function Game() {
                         {(settlements.length ** 2) * 4500}
                     </div>
                 </Button>: null}
+                {/* New Settlment Form */}
                 <Dialog 
                     header={'New Settlement'}
+                    closable={false}
                     visible={newSettlementVisable} 
                     onHide={()=>{
                         setNewSettlementVisable(false)
@@ -460,6 +530,17 @@ function Game() {
                                 enchanted_arms: 0,
                                 charcoal: 0})
                         }}/> : null}
+                    </div>
+                </Dialog>
+                {/* Give Goods Dialog */}
+                <Dialog header={`Stimulus`} visible={giveGoodsVisable} onHide={() => {
+                    setGiveGoodsVisable(false)
+                    setWhoToGive('')
+                    setResourceDistribution({...empty_goodsdist})
+                    }}>
+                    <div className="flex flex-column gap-2">
+                        <ResourceDistribuition goods_cap={reserveGoods} updateFunc={setResourceDistribution}/>
+                        <Button label="Send Care Package" icon='pi pi-send' onClick={sendStimulus}/>
                     </div>
                 </Dialog>
             </div>

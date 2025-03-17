@@ -1,4 +1,5 @@
 import { clans } from "../Goods/good";
+import { ensureNumber } from "../Settlement/SettlementInterface";
 
 export interface ClanInterface {
     name: string;
@@ -36,6 +37,9 @@ export interface ClanInterface {
     goods_produced: number;
     productivity_rate: number;
     total_productivity: number;
+
+    // Develeopment
+    development: number;
 }
 
 interface modifier {
@@ -100,4 +104,7 @@ export const emptyClanInterface: ClanInterface = {
     productivity_rate: 0,
     loyalty_modifiers: [],
     total_productivity: 0,
+    development: 0,
 }
+
+export const developmentBonus = (clan: ClanInterface) : number =>  Math.floor(Math.max(0,Math.floor(((ensureNumber(clan.development/(8 * clan.population))) ** (1/3))-2))+1);

@@ -36,5 +36,6 @@ FaHeart = loyalty
 FaGear = Efficency
 GiSlaveryWhip = Corvee Labor
 BsBuildingFillUp = development growth
+BsBuildingFillGear = Development
 
 FaCoins = Finanace Points

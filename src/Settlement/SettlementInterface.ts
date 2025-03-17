@@ -1,4 +1,4 @@
-import { ClanInterface, emptyClanInterface } from "../Clans/ClanInterface";
+import { ClanInterface, developmentBonus, emptyClanInterface } from "../Clans/ClanInterface";
 import { TerrainData, TerrainType } from "./TerrainInterface";
 import { newRulerClan } from "../Clans/Rulers";
 import { newArchivists } from "../Clans/Archivists";
@@ -296,6 +296,27 @@ export const updateGoodsProduction = (settlement: SettlementInterface) => {
     setEfficency(settlement)
     setTaxedProductivity(settlement)
     setTotalProductivity(settlement)
+    updateDevelopmet(settlement)
+}
+
+const updateDevelopmet = (settlement: SettlementInterface) => {
+    calcDevelopment(settlement.rulers)
+    calcDevelopment(settlement.archivists)
+    calcDevelopment(settlement.engineers)
+    calcDevelopment(settlement.rune_smiths)
+    calcDevelopment(settlement.craftsmen)
+    calcDevelopment(settlement.merchants)
+    calcDevelopment(settlement.clerics)
+    calcDevelopment(settlement.miners)
+    calcDevelopment(settlement.farmers)
+    calcDevelopment(settlement.warriors)
+    calcDevelopment(settlement.foresters)
+    calcDevelopment(settlement.criminals)
+}
+
+const calcDevelopment = (clan: ClanInterface) => {
+    // Natural Development Growth
+    clan.development += (clan.total_productivity - clan.taxed_productivity) * 0.3
 }
 
 const setTotalProductivity = (settlement: SettlementInterface) => {
@@ -406,7 +427,7 @@ const calcLoylaty = (clan: ClanInterface, settlement: SettlementInterface): numb
     return loyalty;
 }
 
-const ensureNumber = (value: number): number => isNaN(value) ? 0 : value
+export const ensureNumber = (value: number): number => isNaN(value) ? 0 : value
 
 // development + goods consumption
 const setEfficency = (settlement: SettlementInterface) => {
@@ -489,7 +510,7 @@ const calcEfficency = (clan: ClanInterface, settlement: SettlementInterface): nu
     }
     efficency = ensureNumber(efficency / total_goods_counted)
     efficency *= 5
-    efficency = Math.max(efficency + 1,0)
+    efficency = Math.max(efficency + developmentBonus(clan),0)
     efficency = Math.floor(efficency*bureaucratic_bonus)
     return efficency;
 }

@@ -17,8 +17,8 @@ import { saveLocation } from '../utilities/SaveData';
 import { useParams } from 'react-router';
 
 function Settlement(
-  {settlement, navigateSettlement, updateParent}: 
-  {settlement: SettlementInterface, navigateSettlement: (name: string) => void, updateParent: () => void}) {
+  {settlement, navigateSettlement, updateParent,stimulus}: 
+  {settlement: SettlementInterface, navigateSettlement: (name: string) => void, updateParent: () => void,stimulus: (name: string) => void}) {
 
   const [taxRate,setTaxRate] = useState<number>(settlement.settlment_tax);
   const [productionQuota,setProductionQuota] = useState<number>(settlement.production_quota);
@@ -89,6 +89,7 @@ function Settlement(
             }/>
           </div>
         </div>
+        {/* Resouce Screen */}
         <div className='flex flex-row gap-3'>
         <div className='flex flex-column gap-2'>
             <div className='flex flex-row gap-1'>
@@ -201,6 +202,9 @@ function Settlement(
           <label htmlFor="production-quota">Production Quota</label>
           <InputText id="production-quota" value={Math.round((productionQuota * 100)).toString()}/>
           <Slider value={productionQuota * 100} onChange={(e) => setProductionQuota((e.value as number)/100)} step={1}/>
+        </div>
+        <div>
+          <Button label='Give Stimulus' icon='pi pi-box' onClick={()=>stimulus(settlement.name)}/>
         </div>
       </Card>
     </>

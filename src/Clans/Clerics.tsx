@@ -32,6 +32,7 @@ export const newClerics = () => {
         productivity_rate: 4,
         loyalty_modifiers: [], 
         total_productivity: 0,
+        development: 0,
     }
     return clerics;
 }

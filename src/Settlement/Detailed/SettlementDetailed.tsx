@@ -212,6 +212,29 @@ export default function SettlementDetailed() {
         getSettlementData()
     }
 
+    const fp_invested = async (id: clans,amount: number) => {
+        const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
+        const settlements = await store.get<SettlementInterface[]>('settlements');
+        settlements?.forEach(s => {if (s.name === settlementId) {
+            s.finance_points -= amount
+            if(id === clans.rulers) {s.rulers.development += amount}
+            else if(id === clans.archivists) {s.archivists.development += Math.round(amount/4)}
+            else if(id === clans.engineers) {s.engineers.development += Math.round(amount/4)}
+            else if(id === clans.runeSmiths) {s.rune_smiths.development += Math.round(amount/4)}
+            else if(id === clans.craftsmen) {s.craftsmen.development += Math.round(amount/4)}
+            else if(id === clans.merchants) {s.merchants.development += Math.round(amount/4)}
+            else if(id === clans.clerics) {s.clerics.development += Math.round(amount/4)}
+            else if(id === clans.miners) {s.miners.development += Math.round(amount/4)}
+            else if(id === clans.farmers) {s.farmers.development += Math.round(amount/4)}
+            else if(id === clans.warriors) {s.warriors.development += Math.round(amount/4)}
+            else if(id === clans.foresters) {s.foresters.development += Math.round(amount/4)}
+            else if(id === clans.criminals) {s.criminals.development += Math.round(amount/4)}
+        }})
+        store.set('settlements',settlements)
+        store.save()
+        getSettlementData()
+    }
+
 
     return(
         <div className="flex flex-column gap-2">
@@ -365,72 +388,96 @@ export default function SettlementDetailed() {
                                 clan={settlement.rulers}
                                 resources={[food,beer,leather,livestock,timber,charcoal,commonOres,gems,rareOres]}
                                 updateParent={getSettlementData}
+                                funds={settlement.finance_points}
+                                updateFunds={fp_invested}
                                 icon={<BiSolidCrown/>}/> : null}
                         {settlement.archivists.population > 0 ? 
                             <ClanInfo 
                                 clan={settlement.archivists} 
                                 resources={[food,beer,leather,livestock,timber,charcoal,commonOres,gems,rareOres]}
                                 updateParent={getSettlementData}
+                                funds={settlement.finance_points}
+                                updateFunds={fp_invested}
                                 icon={<FaArchive/>}/> : null}
                         {settlement.engineers.population > 0 ? 
                             <ClanInfo 
                                 clan={settlement.engineers}
                                 resources={[food,beer,leather,livestock,timber,charcoal,commonOres,gems,rareOres]}
                                 updateParent={getSettlementData}
+                                funds={settlement.finance_points}
+                                updateFunds={fp_invested}
                                 icon={<MdEngineering/>}/> : null}
                         {settlement.rune_smiths.population > 0 ? 
                             <ClanInfo 
                                 clan={settlement.rune_smiths}
                                 resources={[food,beer,leather,livestock,timber,charcoal,commonOres,gems,rareOres]}
                                 updateParent={getSettlementData}
+                                funds={settlement.finance_points}
+                                updateFunds={fp_invested}
                                 icon={<GiBlacksmith/>}/> : null}
                         {settlement.craftsmen.population > 0 ? 
                             <ClanInfo 
                                 clan={settlement.craftsmen} 
                                 resources={[food,beer,leather,livestock,timber,charcoal,commonOres,gems,rareOres]}
                                 updateParent={getSettlementData}
+                                funds={settlement.finance_points}
+                                updateFunds={fp_invested}
                                 icon={<FaHammer/>}/> : null}
                         {settlement.merchants.population > 0 ? 
                             <ClanInfo 
                                 clan={settlement.merchants} 
                                 resources={[food,beer,leather,livestock,timber,charcoal,commonOres,gems,rareOres]}
                                 updateParent={getSettlementData}
+                                funds={settlement.finance_points}
+                                updateFunds={fp_invested}
                                 icon={<TbMoneybag/>}/> : null}
                         {settlement.clerics.population > 0 ? 
                             <ClanInfo 
                                 clan={settlement.clerics} 
                                 resources={[food,beer,leather,livestock,timber,charcoal,commonOres,gems,rareOres]}
                                 updateParent={getSettlementData}
+                                funds={settlement.finance_points}
+                                updateFunds={fp_invested}
                                 icon={<MdChurch/>}/> : null}
                         {settlement.miners.population > 0 ? 
                             <ClanInfo 
                                 clan={settlement.miners} 
                                 resources={[food,beer,leather,livestock,timber,charcoal,commonOres,gems,rareOres]}
                                 updateParent={getSettlementData}
+                                funds={settlement.finance_points}
+                                updateFunds={fp_invested}
                                 icon={<TbPick/>}/> : null}
                         {settlement.farmers.population > 0 ? 
                             <ClanInfo 
                                 clan={settlement.farmers} 
                                 resources={[food,beer,leather,livestock,timber,charcoal,commonOres,gems,rareOres]}
                                 updateParent={getSettlementData}
+                                funds={settlement.finance_points}
+                                updateFunds={fp_invested}
                                 icon={<GiFarmer/>}/> : null}
                         {settlement.warriors.population > 0 ? 
                             <ClanInfo 
                                 clan={settlement.warriors} 
                                 resources={[food,beer,leather,livestock,timber,charcoal,commonOres,gems,rareOres]}
                                 updateParent={getSettlementData}
+                                funds={settlement.finance_points}
+                                updateFunds={fp_invested}
                                 icon={<LuSword/>}/> : null}
                         {settlement.foresters.population > 0 ? 
                             <ClanInfo 
                                 clan={settlement.foresters} 
                                 resources={[food,beer,leather,livestock,timber,charcoal,commonOres,gems,rareOres]}
                                 updateParent={getSettlementData}
+                                funds={settlement.finance_points}
+                                updateFunds={fp_invested}
                                 icon={<GiAxeInStump/>}/> : null}
                         {settlement.criminals.population > 0 ? 
                             <ClanInfo 
                                 clan={settlement.criminals} 
                                 resources={[food,beer,leather,livestock,timber,charcoal,commonOres,gems,rareOres]}
                                 updateParent={getSettlementData}
+                                funds={settlement.finance_points}
+                                updateFunds={fp_invested}
                                 icon={<RiCriminalFill/>}/> : null}
                     </div>
                 </Panel>

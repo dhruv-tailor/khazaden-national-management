@@ -32,6 +32,7 @@ export const newRulerClan = () => {
         productivity_rate: 8,
         loyalty_modifiers: [], 
         total_productivity: 0,
+        development: 0,
     }
     return rulers;
 }

@@ -32,6 +32,7 @@ export const newCriminals = () => {
         productivity_rate: 1,
         loyalty_modifiers: [{name: 'Rage Against the Machine', value: -3}], 
         total_productivity: 0,
+        development: 0,
     }
     return foresters;
 }
