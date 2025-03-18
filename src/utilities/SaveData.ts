@@ -6,6 +6,17 @@ import { type } from '@tauri-apps/plugin-os'
 import { TerrainType } from "../Settlement/TerrainInterface";
 import { newSettlement, updateGoodsProduction } from "../Settlement/SettlementInterface";
 import { empty_goodsdist } from "../components/ResourceDistribution";
+import { Baetanuesa } from "../ForeignPowers/Powers/Baetanuesa";
+import { Beznesti } from "../ForeignPowers/Powers/Beznesti";
+import { Dragonsbane } from "../ForeignPowers/Powers/Dragonsbane";
+import { Eidgenossenkhazaden } from "../ForeignPowers/Powers/Eidgenossenkhazaden";
+import { Garozemle } from "../ForeignPowers/Powers/Garozemle";
+import { Kayasahr } from "../ForeignPowers/Powers/Kayasahr";
+import { Pactusallamanni } from "../ForeignPowers/Powers/Pactusallamanni";
+import { Polabtheli } from "../ForeignPowers/Powers/Polabtheli";
+import { Saemark } from "../ForeignPowers/Powers/Saemark";
+import { Sledzianska } from "../ForeignPowers/Powers/Sledzianska";
+import { TerraKontor } from "../ForeignPowers/Powers/TerraKontor";
 
 const fileSeperator = () => {
     const osType = type();
@@ -82,6 +93,11 @@ export const createNewSave = async (saveName: string)  => {
     
     store.set('settlements', [initial_settlement]);
     store.set('Federal Reserve',empty_goodsdist)
+    store.set('Foreign Powers', [Baetanuesa,Beznesti,Dragonsbane,Eidgenossenkhazaden,Garozemle,Kayasahr,Pactusallamanni,Polabtheli,Saemark,Sledzianska,TerraKontor])
+    store.set('Positive Global Market Trend',true) //True means going up false means going down
+    store.set('Osc Period',60) // How Many months in the economy trend
+    store.set('Osc Months Passed',0)
+    store.set('Market Trajectory', 0.0002)
     await store.save();
     store.close();
 }

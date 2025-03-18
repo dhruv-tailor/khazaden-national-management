@@ -14,6 +14,7 @@ import { newForesters } from "../Clans/Foresters";
 import { newCriminals } from "../Clans/Criminals";
 import { setConsumptionRates } from "./ConsumptionRate";
 import { clans } from "../Goods/good";
+import { ForeignPowerInterface } from "../ForeignPowers/ForeignPowerInterface";
 
 export interface SettlementInterface {
     name: string;
@@ -300,23 +301,27 @@ export const updateGoodsProduction = (settlement: SettlementInterface) => {
 }
 
 const updateDevelopmet = (settlement: SettlementInterface) => {
-    calcDevelopment(settlement.rulers)
-    calcDevelopment(settlement.archivists)
-    calcDevelopment(settlement.engineers)
-    calcDevelopment(settlement.rune_smiths)
-    calcDevelopment(settlement.craftsmen)
-    calcDevelopment(settlement.merchants)
-    calcDevelopment(settlement.clerics)
-    calcDevelopment(settlement.miners)
-    calcDevelopment(settlement.farmers)
-    calcDevelopment(settlement.warriors)
-    calcDevelopment(settlement.foresters)
-    calcDevelopment(settlement.criminals)
+    calcDevelopment(settlement.rulers,settlement)
+    calcDevelopment(settlement.archivists,settlement)
+    calcDevelopment(settlement.engineers,settlement)
+    calcDevelopment(settlement.rune_smiths,settlement)
+    calcDevelopment(settlement.craftsmen,settlement)
+    calcDevelopment(settlement.merchants,settlement)
+    calcDevelopment(settlement.clerics,settlement)
+    calcDevelopment(settlement.miners,settlement)
+    calcDevelopment(settlement.farmers,settlement)
+    calcDevelopment(settlement.warriors,settlement)
+    calcDevelopment(settlement.foresters,settlement)
+    calcDevelopment(settlement.criminals,settlement)
 }
 
-const calcDevelopment = (clan: ClanInterface) => {
+const calcDevelopment = (clan: ClanInterface, settlement: SettlementInterface) => {
     // Natural Development Growth
-    clan.development += (clan.total_productivity - clan.taxed_productivity) * 0.3
+    let bonus = 1;
+    if(clan.id === settlement.development_growth_bonus) {
+       bonus = 8 * settlement.merchants.taxed_productivity * (clan.total_productivity - clan.taxed_productivity) * 0.3
+    }
+    clan.development += (clan.total_productivity - clan.taxed_productivity) * 0.3 * bonus
 }
 
 const setTotalProductivity = (settlement: SettlementInterface) => {
@@ -520,7 +525,7 @@ export const tierModifier = (tier: SettlementTier) => {
     return (2 ** (tier - 1))
 }
 
-export const popGrowth = (settlement: SettlementInterface) => {
+export const popGrowth = (settlement: SettlementInterface,foreign_nations: ForeignPowerInterface[] ) => {
     const K = settlement.projected_pop
     const P0 = (settlement.archivists.population + 
         settlement.clerics.population +
@@ -596,8 +601,11 @@ export const popGrowth = (settlement: SettlementInterface) => {
     gained_pg *= Math.max(0,1 - (settlement.food_and_water.deficit/settlement.food_and_water.consumption_rate))
     // Pops dying from starving
     gained_pg -= Math.round(0.1 * (settlement.food_and_water.deficit/settlement.food_and_water.consumption_rate) / 75 * P0)
-    // Hard Coded Immigration
-    const MGM = 0.025
+    // Immigration
+    let MGM = 0
+    foreign_nations.forEach(nation => {
+        MGM += nation.immigrationRate * nation.dwarfPopulation
+    })
     const avg_growth = P0 * 17.5226452905812 - 113.226452905812
 
     const pop_final = (settlement.pop_cap * K * Math.exp(MGM*gained_pg/avg_growth))/(settlement.pop_cap + K * (Math.exp(MGM * gained_pg/avg_growth)-1))

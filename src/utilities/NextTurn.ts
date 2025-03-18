@@ -2,6 +2,7 @@ import { load } from "@tauri-apps/plugin-store";
 import { saveLocation } from "./SaveData";
 import { popGrowth, SettlementInterface, updateGoodsProduction } from "../Settlement/SettlementInterface";
 import { goodsdist } from "../components/ResourceDistribution";
+import { ForeignPowerInterface } from "../ForeignPowers/ForeignPowerInterface";
 
 // Calcualtes How much a settlement's stock changes
 const calcStockChange = (produced: number, consumed: number, quota: number) => Math.round((produced * (1 - quota)) - consumed)
@@ -10,6 +11,14 @@ export const NextTurn = async (game: string) => {
     const store = await load(await saveLocation(game), {autoSave: false});
     const settlements = await store.get<SettlementInterface[]>('settlements');
     const next_goodsdist = await store.get<goodsdist>('Federal Reserve');
+    const foreign_nations = await store.get<ForeignPowerInterface[]>('Foreign Powers');
+    // Market Data
+    const osc_months = await store.get<number>('Osc Period') ?? 0
+    const osc_months_passed = await store.get<number>('Osc Months Passed')?? 0
+    const market_trajectory = await store.get<number>('Market Trajectory')?? 0
+    const global_market_trend = await store.get<boolean>('Positive Global Market Trend')?? true
+    const market_modifier = (Math.random() * ((2 * market_trajectory) + market_trajectory) - market_trajectory * (global_market_trend ? 1 : -1)) + 1
+
     if (!next_goodsdist) {
         throw new Error('Failed to load Federal Reserve goods distribution');
     }
@@ -143,7 +152,7 @@ export const NextTurn = async (game: string) => {
         next_goodsdist.charcoal += Math.round(settlement.foresters.enchanted_charcoal.produced * settlement.production_quota)
 
         // Calculate Pop Growth
-        popGrowth(settlement)
+        popGrowth(settlement,foreign_nations ?? [])
 
         const P0 = (settlement.archivists.population + 
             settlement.clerics.population +
@@ -229,7 +238,63 @@ export const NextTurn = async (game: string) => {
         }
 
     })
+
+    foreign_nations?.forEach(nation => {
+        const market_health = randMarketHealth()
+        nation.supply ={
+            money: Math.round(nation.supply.money * market_health * randMarketHealth() * market_modifier),
+            food: Math.round(nation.supply.food * market_health * randMarketHealth() * market_modifier),
+            beer: Math.round(nation.supply.beer * market_health * randMarketHealth() * market_modifier),
+            leather: Math.round(nation.supply.leather * market_health * randMarketHealth() * market_modifier),
+            artisinal: Math.round(nation.supply.artisinal * market_health * randMarketHealth() * market_modifier),
+            livestock: Math.round(nation.supply.livestock * market_health * randMarketHealth() * market_modifier),
+            ornamental: Math.round(nation.supply.ornamental * market_health * randMarketHealth() * market_modifier),
+            enchanted: Math.round(nation.supply.enchanted * market_health * randMarketHealth() * market_modifier),
+            timber: Math.round(nation.supply.timber * market_health * randMarketHealth() * market_modifier),
+            tools: Math.round(nation.supply.tools * market_health * randMarketHealth() * market_modifier),
+            common_ores: Math.round(nation.supply.common_ores * market_health * randMarketHealth() * market_modifier),
+            medical: Math.round(nation.supply.medical * market_health * randMarketHealth() * market_modifier),
+            rare_ores: Math.round(nation.supply.rare_ores * market_health * randMarketHealth() * market_modifier),
+            gems: Math.round(nation.supply.gems * market_health * randMarketHealth() * market_modifier),
+            runes: Math.round(nation.supply.runes * market_health * randMarketHealth() * market_modifier),
+            arms: Math.round(nation.supply.arms * market_health * randMarketHealth() * market_modifier),
+            books: Math.round(nation.supply.books * market_health * randMarketHealth() * market_modifier),
+            enchanted_arms: Math.round(nation.supply.enchanted_arms * market_health * randMarketHealth() * market_modifier),
+            charcoal: Math.round(nation.supply.charcoal * market_health * randMarketHealth() * market_modifier),
+        }
+        nation.demand ={
+            money: Math.round(nation.supply.money * market_health * randMarketHealth() * market_modifier),
+            food: Math.round(nation.supply.food * market_health * randMarketHealth() * market_modifier),
+            beer: Math.round(nation.supply.beer * market_health * randMarketHealth() * market_modifier),
+            leather: Math.round(nation.supply.leather * market_health * randMarketHealth() * market_modifier),
+            artisinal: Math.round(nation.supply.artisinal * market_health * randMarketHealth() * market_modifier),
+            livestock: Math.round(nation.supply.livestock * market_health * randMarketHealth() * market_modifier),
+            ornamental: Math.round(nation.supply.ornamental * market_health * randMarketHealth() * market_modifier),
+            enchanted: Math.round(nation.supply.enchanted * market_health * randMarketHealth() * market_modifier),
+            timber: Math.round(nation.supply.timber * market_health * randMarketHealth() * market_modifier),
+            tools: Math.round(nation.supply.tools * market_health * randMarketHealth() * market_modifier),
+            common_ores: Math.round(nation.supply.common_ores * market_health * randMarketHealth() * market_modifier),
+            medical: Math.round(nation.supply.medical * market_health * randMarketHealth() * market_modifier),
+            rare_ores: Math.round(nation.supply.rare_ores * market_health * randMarketHealth() * market_modifier),
+            gems: Math.round(nation.supply.gems * market_health * randMarketHealth() * market_modifier),
+            runes: Math.round(nation.supply.runes * market_health * randMarketHealth() * market_modifier),
+            arms: Math.round(nation.supply.arms * market_health * randMarketHealth() * market_modifier),
+            books: Math.round(nation.supply.books * market_health * randMarketHealth() * market_modifier),
+            enchanted_arms: Math.round(nation.supply.enchanted_arms * market_health * randMarketHealth() * market_modifier),
+            charcoal: Math.round(nation.supply.charcoal * market_health * randMarketHealth() * market_modifier),
+        }
+    })
+    if(osc_months_passed > osc_months) {
+        store.set('Osc Period',Math.floor(Math.random() * 28) + 48)
+        store.set('Osc Months Passed',0)
+        store.set('Market Trajectory',Math.random() * 0.005)
+        store.set('Positive Global Market Trend',!global_market_trend)
+    } else {
+        store.set('Osc Months Passed',osc_months_passed + 1)
+    }
     store.set('settlements',settlements)
     store.set('Federal Reserve', next_goodsdist)
     store.save()
 }
+
+const randMarketHealth = () => ((Math.floor(Math.random() * 101) - 26)/(10 ** 5)) + 1
