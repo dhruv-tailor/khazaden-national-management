@@ -320,7 +320,10 @@ function Game() {
     return (
         <div className="flex flex-column gap-2">
             <Button label="Next Turn" onClick={processNextTurn} size="small" icon="pi pi-angle-double-right"/>
-            <Button severity="secondary" label='Foreign Powers' icon='pi pi-flag-fill' onClick={()=>{navigate(`foreignpowers`)}}/>
+            <div className="flex flex-row gap-1">
+                <Button className="flex-grow-1" severity="secondary" label='Foreign Powers' icon='pi pi-flag-fill' onClick={()=>{navigate(`foreignpowers`)}}/>
+                <Button className="flex-grow-1" label='Economy' severity="warning" icon='pi pi-wallet' onClick={()=>navigate('economy')}/>
+            </div>
             {/* National Stock */}
             <Panel header="Federal Reserve" toggleable>
                 <div className="flex flex-row flex-wrap gap-2">

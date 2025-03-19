@@ -1,4 +1,5 @@
 import { goodsdist } from "../components/ResourceDistribution";
+import { initial_prices } from "../Economics/priceChanges";
 import { EconomyTypeData, EconomyTypes } from "../Goods/EconomyTypes";
 
 export enum ForeignRecognition {
@@ -56,6 +57,11 @@ export interface ForeignPowerInterface {
     economyType: EconomyTypes;
     supply: goodsdist;
     demand: goodsdist;
+    prices: goodsdist;
+    available_supply: goodsdist;
+    available_demand: goodsdist;
+    retlaitory_tariffs: number;
+    price_history: goodsdist[]
 }
 
 export const newForeignPower = (name: string, dwarfPopulation: number,economy: EconomyTypes,start_factor: number): ForeignPowerInterface => {
@@ -114,6 +120,51 @@ export const newForeignPower = (name: string, dwarfPopulation: number,economy: E
             books: pop_scaling_factor * start_factor * EconomyTypeData[economy].demand.books,
             enchanted_arms: pop_scaling_factor * start_factor * EconomyTypeData[economy].demand.enchanted_arms,
             charcoal: pop_scaling_factor * start_factor * EconomyTypeData[economy].demand.charcoal
-        }
+        },
+        prices: {...initial_prices},
+        available_supply: {
+            money: Math.round(pop_scaling_factor * start_factor * 0.05),
+            food: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].supply.food * 0.05),
+            beer: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].supply.beer * 0.05),
+            leather: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].supply.leather * 0.05),
+            artisinal: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].supply.artisinal * 0.05),
+            livestock: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].supply.livestock * 0.05),
+            ornamental: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].supply.ornamental * 0.05),
+            enchanted: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].supply.enchanted * 0.05),
+            timber: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].supply.timber * 0.05),
+            tools: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].supply.tools * 0.05),
+            common_ores: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].supply.common_ores * 0.05),
+            medical: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].supply.medical * 0.05),
+            rare_ores: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].supply.rare_ores * 0.05),
+            gems: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].supply.gems * 0.05),
+            runes: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].supply.runes * 0.05),
+            arms: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].supply.arms * 0.05),
+            books: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].supply.books * 0.05),
+            enchanted_arms: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].supply.enchanted_arms * 0.05),
+            charcoal: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].supply.charcoal * 0.05)
+        },
+        available_demand: {
+            money: Math.round(pop_scaling_factor * start_factor * 0.05),
+            food: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].demand.food * 0.05),
+            beer: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].demand.beer * 0.05),
+            leather: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].demand.leather * 0.05),
+            artisinal: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].demand.artisinal * 0.05),
+            livestock: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].demand.livestock * 0.05),
+            ornamental: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].demand.ornamental * 0.05),
+            enchanted: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].demand.enchanted * 0.05),
+            timber: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].demand.timber * 0.05),
+            tools: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].demand.tools * 0.05),
+            common_ores: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].demand.common_ores * 0.05),
+            medical: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].demand.medical * 0.05),
+            rare_ores: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].demand.rare_ores * 0.05),
+            gems: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].demand.gems * 0.05),
+            runes: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].demand.runes * 0.05),
+            arms: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].demand.arms * 0.05),
+            books: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].demand.books * 0.05),
+            enchanted_arms: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].demand.enchanted_arms * 0.05),
+            charcoal: Math.round(pop_scaling_factor * start_factor * EconomyTypeData[economy].demand.charcoal * 0.05)
+        },
+        retlaitory_tariffs: 0,
+        price_history: []
     })
 }

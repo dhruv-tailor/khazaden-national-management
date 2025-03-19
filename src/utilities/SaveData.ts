@@ -17,6 +17,7 @@ import { Polabtheli } from "../ForeignPowers/Powers/Polabtheli";
 import { Saemark } from "../ForeignPowers/Powers/Saemark";
 import { Sledzianska } from "../ForeignPowers/Powers/Sledzianska";
 import { TerraKontor } from "../ForeignPowers/Powers/TerraKontor";
+import { initial_prices } from "../Economics/priceChanges";
 
 const fileSeperator = () => {
     const osType = type();
@@ -96,8 +97,11 @@ export const createNewSave = async (saveName: string)  => {
     store.set('Foreign Powers', [Baetanuesa,Beznesti,Dragonsbane,Eidgenossenkhazaden,Garozemle,Kayasahr,Pactusallamanni,Polabtheli,Saemark,Sledzianska,TerraKontor])
     store.set('Positive Global Market Trend',true) //True means going up false means going down
     store.set('Osc Period',60) // How Many months in the economy trend
-    store.set('Osc Months Passed',0)
-    store.set('Market Trajectory', 0.0002)
+    store.set('Osc Months Passed',0) // How Many months into the economy are we
+    store.set('Market Trajectory', 0.0002) // The Veleocity of the market
+    store.set('Turns Passed',0) // Turns since game start
+    store.set('Federal Prices',{...initial_prices}) // Prices for the goods in the federal reserve
+    store.set('Price History',[])
     await store.save();
     store.close();
 }

@@ -3,7 +3,7 @@ import { ForeignPowerInterface } from "./ForeignPowerInterface";
 import { Knob } from "primereact/knob";
 import { RecognitionBadge } from "./badges/RecognitionBadge";
 import { InputNumber } from "primereact/inputnumber";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ProgressBar } from "primereact/progressbar";
 import {CombatantStatusBadge} from "./badges/CombatantStatusBadge";
 import { AllianceStatusBadge } from "./badges/AllianceStatusBadge";
