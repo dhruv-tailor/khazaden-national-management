@@ -25,7 +25,7 @@ export const price_volitility: goodsdist = {
 
 export const calcPriceChange = (current_price: number, current_inventory: number, new_inventory: number, volitility: number) => {
     const val = Math.max(0,ensureNumber(current_price * (1 + volitility * Math.log(ensureNumber(current_inventory/new_inventory)))))
-    return(val !== 0 ? val : current_price)
+    return((val !== 0) && (val !== null) ? val : current_price)
 }
 
 export const initial_prices: goodsdist = {

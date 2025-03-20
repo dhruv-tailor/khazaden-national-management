@@ -1,0 +1,31 @@
+Initial Version Features
+----------------------------
+Days Months and Years - X
+Goods Production - O
+Bureaucratic Focus - O
+Settlements - O
+Resource Caps - O
+Pop Growth - O
+Pop Conversion/ Encourage Growth - X
+Military - X
+Goods Consumption - O
+Trade - X
+Trade Potential - O
+Diplomacy - X
+Loans - X
+Development - O
+
+
+In Progress
+------------------
+Buy and Sell from Other Nations
+Buy and Sell from Other Settlements
+Buy and Sell from Federal Reserve
+
+
+Future Features
+--------------------
+Seasons
+Weather Reports
+Customized Start
+Market Caps
