@@ -19,21 +19,22 @@ interface TableView {
 }
 
 export default function PriceCard(
-    {prices,availableGoods,name,realname,type,updateFunc}:
+    {prices,availableGoods,name,realname,type,updateFunc,merchantCapacity}:
     {
         prices: goodsdist,
         availableGoods: goodsdist,
         name: string,
         realname: string,
         type: 'Settlement' | 'Federal' | 'Foreign',
-        updateFunc: (units_ordered: goodsdist, prices: goodsdist, type: "Settlement" | "Federal" | "Foreign", realname: string) => void
+        updateFunc: (units_ordered: goodsdist, prices: goodsdist, type: "Settlement" | "Federal" | "Foreign", realname: string,capUsed: number) => void
+        merchantCapacity?: number
     }
 ) {
     const [priceTable, setPriceTable] = useState<TableView[]>([])
     const [showBuy,setShowBuy] = useState<boolean>(false)
 
-    const updateInventory = (units_ordered: goodsdist) => {
-        updateFunc(units_ordered,prices,type,realname)
+    const updateInventory = (units_ordered: goodsdist,capUsed: number) => {
+        updateFunc(units_ordered,prices,type,realname,capUsed)
     }
     
     useEffect(() => {
@@ -161,8 +162,9 @@ export default function PriceCard(
     },[])
     
     return(<>
-    <Card className="md:w-25rem" header={name}>
+    <Card className="md:w-25rem">
         <div className="flex flex-column gap-2">
+            <h2>{name}</h2>
             <DataTable selectionMode='single' removableSort sortMode="multiple" stripedRows showGridlines size='small' value={priceTable}>
                 <Column field="name" header='Good'></Column>
                 <Column sortable field="available" header="Available"></Column>

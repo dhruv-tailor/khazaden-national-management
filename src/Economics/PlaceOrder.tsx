@@ -9,9 +9,20 @@ import { useState } from "react";
 import { goods } from "../Goods/good";
 import { Button } from "primereact/button";
 
-export default function PlaceOrder({prices,available,updateFunc}:{prices: goodsdist,available:goodsdist,updateFunc: (units_ordered: goodsdist) => void}) {
+export default function PlaceOrder(
+    {prices,available,updateFunc,merchantCapacity}:
+    {prices: goodsdist,available:goodsdist,updateFunc: (units_ordered: goodsdist,capUsed: number) => void,merchantCapacity?: number}
+) {
 
     const [order,setOrder] = useState<goodsdist>({...empty_goodsdist})
+    const [capacityUsed, setCapacityUsed] = useState<number>(0)
+
+    const whichOne = (capacity: number,natCap: number) => {
+        if(natCap) {
+            return (capacity < natCap ? capacity : natCap)
+        }
+        return capacity
+    }
 
     const updateOrder = (units: number, type: goods) => {
         switch (type) {
@@ -70,6 +81,26 @@ export default function PlaceOrder({prices,available,updateFunc}:{prices: goodsd
                 setOrder({...order,charcoal: units});
                 break;
         }
+        let cap_used = 0
+        cap_used += order.food
+        cap_used += order.beer
+        cap_used += order.leather
+        cap_used += order.artisinal
+        cap_used += order.livestock
+        cap_used += order.ornamental
+        cap_used += order.enchanted
+        cap_used += order.timber
+        cap_used += order.tools
+        cap_used += order.common_ores
+        cap_used += order.medical
+        cap_used += order.rare_ores
+        cap_used += order.gems
+        cap_used += order.runes
+        cap_used += order.arms
+        cap_used += order.books
+        cap_used += order.enchanted_arms
+        cap_used += order.charcoal
+        setCapacityUsed(cap_used)
     }
 
     return(<>
@@ -79,146 +110,164 @@ export default function PlaceOrder({prices,available,updateFunc}:{prices: goodsd
                     type={goods.food}
                     units={order.food} 
                     price={Math.round(prices.food)} 
-                    max={available.food} 
+                    max={merchantCapacity ? whichOne(merchantCapacity-capacityUsed,available.food) : available.food} 
                     updateFunc={updateOrder}
+                    capUsed={merchantCapacity ? true : false}
                     icon={<IoFastFood/>}/>: null}
             {available.beer > 0 ? 
                 <OrderRow 
                     units={order.beer}
                     type={goods.beer}
                     price={Math.round(prices.beer)} 
-                    max={available.beer} 
+                    max={merchantCapacity ? whichOne(merchantCapacity-capacityUsed,available.beer) : available.beer} 
                     updateFunc={updateOrder}
+                    capUsed={merchantCapacity ? true : false}
                     icon={<GiBeerStein/>}/>: null}
             {available.leather > 0 ? 
                 <OrderRow 
                     units={order.leather}
                     type={goods.leather} 
                     price={Math.round(prices.leather)} 
-                    max={available.leather} 
+                    max={merchantCapacity ? whichOne(merchantCapacity-capacityUsed,available.leather) : available.leather} 
                     updateFunc={updateOrder}
+                    capUsed={merchantCapacity ? true : false}
                     icon={<GiClothes/>}/>: null}
             {available.artisinal > 0 ? 
                 <OrderRow 
                     units={order.artisinal}
                     type={goods.artisinal} 
                     price={Math.round(prices.artisinal)} 
-                    max={available.artisinal}
+                    max={merchantCapacity ? whichOne(merchantCapacity-capacityUsed,available.artisinal) : available.artisinal}
                     updateFunc={updateOrder} 
+                    capUsed={merchantCapacity ? true : false}
                     icon={<LuHandCoins/>}/>: null}
             {available.livestock > 0? 
                 <OrderRow 
                     units={order.livestock} 
                     type={goods.livestock}
                     price={Math.round(prices.livestock)} 
-                    max={available.livestock} 
+                    max={merchantCapacity ? whichOne(merchantCapacity-capacityUsed,available.livestock) : available.livestock} 
                     updateFunc={updateOrder}
+                    capUsed={merchantCapacity ? true : false}
                     icon={<PiCowFill/>}/>:null}
             {available.ornamental > 0? 
                 <OrderRow 
                     units={order.ornamental} 
                     type={goods.ornamenatal}
                     price={Math.round(prices.ornamental)} 
-                    max={available.ornamental}
+                    max={merchantCapacity ? whichOne(merchantCapacity-capacityUsed,available.ornamental) : available.ornamental}
                     updateFunc={updateOrder} 
+                    capUsed={merchantCapacity ? true : false}
                     icon={<GiPouringChalice/>}/>:null}
             {available.enchanted > 0? 
                 <OrderRow 
                     units={order.enchanted}
                     type={goods.luxuries} 
                     price={Math.round(prices.enchanted)} 
-                    max={available.enchanted} 
+                    max={merchantCapacity ? whichOne(merchantCapacity-capacityUsed,available.enchanted) : available.enchanted} 
                     updateFunc={updateOrder}
+                    capUsed={merchantCapacity ? true : false}
                     icon={<GiCrystalBall/>}/>:null}
             {available.timber > 0? 
                 <OrderRow 
                     units={order.timber} 
                     type={goods.timber}
                     price={Math.round(prices.timber)} 
-                    max={available.timber}
+                    max={merchantCapacity ? whichOne(merchantCapacity-capacityUsed,available.timber) : available.timber}
                     updateFunc={updateOrder} 
+                    capUsed={merchantCapacity ? true : false}
                     icon={<GiWoodPile/>}/>:null}
             {available.tools > 0? 
                 <OrderRow 
                     units={order.tools} 
                     type={goods.tools}
                     price={Math.round(prices.tools)} 
-                    max={available.tools} 
+                    max={merchantCapacity ? whichOne(merchantCapacity-capacityUsed,available.tools) : available.tools} 
                     updateFunc={updateOrder}
+                    capUsed={merchantCapacity ? true : false}
                     icon={<FaTools/>}/>:null}
             {available.common_ores > 0? 
                 <OrderRow 
                     units={order.common_ores} 
                     type={goods.commonOres}
                     price={Math.round(prices.common_ores)}
-                    max={available.common_ores} 
+                    max={merchantCapacity ? whichOne(merchantCapacity-capacityUsed,available.common_ores) : available.common_ores} 
                     updateFunc={updateOrder}
+                    capUsed={merchantCapacity ? true : false}
                     icon={<GiCoalWagon/>}/>:null}
             {available.medical > 0? 
                 <OrderRow 
                     units={order.medical} 
                     type={goods.medical}
                     price={Math.round(prices.medical)} 
-                    max={available.medical} 
+                    max={merchantCapacity ? whichOne(merchantCapacity-capacityUsed,available.common_ores) : available.common_ores} 
                     updateFunc={updateOrder}
+                    capUsed={merchantCapacity ? true : false}
                     icon={<FaBriefcaseMedical/>}/>:null}
             {available.rare_ores > 0? 
                 <OrderRow 
                     units={order.rare_ores} 
                     type={goods.rareOres}
                     price={Math.round(prices.rare_ores)} 
-                    max={available.rare_ores} 
+                    max={merchantCapacity ? whichOne(merchantCapacity-capacityUsed,available.rare_ores) : available.rare_ores} 
                     updateFunc={updateOrder}
+                    capUsed={merchantCapacity ? true : false}
                     icon={<FaGem/>}/>:null}
             {available.gems > 0? 
                 <OrderRow 
                     units={order.gems} 
                     type={goods.gems}
                     price={Math.round(prices.gems)} 
-                    max={available.gems} 
+                    max={merchantCapacity ? whichOne(merchantCapacity-capacityUsed,available.gems) : available.gems} 
                     updateFunc={updateOrder}
+                    capUsed={merchantCapacity ? true : false}
                     icon={<GiGems/>}/>:null}
             {available.runes > 0? 
                 <OrderRow 
                     units={order.runes} 
                     type={goods.runes}
                     price={Math.round(prices.runes)} 
-                    max={available.runes} 
+                    max={merchantCapacity ? whichOne(merchantCapacity-capacityUsed,available.runes) : available.runes} 
                     updateFunc={updateOrder}
+                    capUsed={merchantCapacity ? true : false}
                     icon={<GiRuneStone/>}/>:null}
             {available.arms > 0? 
                 <OrderRow 
                     units={order.arms} 
                     type={goods.arms}
                     price={Math.round(prices.arms)} 
-                    max={available.arms} 
+                    max={merchantCapacity ? whichOne(merchantCapacity-capacityUsed,available.arms) : available.arms} 
                     updateFunc={updateOrder}
+                    capUsed={merchantCapacity ? true : false}
                     icon={<FaShieldAlt/>}/>:null}
             {available.books > 0? 
                 <OrderRow 
                     units={order.books} 
                     type={goods.books}
                     price={Math.round(prices.books)} 
-                    max={available.books} 
+                    max={merchantCapacity ? whichOne(merchantCapacity-capacityUsed,available.books) : available.books} 
                     updateFunc={updateOrder}
+                    capUsed={merchantCapacity ? true : false}
                     icon={<FaBook/>}/>:null}
             {available.enchanted_arms > 0? 
                 <OrderRow 
                     units={order.enchanted_arms} 
                     type={goods.enchantedArms}
                     price={Math.round(prices.enchanted_arms)} 
-                    max={available.enchanted_arms} 
+                    max={merchantCapacity ? whichOne(merchantCapacity-capacityUsed,available.enchanted_arms) : available.enchanted_arms} 
                     updateFunc={updateOrder}
+                    capUsed={merchantCapacity ? true : false}
                     icon={<GiMagicShield/>}/>:null}
             {available.charcoal > 0? 
                 <OrderRow 
                     units={order.charcoal} 
                     type={goods.charcoal}
                     price={Math.round(prices.charcoal)} 
-                    max={available.charcoal} 
+                    max={merchantCapacity ? whichOne(merchantCapacity-capacityUsed,available.charcoal) : available.charcoal} 
                     updateFunc={updateOrder}
+                    capUsed={merchantCapacity ? true : false}
                     icon={<GiThrownCharcoal/>}/>:null}
-            <Button severity="success" icon='pi pi-shopping-cart' onClick={()=>{updateFunc(order)}}>
+            <Button severity="success" icon='pi pi-shopping-cart' onClick={()=>{updateFunc(order,capacityUsed)}}>
                 <div className="flex flex-row gap-1">
                     Purchase For  
                     <FaCoins/>

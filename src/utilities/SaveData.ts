@@ -91,6 +91,7 @@ export const createNewSave = async (saveName: string)  => {
     // Finances
     initial_settlement.finance_points = 2000
     initial_settlement.projected_pop = 10
+    initial_settlement.merchant_capacity = 50
     
     store.set('settlements', [initial_settlement]);
     store.set('Federal Reserve',empty_goodsdist)
@@ -101,7 +102,8 @@ export const createNewSave = async (saveName: string)  => {
     store.set('Market Trajectory', 0.0002) // The Veleocity of the market
     store.set('Turns Passed',0) // Turns since game start
     store.set('Federal Prices',{...initial_prices}) // Prices for the goods in the federal reserve
-    store.set('Price History',[])
+    store.set('Price History',[]) // Tracks the history of prices in the nation
+    store.set('Merchant Capacity',0)
     await store.save();
     store.close();
 }

@@ -24,6 +24,9 @@ export const NextTurn = async (game: string) => {
     const federal_prices = await store.get<goodsdist>('Federal Prices') ?? {...empty_goodsdist}
     const price_history = await store.get<goodsdist[]>('Price History') ?? []
 
+    // Federal Merchant Capacity
+    let merchant_capacity: number = 0
+
     if (!next_goodsdist) {
         throw new Error('Failed to load Federal Reserve goods distribution');
     }
@@ -295,53 +298,54 @@ export const NextTurn = async (game: string) => {
             settlement.foresters.timber.produced = Math.floor((settlement.foresters.timber.produced/total)*max)
             settlement.foresters.enchanted_charcoal.produced = Math.floor((settlement.foresters.enchanted_charcoal.produced/total)*max)
         }
-
+        settlement.merchant_capacity = Math.round(settlement.merchants.taxed_productivity * (1 - settlement.settlment_tax))
+        merchant_capacity += Math.round(settlement.merchants.taxed_productivity * settlement.settlment_tax)
     })
 
     foreign_nations?.forEach(nation => {
         const market_health = randMarketHealth()
         const old_supply = {...nation.supply}
         nation.supply ={
-            money: Math.round(nation.supply.money * market_health * randMarketHealth() * market_modifier),
-            food: Math.round(nation.supply.food * market_health * randMarketHealth() * market_modifier),
-            beer: Math.round(nation.supply.beer * market_health * randMarketHealth() * market_modifier),
-            leather: Math.round(nation.supply.leather * market_health * randMarketHealth() * market_modifier),
-            artisinal: Math.round(nation.supply.artisinal * market_health * randMarketHealth() * market_modifier),
-            livestock: Math.round(nation.supply.livestock * market_health * randMarketHealth() * market_modifier),
-            ornamental: Math.round(nation.supply.ornamental * market_health * randMarketHealth() * market_modifier),
-            enchanted: Math.round(nation.supply.enchanted * market_health * randMarketHealth() * market_modifier),
-            timber: Math.round(nation.supply.timber * market_health * randMarketHealth() * market_modifier),
-            tools: Math.round(nation.supply.tools * market_health * randMarketHealth() * market_modifier),
-            common_ores: Math.round(nation.supply.common_ores * market_health * randMarketHealth() * market_modifier),
-            medical: Math.round(nation.supply.medical * market_health * randMarketHealth() * market_modifier),
-            rare_ores: Math.round(nation.supply.rare_ores * market_health * randMarketHealth() * market_modifier),
-            gems: Math.round(nation.supply.gems * market_health * randMarketHealth() * market_modifier),
-            runes: Math.round(nation.supply.runes * market_health * randMarketHealth() * market_modifier),
-            arms: Math.round(nation.supply.arms * market_health * randMarketHealth() * market_modifier),
-            books: Math.round(nation.supply.books * market_health * randMarketHealth() * market_modifier),
-            enchanted_arms: Math.round(nation.supply.enchanted_arms * market_health * randMarketHealth() * market_modifier),
-            charcoal: Math.round(nation.supply.charcoal * market_health * randMarketHealth() * market_modifier),
+            money: nation.supply.money * market_health * randMarketHealth() * market_modifier,
+            food: nation.supply.food * market_health * randMarketHealth() * market_modifier,
+            beer: nation.supply.beer * market_health * randMarketHealth() * market_modifier,
+            leather: nation.supply.leather * market_health * randMarketHealth() * market_modifier,
+            artisinal: nation.supply.artisinal * market_health * randMarketHealth() * market_modifier,
+            livestock: nation.supply.livestock * market_health * randMarketHealth() * market_modifier,
+            ornamental: nation.supply.ornamental * market_health * randMarketHealth() * market_modifier,
+            enchanted: nation.supply.enchanted * market_health * randMarketHealth() * market_modifier,
+            timber: nation.supply.timber * market_health * randMarketHealth() * market_modifier,
+            tools: nation.supply.tools * market_health * randMarketHealth() * market_modifier,
+            common_ores: nation.supply.common_ores * market_health * randMarketHealth() * market_modifier,
+            medical: nation.supply.medical * market_health * randMarketHealth() * market_modifier,
+            rare_ores: nation.supply.rare_ores * market_health * randMarketHealth() * market_modifier,
+            gems: nation.supply.gems * market_health * randMarketHealth() * market_modifier,
+            runes: nation.supply.runes * market_health * randMarketHealth() * market_modifier,
+            arms: nation.supply.arms * market_health * randMarketHealth() * market_modifier,
+            books: nation.supply.books * market_health * randMarketHealth() * market_modifier,
+            enchanted_arms: nation.supply.enchanted_arms * market_health * randMarketHealth() * market_modifier,
+            charcoal: nation.supply.charcoal * market_health * randMarketHealth() * market_modifier,
         }
         nation.demand ={
-            money: Math.round(nation.supply.money * market_health * randMarketHealth() * market_modifier),
-            food: Math.round(nation.supply.food * market_health * randMarketHealth() * market_modifier),
-            beer: Math.round(nation.supply.beer * market_health * randMarketHealth() * market_modifier),
-            leather: Math.round(nation.supply.leather * market_health * randMarketHealth() * market_modifier),
-            artisinal: Math.round(nation.supply.artisinal * market_health * randMarketHealth() * market_modifier),
-            livestock: Math.round(nation.supply.livestock * market_health * randMarketHealth() * market_modifier),
-            ornamental: Math.round(nation.supply.ornamental * market_health * randMarketHealth() * market_modifier),
-            enchanted: Math.round(nation.supply.enchanted * market_health * randMarketHealth() * market_modifier),
-            timber: Math.round(nation.supply.timber * market_health * randMarketHealth() * market_modifier),
-            tools: Math.round(nation.supply.tools * market_health * randMarketHealth() * market_modifier),
-            common_ores: Math.round(nation.supply.common_ores * market_health * randMarketHealth() * market_modifier),
-            medical: Math.round(nation.supply.medical * market_health * randMarketHealth() * market_modifier),
-            rare_ores: Math.round(nation.supply.rare_ores * market_health * randMarketHealth() * market_modifier),
-            gems: Math.round(nation.supply.gems * market_health * randMarketHealth() * market_modifier),
-            runes: Math.round(nation.supply.runes * market_health * randMarketHealth() * market_modifier),
-            arms: Math.round(nation.supply.arms * market_health * randMarketHealth() * market_modifier),
-            books: Math.round(nation.supply.books * market_health * randMarketHealth() * market_modifier),
-            enchanted_arms: Math.round(nation.supply.enchanted_arms * market_health * randMarketHealth() * market_modifier),
-            charcoal: Math.round(nation.supply.charcoal * market_health * randMarketHealth() * market_modifier),
+            money: nation.demand.money * market_health * randMarketHealth() * market_modifier,
+            food: nation.demand.food * market_health * randMarketHealth() * market_modifier,
+            beer: nation.demand.beer * market_health * randMarketHealth() * market_modifier,
+            leather: nation.demand.leather * market_health * randMarketHealth() * market_modifier,
+            artisinal: nation.demand.artisinal * market_health * randMarketHealth() * market_modifier,
+            livestock: nation.demand.livestock * market_health * randMarketHealth() * market_modifier,
+            ornamental: nation.demand.ornamental * market_health * randMarketHealth() * market_modifier,
+            enchanted: nation.demand.enchanted * market_health * randMarketHealth() * market_modifier,
+            timber: nation.demand.timber * market_health * randMarketHealth() * market_modifier,
+            tools: nation.demand.tools * market_health * randMarketHealth() * market_modifier,
+            common_ores: nation.demand.common_ores * market_health * randMarketHealth() * market_modifier,
+            medical: nation.demand.medical * market_health * randMarketHealth() * market_modifier,
+            rare_ores: nation.demand.rare_ores * market_health * randMarketHealth() * market_modifier,
+            gems: nation.demand.gems * market_health * randMarketHealth() * market_modifier,
+            runes: nation.demand.runes * market_health * randMarketHealth() * market_modifier,
+            arms: nation.demand.arms * market_health * randMarketHealth() * market_modifier,
+            books: nation.demand.books * market_health * randMarketHealth() * market_modifier,
+            enchanted_arms: nation.demand.enchanted_arms * market_health * randMarketHealth() * market_modifier,
+            charcoal: nation.demand.charcoal * market_health * randMarketHealth() * market_modifier,
         }
         // Update Prices
         nation.price_history = [...nation.price_history,nation.prices]
@@ -363,6 +367,50 @@ export const NextTurn = async (game: string) => {
         nation.prices.books = calcPriceChange(nation.prices.books,old_supply.books,nation.supply.books,price_volitility.books)
         nation.prices.enchanted_arms = calcPriceChange(nation.prices.enchanted_arms,old_supply.enchanted_arms,nation.supply.enchanted_arms,price_volitility.enchanted_arms)
         nation.prices.charcoal = calcPriceChange(nation.prices.charcoal,old_supply.charcoal,nation.supply.charcoal,price_volitility.charcoal)
+
+        nation.available_supply = {
+            money: Math.round(nation.supply.money * 0.05),
+            food: Math.round(nation.supply.food * 0.05),
+            beer: Math.round(nation.supply.beer * 0.05),
+            leather: Math.round(nation.supply.leather * 0.05),
+            artisinal: Math.round(nation.supply.artisinal * 0.05),
+            livestock: Math.round(nation.supply.livestock * 0.05),
+            ornamental: Math.round(nation.supply.ornamental * 0.05),
+            enchanted: Math.round(nation.supply.enchanted * 0.05),
+            timber: Math.round(nation.supply.timber * 0.05),
+            tools: Math.round(nation.supply.tools * 0.05),
+            common_ores: Math.round(nation.supply.common_ores * 0.05),
+            medical: Math.round(nation.supply.medical * 0.05),
+            rare_ores: Math.round(nation.supply.rare_ores * 0.05),
+            gems: Math.round(nation.supply.gems * 0.05),
+            runes: Math.round(nation.supply.runes * 0.05),
+            arms: Math.round(nation.supply.arms * 0.05),
+            books: Math.round(nation.supply.books * 0.05),
+            enchanted_arms: Math.round(nation.supply.enchanted_arms * 0.05),
+            charcoal: Math.round(nation.supply.charcoal * 0.05),
+        }
+
+        nation.available_demand = {
+            money: Math.round(nation.demand.money * 0.05),
+            food: Math.round(nation.demand.food * 0.05),
+            beer: Math.round(nation.demand.beer * 0.05),
+            leather: Math.round(nation.demand.leather * 0.05),
+            artisinal: Math.round(nation.demand.artisinal * 0.05),
+            livestock: Math.round(nation.demand.livestock * 0.05),
+            ornamental: Math.round(nation.demand.ornamental * 0.05),
+            enchanted: Math.round(nation.demand.enchanted * 0.05),
+            timber: Math.round(nation.demand.timber * 0.05),
+            tools: Math.round(nation.demand.tools * 0.05),
+            common_ores: Math.round(nation.demand.common_ores * 0.05),
+            medical: Math.round(nation.demand.medical * 0.05),
+            rare_ores: Math.round(nation.demand.rare_ores * 0.05),
+            gems: Math.round(nation.demand.gems * 0.05),
+            runes: Math.round(nation.demand.runes * 0.05),
+            arms: Math.round(nation.demand.arms * 0.05),
+            books: Math.round(nation.demand.books * 0.05),
+            enchanted_arms: Math.round(nation.demand.enchanted_arms * 0.05),
+            charcoal: Math.round(nation.demand.charcoal * 0.05),
+        }
 
     })
     if(osc_months_passed > osc_months) {
@@ -418,6 +466,7 @@ export const NextTurn = async (game: string) => {
 
     store.set('Federal Reserve', next_goodsdist)
     store.set('Turns Passed',turns_passed + 1)
+    store.set('Merchant Capacity',Math.round(merchant_capacity))
     store.save()
 }
 

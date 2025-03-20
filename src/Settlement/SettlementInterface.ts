@@ -13,7 +13,7 @@ import { newWarriors } from "../Clans/Warriors";
 import { newForesters } from "../Clans/Foresters";
 import { newCriminals } from "../Clans/Criminals";
 import { setConsumptionRates } from "./ConsumptionRate";
-import { clans, goods } from "../Goods/good";
+import { clans } from "../Goods/good";
 import { ForeignPowerInterface } from "../ForeignPowers/ForeignPowerInterface";
 import { goodsdist } from "../components/ResourceDistribution";
 import { initial_prices } from "../Economics/priceChanges";
@@ -70,6 +70,7 @@ export interface SettlementInterface {
     // Economy
     prices: goodsdist;
     price_history: goodsdist[];
+    merchant_capacity: number;
 }
 
 export enum SettlementTier {
@@ -144,6 +145,7 @@ export const emptySettlement: SettlementInterface = {
     production_quota: 0,
     prices: {...initial_prices},
     price_history: [],
+    merchant_capacity: 0,
 }
 
 
@@ -296,7 +298,8 @@ export const newSettlement = (name: string, terrain_type: TerrainType, visable_n
         population_growth_bonus: clans.none,
         production_quota: 0,
         prices: {...initial_prices},
-        price_history: []
+        price_history: [],
+        merchant_capacity: 0,
     }
     return settlement;
 }
