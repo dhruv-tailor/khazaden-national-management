@@ -18,6 +18,14 @@ Development - O
 
 In Progress
 ------------------
+    Buying
+    --------
+    Foreign
+    Settlement
+    Reserve
+    
+    Selling
+
 Buy and Sell from Other Nations
 Buy and Sell from Other Settlements
 Buy and Sell from Federal Reserve
@@ -29,3 +37,10 @@ Seasons
 Weather Reports
 Customized Start
 Market Caps
+Starting Scenarios
+Slavery?
+
+Known Bugs
+-----------------
+Development Bonus cause development to skyrocket
+Population might be growing fast

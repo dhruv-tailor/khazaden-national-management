@@ -105,8 +105,9 @@ export default function Economy() {
             settlementPurchase(units_ordered,prices,realname)
         }
         else if (type === 'Foreign') {
-
+            foreignPurchase(units_ordered,realname)
         }
+        setMerchantCapacity(merchantCapacity - capUsed)
         let old_stock = reserveGoods.food
         let new_stock = reserveGoods.food + units_ordered.food
         let price_change = federalPrices.food
@@ -373,11 +374,27 @@ export default function Economy() {
         })
     }
 
-    const foreignPurchase = (units_ordered: goodsdist, prices: goodsdist,realname: string, capUsed: number) => {
+    const foreignPurchase = (units_ordered: goodsdist,realname: string) => {
         foreignPowers.forEach(f => {
             if (f.name === realname) {
                 f.available_supply.food -= units_ordered.food
                 f.available_supply.beer -= units_ordered.beer
+                f.available_supply.leather -= units_ordered.leather
+                f.available_supply.artisinal -= units_ordered.artisinal
+                f.available_supply.ornamental -= units_ordered.ornamental
+                f.available_supply.livestock -= units_ordered.livestock
+                f.available_supply.enchanted -= units_ordered.enchanted
+                f.available_supply.timber -= units_ordered.timber
+                f.available_supply.tools -= units_ordered.tools
+                f.available_supply.common_ores -= units_ordered.common_ores
+                f.available_supply.medical -= units_ordered.medical
+                f.available_supply.rare_ores -= units_ordered.rare_ores
+                f.available_supply.gems -= units_ordered.gems
+                f.available_supply.runes -= units_ordered.runes
+                f.available_supply.arms -= units_ordered.arms
+                f.available_supply.books -= units_ordered.books
+                f.available_supply.enchanted_arms -= units_ordered.enchanted_arms
+                f.available_supply.charcoal -= units_ordered.charcoal
             }
         })
     }
@@ -389,6 +406,7 @@ export default function Economy() {
         store.set('Price History',priceHistory)
         store.set('settlements',settlements);
         store.set('Foreign Powers',foreignPowers)
+        store.set('Merchant Capacity',merchantCapacity)
     }
 
     useEffect(() => {
@@ -506,6 +524,7 @@ export default function Economy() {
                 <PriceChart data={priceChartDataProp(priceHistory,federalPrices)} options={priceChartOptionsProp()}/>
             </Panel>
             <Panel toggleable header='Local Goods'>
+            erchant Capactiy: {merchantCapacity}
                 <div className="flex flex-row gap-2 flex-wrap">
                     {settlements.map(s => {
                         let available: goodsdist = {
@@ -537,6 +556,7 @@ export default function Economy() {
                                 realname={s.name}
                                 type="Settlement"
                                 updateFunc={updateInventory}
+                                merchantCapacity={merchantCapacity}
                             />
                         )
                     })}
@@ -553,6 +573,7 @@ export default function Economy() {
                                 name={f.name}
                                 realname={f.name}
                                 type="Foreign"
+                                merchantCapacity={merchantCapacity}
                                 updateFunc={updateInventory}
                             />:<></>
                         )
