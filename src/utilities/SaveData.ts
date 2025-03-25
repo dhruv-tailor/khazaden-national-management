@@ -3,22 +3,12 @@ import { documentDir } from "@tauri-apps/api/path";
 import {  readDir, BaseDirectory, remove } from "@tauri-apps/plugin-fs";
 import { productName } from "../../src-tauri/tauri.conf.json"
 import { type } from '@tauri-apps/plugin-os'
-import { TerrainType } from "../Settlement/TerrainInterface";
-import { newSettlement, updateGoodsProduction } from "../Settlement/SettlementInterface";
-import { empty_goodsdist } from "../components/ResourceDistribution";
-import { Baetanuesa } from "../ForeignPowers/Powers/Baetanuesa";
-import { Beznesti } from "../ForeignPowers/Powers/Beznesti";
-import { Dragonsbane } from "../ForeignPowers/Powers/Dragonsbane";
-import { Eidgenossenkhazaden } from "../ForeignPowers/Powers/Eidgenossenkhazaden";
-import { Garozemle } from "../ForeignPowers/Powers/Garozemle";
-import { Kayasahr } from "../ForeignPowers/Powers/Kayasahr";
-import { Pactusallamanni } from "../ForeignPowers/Powers/Pactusallamanni";
-import { Polabtheli } from "../ForeignPowers/Powers/Polabtheli";
-import { Saemark } from "../ForeignPowers/Powers/Saemark";
-import { Sledzianska } from "../ForeignPowers/Powers/Sledzianska";
-import { TerraKontor } from "../ForeignPowers/Powers/TerraKontor";
-import { initial_prices } from "../Economics/priceChanges";
-
+import { newSettlement, updateGoodsProduction } from "../Settlement/SettlementInterface/SettlementInterface";
+import { TerrainType } from "../Settlement/SettlementInterface/TerrainInterface";
+import { clanTypes } from "../Clans/ClanInterface/ClanInterface";
+import { empty_goodsdist } from "../Goods/GoodsDist";
+import { initial_prices } from "../Economics/pricing/prices";
+import { Baetanuesa, Beznesti, Dragonsbane, Eidgenossenkhazaden, Garozemle, Kayasahr, Pactusallamanni, Polabtheli, Saemark, Sledzianska, TerraKontor } from "../ForeignPowers/Interface/ForeignPowerInterface";
 const fileSeperator = () => {
     const osType = type();
     if (osType === 'windows') {
@@ -63,38 +53,41 @@ export const createNewSave = async (saveName: string)  => {
     let initial_settlement = newSettlement('Skarduhn', TerrainType.Mountain);
     store.set('settlements', [initial_settlement]);
     // Initial Stock
-    initial_settlement.food_and_water.stock = 150
-    initial_settlement.beer.stock = 150
-    initial_settlement.leather_and_textiles.stock = 150
-    initial_settlement.artisinal_goods.stock = 50
-    initial_settlement.livestock.stock = 50
-    initial_settlement.ornamental_luxuries.stock = 50
-    initial_settlement.enchanted_luxuries.stock = 0
-    initial_settlement.timber.stock = 600
-    initial_settlement.tools.stock = 100
-    initial_settlement.common_ores.stock = 150
-    initial_settlement.medical_supplies.stock = 25
-    initial_settlement.rare_ores.stock = 150
-    initial_settlement.gems.stock = 150
-    initial_settlement.runes.stock = 0
-    initial_settlement.armaments.stock = 25
-    initial_settlement.books.stock = 25
-    initial_settlement.enchanted_armaments.stock = 0
-    initial_settlement.enchanted_charcoal.stock = 0
-    // initial population
-    initial_settlement.craftsmen.population = 1
-    initial_settlement.merchants.population = 1
-    initial_settlement.miners.population = 2
-    initial_settlement.farmers.population = 6
+    initial_settlement.stock = {
+        money: 2000,
+        food: 150,
+        beer: 150,
+        leather: 150,
+        artisinal: 50,
+        livestock: 50,
+        ornamental: 50,
+        enchanted: 0,
+        timber: 600,
+        tools: 100,
+        common_ores: 150,
+        medical: 25,
+        rare_ores: 150,
+        gems: 150,
+        runes: 0,
+        arms: 25,
+        books: 25,
+        enchanted_arms: 0,
+        charcoal: 0
+    }
+
+    initial_settlement.clans.forEach(clan => {
+        if(clan.id === clanTypes.craftsmen || clan.id === clanTypes.merchants) {clan.population = 1}
+        else if (clan.id === clanTypes.miners) {clan.population = 2}
+        else if (clan.id === clanTypes.farmers) {clan.population = 6}
+    })
     // good productions
     updateGoodsProduction(initial_settlement)
     // Finances
-    initial_settlement.finance_points = 2000
     initial_settlement.projected_pop = 10
     initial_settlement.merchant_capacity = 50
     
     store.set('settlements', [initial_settlement]);
-    store.set('Federal Reserve',empty_goodsdist)
+    store.set('Federal Reserve',{...empty_goodsdist})
     store.set('Foreign Powers', [Baetanuesa,Beznesti,Dragonsbane,Eidgenossenkhazaden,Garozemle,Kayasahr,Pactusallamanni,Polabtheli,Saemark,Sledzianska,TerraKontor])
     store.set('Positive Global Market Trend',true) //True means going up false means going down
     store.set('Osc Period',60) // How Many months in the economy trend

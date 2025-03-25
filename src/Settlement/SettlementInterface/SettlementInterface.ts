@@ -1,0 +1,250 @@
+import { newArchivist } from "../../Clans/ClanInterface/Archivists";
+import { baseProductivity, calcDevelopment, calcEfficency, calcLoyalty, calcTaxedProductivity, clanGoodsConsumed, ClanInterface, clanTypes } from "../../Clans/ClanInterface/ClanInterface";
+import { newClerics } from "../../Clans/ClanInterface/Clerics";
+import { newCraftsmen } from "../../Clans/ClanInterface/Craftsmen";
+import { newCriminals } from "../../Clans/ClanInterface/Criminals";
+import { newEngineers } from "../../Clans/ClanInterface/Engineers";
+import { newFarmers } from "../../Clans/ClanInterface/Farmers";
+import { newForesters } from "../../Clans/ClanInterface/Foresters";
+import { newMerchants } from "../../Clans/ClanInterface/Merchants";
+import { newMiners } from "../../Clans/ClanInterface/Miners";
+import { newRulers } from "../../Clans/ClanInterface/Rulers";
+import { newRuneSmiths } from "../../Clans/ClanInterface/RuneSmiths";
+import { newWarriors } from "../../Clans/ClanInterface/Warriors";
+import { initial_prices } from "../../Economics/pricing/prices";
+import { ForeignPowerInterface } from "../../ForeignPowers/Interface/ForeignPowerInterface";
+import { addGoods, empty_goodsdist, goodsdist } from "../../Goods/GoodsDist";
+import { ensureNumber } from "../../utilities/SimpleFunctions";
+import { TerrainData, TerrainType } from "./TerrainInterface";
+
+export enum SettlementTier {
+    Hamlet = 1,
+    Village,
+    Town,
+    City,
+    Metropolis,
+}
+
+export interface SettlementInterface {
+    name: string;
+    visible_name: string;
+    terrain_type: TerrainType;
+    pop_cap: number;
+    tier: SettlementTier;
+    projected_pop: number;
+    settlement_tax: number;
+    production_quota: number;
+
+    production_cap: goodsdist;
+    stock: goodsdist;
+    deficet: goodsdist;
+    consumption_rate: goodsdist;
+
+    clans: ClanInterface[]
+
+    efficency_bonus: clanTypes
+    loyalty_bonus: clanTypes
+    corvee_bonus: clanTypes
+    development_growth_bonus: clanTypes
+    population_growth_bonus: clanTypes
+
+    prices: goodsdist
+    price_history: goodsdist[]
+    merchant_capacity: number;
+}
+
+export const empty_settlement: SettlementInterface = {
+    name: "",
+    visible_name: "",
+    terrain_type: TerrainType.Mountain,
+    pop_cap: 0,
+    tier: SettlementTier.Hamlet,
+    projected_pop: 0,
+    settlement_tax: 0,
+    production_quota: 0,
+    production_cap: {...empty_goodsdist},
+    stock: {...empty_goodsdist},
+    deficet: {...empty_goodsdist},
+    consumption_rate: {...empty_goodsdist},
+    clans: [],
+    efficency_bonus: clanTypes.rulers,
+    loyalty_bonus: clanTypes.rulers,
+    corvee_bonus: clanTypes.rulers,
+    development_growth_bonus: clanTypes.rulers,
+    population_growth_bonus: clanTypes.rulers,
+    prices: {...initial_prices},
+    price_history: [],
+    merchant_capacity: 0
+}
+
+export const newSettlement = (name: string, terrain_type: TerrainType, visable_name?: string) => {
+    let settlement = {...empty_settlement}
+    settlement.name = name
+    settlement.visible_name = visable_name ? visable_name : name
+    settlement.terrain_type = terrain_type
+    settlement.pop_cap = Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].reference_pop_cap)
+    settlement.production_cap = {
+        money: -1,
+        food: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].food_and_water_balancing),
+        beer: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].beer_balancing),
+        leather: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].leather_and_textiles_balancing),
+        artisinal: -1,
+        livestock: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].livestock_balancing),
+        ornamental: -1,
+        enchanted: -1,
+        timber: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].timber_balancing),
+        tools: -1,
+        common_ores: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].common_ores_balancing),
+        medical: -1,
+        rare_ores: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].rare_ores_balancing),
+        gems: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].gems_balancing),
+        runes: -1,
+        arms: -1,
+        books: -1,
+        enchanted_arms: -1,
+        charcoal: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].enchanted_charcoal_balancing)
+    }
+    settlement.clans = [newRulers(),newArchivist(),newEngineers(),newRuneSmiths(),newCraftsmen(),newMerchants(),newClerics(),newMiners(),newFarmers(),newWarriors(),newForesters(),newCriminals()]
+    return settlement
+}
+
+export const SettlementTierDetails = {
+    [SettlementTier.Hamlet]: { name: 'Hamlet', value: SettlementTier.Hamlet },
+    [SettlementTier.Village]: { name: 'Village', value: SettlementTier.Village },
+    [SettlementTier.Town]: { name: 'Town', value: SettlementTier.Town },
+    [SettlementTier.City]: { name: 'City', value: SettlementTier.City },
+    [SettlementTier.Metropolis]: { name: 'Metropolis', value: SettlementTier.Metropolis },
+};
+
+export const updateGoodsProduction = (settlement: SettlementInterface) => {
+    setConsumptionRates(settlement)
+    setLoyalties(settlement)
+    setEfficencies(settlement)
+    setTaxedProductivities(settlement)
+    setDevelopments(settlement)
+}
+
+const setConsumptionRates = (settlement: SettlementInterface) => {
+    let consumption: goodsdist = {...empty_goodsdist}
+    settlement.clans.forEach(clan => {
+        consumption = addGoods(consumption,clanGoodsConsumed(clan))
+    })
+    settlement.consumption_rate = consumption
+}
+
+const setLoyalties = (settlement: SettlementInterface) => {
+    settlement.clans.forEach(clan => {
+        clan.loyalty = calcLoyalty(clan,settlement)
+    })
+}
+
+const setEfficencies = (settlement: SettlementInterface) => {
+    settlement.clans.forEach(clan => {
+        clan.efficency = calcEfficency(clan,settlement)
+    })
+}
+
+const setTaxedProductivities = (settlement: SettlementInterface) => {
+    settlement.clans.forEach(clan => {
+        clan.taxed_productivity = calcTaxedProductivity(clan,settlement)
+        clan.goods_produced = Math.round(clan.taxed_productivity * 0.25)
+        clan.total_productivity = baseProductivity(clan)
+    })
+}
+
+const setDevelopments = (settlement: SettlementInterface) => {
+    settlement.clans.forEach(clan => {
+        clan.development = calcDevelopment(clan,settlement)
+    })
+}
+
+const tierModifier = (tier: SettlementTier) => (2 ** (tier - 1))
+
+export const updateSettlmentStock = (settlement: SettlementInterface) => {
+    if (settlement.stock.food < 0) {
+        settlement.deficet.food = Math.abs(settlement.stock.food)
+        settlement.stock.food = 0
+    }
+    if (settlement.stock.beer < 0) {
+        settlement.deficet.beer = Math.abs(settlement.stock.beer)
+        settlement.stock.beer = 0
+    }
+    if (settlement.stock.leather < 0) {
+        settlement.deficet.leather = Math.abs(settlement.stock.leather)
+        settlement.stock.leather = 0
+    }
+    if (settlement.stock.artisinal < 0) {
+        settlement.deficet.artisinal = Math.abs(settlement.stock.artisinal)
+        settlement.stock.artisinal = 0
+    }
+    if (settlement.stock.livestock < 0) {
+        settlement.deficet.livestock = Math.abs(settlement.stock.livestock)
+        settlement.stock.livestock = 0
+    }
+    if (settlement.stock.ornamental < 0) {
+        settlement.deficet.ornamental = Math.abs(settlement.stock.ornamental)
+        settlement.stock.ornamental = 0
+    }
+    if (settlement.stock.enchanted < 0) {
+        settlement.deficet.enchanted = Math.abs(settlement.stock.enchanted)
+        settlement.stock.enchanted = 0
+    }
+    if (settlement.stock.timber < 0) {
+        settlement.deficet.timber = Math.abs(settlement.stock.timber)
+        settlement.stock.timber = 0
+    }
+    if (settlement.stock.tools < 0) {
+        settlement.deficet.tools = Math.abs(settlement.stock.tools)
+        settlement.stock.tools = 0
+    }
+    if (settlement.stock.common_ores < 0) {
+        settlement.deficet.common_ores = Math.abs(settlement.stock.common_ores)
+        settlement.stock.common_ores = 0
+    }
+    if (settlement.stock.medical < 0) {
+        settlement.deficet.medical = Math.abs(settlement.stock.medical)
+        settlement.stock.medical = 0
+    }
+    if (settlement.stock.rare_ores < 0) {
+        settlement.deficet.rare_ores = Math.abs(settlement.stock.rare_ores)
+        settlement.stock.rare_ores = 0
+    }
+    if (settlement.stock.gems < 0) {
+        settlement.deficet.gems = Math.abs(settlement.stock.gems)
+        settlement.stock.gems = 0
+    }
+    if (settlement.stock.runes < 0) {
+        settlement.deficet.runes = Math.abs(settlement.stock.runes)
+        settlement.stock.runes = 0
+    }
+    if (settlement.stock.arms < 0) {
+        settlement.deficet.arms = Math.abs(settlement.stock.arms)
+        settlement.stock.arms = 0
+    }
+    if (settlement.stock.charcoal < 0) {
+        settlement.deficet.charcoal = Math.abs(settlement.stock.charcoal)
+        settlement.stock.charcoal = 0
+    }
+}
+
+export const popGrowth = (settlement: SettlementInterface, foreign_nations: ForeignPowerInterface[]) => {
+    const K = settlement.projected_pop
+    let P0 = 0
+    let bonus = 7 * settlement.clans.filter(clan => clan.id === clanTypes.clerics)[0].taxed_productivity
+    let gained_pg = 0
+    settlement.clans.forEach(clan => {
+        P0 += clan.population
+        if(settlement.population_growth_bonus === clan.id) { gained_pg += (clan.total_productivity - clan.taxed_productivity) * 0.7 * bonus }
+        else { gained_pg += (clan.total_productivity - clan.taxed_productivity) * 0.7 }
+    })
+    gained_pg *= 0.7
+    // shower growth from starving Civilians
+    gained_pg *= Math.max(0, 1 - ensureNumber(settlement.deficet.food/settlement.consumption_rate.food))
+    gained_pg -= Math.round(0.1 * ensureNumber(settlement.deficet.food/settlement.consumption_rate.food) / 75 * P0)
+    // Immigration
+    let MGM = 0
+    foreign_nations.forEach(nation => { MGM += nation.immigrationRate * nation.dwarfPopulation })
+    const avg_growth = P0 * 17.5226452905812 - 113.226452905812
+    const pop_final = (settlement.pop_cap * K * Math.exp(MGM*gained_pg/avg_growth))/(settlement.pop_cap + K * (Math.exp(MGM * gained_pg/avg_growth)-1))
+    settlement.projected_pop = pop_final
+}

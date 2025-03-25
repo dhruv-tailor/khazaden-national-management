@@ -6,7 +6,7 @@ import { useRef } from "react";
 import { deleteSavegame } from "../utilities/SaveData";
 import { useNavigate } from "react-router";
 
-export default function GameName({name, updateCall} : {name: string, updateCall: () => void}) {
+export default function GameName({name, updateCall} : {name: string, updateCall: (name: string) => void}) {
 
     const toast = useRef<Toast>(null);
     let navigate = useNavigate();
@@ -31,7 +31,7 @@ export default function GameName({name, updateCall} : {name: string, updateCall:
 
     const accept = () => {
         deleteSavegame(name);
-        updateCall();
+        updateCall(name);
         if (toast.current) {
             toast.current.show({ severity: 'info', summary: 'Confirmed', detail: 'Save File has been deleted', life: 1500 });
         }
