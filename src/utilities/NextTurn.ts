@@ -67,6 +67,7 @@ export const NextTurn = async (game: string) => {
             clan.production = floorGoods(scaleGoods(scaleDownGoods(clan.production,clan_produced),clan.goods_produced))
         })
 
+        // Merchant Capacity
         const merchant_cap = settlement.clans.filter(clan => clan.id === clanTypes.merchants)[0].taxed_productivity
         settlement.merchant_capacity = Math.round(merchant_cap * (1 - settlement.settlement_tax))
         merchant_capacity += Math.round(merchant_cap * settlement.settlement_tax)

@@ -19,7 +19,6 @@ export default function LoadGame() {
 
     const updatesaves = (name: string) => {
         setSavegames(savegames.filter(save => save !== name))
-        getSaves()
     }
     
     useEffect(() => {
