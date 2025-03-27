@@ -13,7 +13,7 @@ import { newRuneSmiths } from "../../Clans/ClanInterface/RuneSmiths";
 import { newWarriors } from "../../Clans/ClanInterface/Warriors";
 import { initial_prices } from "../../Economics/pricing/prices";
 import { ForeignPowerInterface } from "../../ForeignPowers/Interface/ForeignPowerInterface";
-import { addGoods, empty_goodsdist, goodsdist } from "../../Goods/GoodsDist";
+import { addGoods, empty_goodsdist, goodsdist, roundGoods, scaleGoods, subtractGoods } from "../../Goods/GoodsDist";
 import { ensureNumber } from "../../utilities/SimpleFunctions";
 import { TerrainData, TerrainType } from "./TerrainInterface";
 
@@ -158,7 +158,7 @@ const setDevelopments = (settlement: SettlementInterface) => {
     })
 }
 
-const tierModifier = (tier: SettlementTier) => (2 ** (tier - 1))
+export const tierModifier = (tier: SettlementTier) => (2 ** (tier - 1))
 
 export const updateSettlmentStock = (settlement: SettlementInterface) => {
     if (settlement.stock.food < 0) {
@@ -247,4 +247,19 @@ export const popGrowth = (settlement: SettlementInterface, foreign_nations: Fore
     const avg_growth = P0 * 17.5226452905812 - 113.226452905812
     const pop_final = (settlement.pop_cap * K * Math.exp(MGM*gained_pg/avg_growth))/(settlement.pop_cap + K * (Math.exp(MGM * gained_pg/avg_growth)-1))
     settlement.projected_pop = pop_final
+}
+
+export const settlementChange = (settlement: SettlementInterface): goodsdist => {
+    return {...settlement.clans.map(clan => subtractGoods(
+        roundGoods(
+            scaleGoods(
+                clan.production,
+                1-settlement.production_quota
+        )),
+        scaleGoods(clan.consumption_rate,clan.population))
+        ).reduce((sum,val) => addGoods(sum,val)),
+        money: settlement.clans.map(
+            clan => Math.round(clan.tax_rate * clan.taxed_productivity * (1 - settlement.settlement_tax))
+        ).reduce((sum,val) => sum + val)
+    }
 }

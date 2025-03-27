@@ -1,8 +1,7 @@
 import { Card } from "primereact/card";
-import { SettlementInterface, SettlementTierDetails } from "./SettlementInterface/SettlementInterface";
+import { settlementChange, SettlementInterface, SettlementTierDetails } from "./SettlementInterface/SettlementInterface";
 import PopulationIconTT from "../tooltips/PopulationIconTT";
 import DisplayGoods from "../components/goodsDislay";
-import { addGoods, roundGoods, scaleGoods, subtractGoods } from "../Goods/GoodsDist";
 import { Divider } from "primereact/divider";
 import { InputText } from "primereact/inputtext";
 import { Slider } from "primereact/slider";
@@ -31,18 +30,7 @@ export default function Settlement(
         </div>
         <DisplayGoods 
             stock={settlement.stock} 
-            change={{...settlement.clans.map(clan => subtractGoods(
-                roundGoods(
-                    scaleGoods(
-                        clan.production,
-                        1-settlement.production_quota
-                )),
-                scaleGoods(clan.consumption_rate,clan.population))
-                ).reduce((sum,val) => addGoods(sum,val)),
-                money: settlement.clans.map(
-                    clan => Math.round(clan.tax_rate * clan.taxed_productivity * (1 - settlement.settlement_tax))
-                ).reduce((sum,val) => sum + val)
-                }} 
+            change={settlementChange(settlement)} 
         />
         <Divider/>
         <div>
