@@ -11,6 +11,8 @@ import { Dialog } from "primereact/dialog";
 import ResourceDistribuition from "./components/ResourceDistribution";
 import { Button } from "primereact/button";
 import MoneyIconTT from "./tooltips/goods/MoneyIconTT";
+import NewSettlement from "./Settlement/NewSettlement";
+import { calcPriceGoods } from "./Economics/pricing/prices";
 
 export default function Game() {
     const gameId = useParams().game
@@ -20,15 +22,20 @@ export default function Game() {
 
     // Federal Goods
     const [reserveGoods,setReserveGoods] = useState<goodsdist>({...empty_goodsdist});
-    const [changeGoods,setChangeGoods] = useState<goodsdist>(empty_goodsdist);
+    const [changeGoods,setChangeGoods] = useState<goodsdist>({...empty_goodsdist});
+    const [prices,setPrices] = useState<goodsdist>({...empty_goodsdist})
 
     // Stimulus
     const [whoToGive,setWhoToGive] = useState<string>('');
     const [giveGoodsVisable,setGiveGoodsVisable] = useState<boolean>(false)
+
+    // New Settlement Screen
+    const [newSettlementVisable,setNewSettlementVisable] = useState<boolean>(false);
     
     const getSettlements = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
         store.get<goodsdist>('Federal Reserve').then(value => {if (value) {setReserveGoods(value);}});
+        store.get<goodsdist>('Federal Prices').then(value => {if (value) {setPrices(value)}})
         const get_settlements = await store.get<SettlementInterface[]>('settlements') ?? [];
         setSettlements(get_settlements)
         updateSettlements()
@@ -89,12 +96,18 @@ export default function Game() {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
         store.set('settlements',settlements)
         store.set('Federal Reserve',reserveGoods)
+        store.set('Federal Prices',prices)
         store.save()
     }
 
-    useEffect(() => {
-        getSettlements()
-    },[])
+    const createSettlement = (s: SettlementInterface) => {
+        setNewSettlementVisable(false)
+        s.name = `settlement${settlements.length + 1}`
+        setSettlements([...settlements,s])
+        setPrices({...calcPriceGoods(prices,reserveGoods,s.stock)})
+    }
+
+    useEffect(() => {getSettlements()},[])
     
     return(
     <div className="flex flex-column gap-2">
@@ -123,6 +136,7 @@ export default function Game() {
             {reserveGoods.money < ((settlements.length ** 2) * 4500) ? 
             <Button icon="pi pi-plus" onClick={()=>{
                 setReserveGoods({...reserveGoods,money: reserveGoods.money - ((settlements.length ** 2) * 4500)})
+                setNewSettlementVisable(true)
             }}>
                 <div className="flex flex-row gap-1">
                     New Settlement
@@ -141,7 +155,14 @@ export default function Game() {
         </Dialog>
 
         {/* New Settlment Dialog */}
-
+        <Dialog
+            header={'New Settlement'}
+            closable={false}
+            visible={newSettlementVisable}
+            onHide={() => {setNewSettlementVisable(false)}}
+        >
+            <NewSettlement max_resources={reserveGoods} updateFunc={createSettlement}/>
+        </Dialog>
 
     </div>
     )

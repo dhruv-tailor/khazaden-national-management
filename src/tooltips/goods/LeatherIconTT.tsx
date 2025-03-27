@@ -1,5 +1,6 @@
 import { GiClothes } from "react-icons/gi";
 import ToolTips from "../TT";
+import FarmersIconTT from "../clans/FarmersIconTT";
 
 export default function LeatherIconTT() {
     return <ToolTips 
@@ -7,7 +8,10 @@ export default function LeatherIconTT() {
         body={<>
             <b>Leather & Textiles</b>
             <p>Consumed by everyone to survive</p>
-            <p>Produced by: Farmers</p>
+            <div className="flex flex-row gap-1">
+                Produced by:
+                <FarmersIconTT/>
+            </div>
         </>}
     />
 }

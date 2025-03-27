@@ -1,13 +1,21 @@
 import { GiThrownCharcoal } from "react-icons/gi";
 import ToolTips from "../TT";
+import RuneSmithsIconTT from "../clans/RuneSmithsIconTT";
+import ForestersIconTT from "../clans/ForestersIconTT";
 
 export default function CharcoalIconTT() {
     return <ToolTips 
         hover={<GiThrownCharcoal/>}
         body={<>
             <b>Enchanted Charcoal</b>
-            <p>Consumed by: Rune Smiths</p>
-            <p>Produced by: Foresters</p>
+            <div className="flex flex-row gap-1">
+                Consumed by: 
+                <RuneSmithsIconTT/>
+            </div>
+            <div className="flex flex-row gap-1">
+                Produced by:
+                <ForestersIconTT/>
+            </div>
         </>}
     />
 }

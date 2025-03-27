@@ -1,5 +1,5 @@
 import { InputNumber } from "primereact/inputnumber";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MoneyIconTT from "../tooltips/goods/MoneyIconTT";
 import { Button } from "primereact/button";
 import { empty_goodsdist, goodsdist } from "../Goods/GoodsDist";
@@ -21,10 +21,12 @@ import ArmsIconTT from "../tooltips/goods/ArmsIconTT";
 import BooksIconTT from "../tooltips/goods/BooksIconTT";
 import CharcoalIconTT from "../tooltips/goods/CharcoalIconTT";
 
-export default function ResourceDistribuition({goods_cap,updateFunc}:{goods_cap: goodsdist,updateFunc: (dist: goodsdist) => void}) {
+export default function ResourceDistribuition({goods_cap,updateFunc,existing_dist}:{goods_cap: goodsdist,updateFunc: (dist: goodsdist) => void,existing_dist?: goodsdist}) {
     
     const [goods,setGoods] = useState<goodsdist>({...empty_goodsdist});
     const boxSize = 3
+
+    useEffect(() => {if(existing_dist) {setGoods({...existing_dist})}},[])
 
     return(
         <div className="flex flex-column gap-3">
