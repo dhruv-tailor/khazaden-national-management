@@ -42,7 +42,7 @@ export const newCraftsmen = () => {
         gems: 0,
         runes: 0,
         arms: 1,
-        books: 1,
+        books: 0,
         enchanted_arms: 0,
         charcoal: 0
     }

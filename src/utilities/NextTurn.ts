@@ -1,10 +1,11 @@
 import { load } from "@tauri-apps/plugin-store";
 import { saveLocation } from "./SaveData";
-import { popGrowth, SettlementInterface, updateGoodsProduction, updateSettlmentStock } from "../Settlement/SettlementInterface/SettlementInterface";
+import { popGrowth, SettlementInterface, tierModifier, updateGoodsProduction, updateSettlmentStock } from "../Settlement/SettlementInterface/SettlementInterface";
 import { ForeignPowerInterface } from "../ForeignPowers/Interface/ForeignPowerInterface";
 import { goodsdist, empty_goodsdist, addGoods, subtractGoods, scaleGoods, roundGoods, totalGoods, scaleDownGoods, floorGoods } from "../Goods/GoodsDist";
 import { calcPriceGoods } from "../Economics/pricing/prices";
 import { clanTypes } from "../Clans/ClanInterface/ClanInterface";
+import { TerrainData } from "../Settlement/SettlementInterface/TerrainInterface";
 
 
 export const NextTurn = async (game: string) => {
@@ -71,6 +72,29 @@ export const NextTurn = async (game: string) => {
         const merchant_cap = settlement.clans.filter(clan => clan.id === clanTypes.merchants)[0].taxed_productivity
         settlement.merchant_capacity = Math.round(merchant_cap * (1 - settlement.settlement_tax))
         merchant_capacity += Math.round(merchant_cap * settlement.settlement_tax)
+
+        //Reset available natural resource
+        settlement.production_cap = {
+            money: -1,
+            food: Math.round(tierModifier(settlement.tier) * TerrainData[settlement.terrain_type].food_and_water_balancing),
+            beer: Math.round(tierModifier(settlement.tier) * TerrainData[settlement.terrain_type].beer_balancing),
+            leather: Math.round(tierModifier(settlement.tier) * TerrainData[settlement.terrain_type].leather_and_textiles_balancing),
+            artisinal: -1,
+            livestock: Math.round(tierModifier(settlement.tier) * TerrainData[settlement.terrain_type].livestock_balancing),
+            ornamental: -1,
+            enchanted: -1,
+            timber: Math.round(tierModifier(settlement.tier) * TerrainData[settlement.terrain_type].timber_balancing),
+            tools: -1,
+            common_ores: Math.round(tierModifier(settlement.tier) * TerrainData[settlement.terrain_type].common_ores_balancing),
+            medical: -1,
+            rare_ores: Math.round(tierModifier(settlement.tier) * TerrainData[settlement.terrain_type].rare_ores_balancing),
+            gems: Math.round(tierModifier(settlement.tier) * TerrainData[settlement.terrain_type].gems_balancing),
+            runes: -1,
+            arms: -1,
+            books: -1,
+            enchanted_arms: -1,
+            charcoal: Math.round(tierModifier(settlement.tier) * TerrainData[settlement.terrain_type].enchanted_charcoal_balancing)
+        }
     })
 
     foreign_nations.forEach(nation => {

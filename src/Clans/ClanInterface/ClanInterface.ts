@@ -61,7 +61,14 @@ export const empty_clan = {
 export const clanGoodsConsumed = (clan: ClanInterface) => scaleGoods(clan.consumption_rate,clan.population)
 const taxationModifier = (tax_rate: number) => 3.24 + (1.23 * tax_rate) - (12.40 * (tax_rate ** 2))
 export const baseProductivity = (clan: ClanInterface) => ensureNumber((clan.loyalty + clan.efficency)/20) * 40 * clan.productivity_rate * clan.population
-export const developmentBonus = (clan: ClanInterface) : number =>  Math.floor(Math.max(0,Math.floor(((ensureNumber(clan.development/(8 * clan.population))) ** (1/3))-2))+1);
+export const developmentBonus = (clan: ClanInterface) : number =>  Math.floor(
+    Math.max(
+        0,
+        Math.floor(
+            (ensureNumber(clan.development/(8 * clan.population))) ** (1/3)
+        )-2
+    )+1
+);
 
 const deficetRatio = (deficet: number, consumption_rate: number) => {
     let values = [0,0]

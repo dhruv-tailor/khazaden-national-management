@@ -22,6 +22,28 @@ export interface goodsdist {
     charcoal: number;
 }
 
+export enum goodsId {
+    money,
+    food,
+    beer,
+    leather,
+    artisinal,
+    livestock,
+    ornamental,
+    enchanted,
+    timber,
+    tools,
+    common_ores,
+    medical,
+    rare_ores,
+    gems,
+    runes,
+    arms,
+    books,
+    enchanted_arms,
+    charcoal,
+}
+
 export const empty_goodsdist: goodsdist = {
     money: 0,
     food: 0,
