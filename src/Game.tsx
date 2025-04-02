@@ -13,6 +13,7 @@ import { Button } from "primereact/button";
 import MoneyIconTT from "./tooltips/goods/MoneyIconTT";
 import NewSettlement from "./Settlement/NewSettlement";
 import { calcPriceGoods } from "./Economics/pricing/prices";
+import { NextTurn } from "./utilities/NextTurn";
 
 export default function Game() {
     const gameId = useParams().game
@@ -87,8 +88,8 @@ export default function Game() {
         setWhoToGive('')
     }
 
-    const navigateSettlement = (name: string) => {
-        saveData()
+    const navigateSettlement = async (name: string) => {
+        await saveData()
         navigate(`settlement/${name}`)
     }
 
@@ -107,10 +108,32 @@ export default function Game() {
         setPrices({...calcPriceGoods(prices,reserveGoods,s.stock)})
     }
 
+    const processNextTurn = async () => {
+        await saveData()
+        await NextTurn(gameId ?? '')
+        await getSettlements()
+    }
+
+    const goToForeignPowers = async () => {
+        await saveData()
+        navigate(`foreignpowers`)
+    }
+
+    const goToEconomy = async () => {
+        await saveData()
+        navigate(`economy`)
+    }
+
+
     useEffect(() => {getSettlements()},[])
     
     return(
     <div className="flex flex-column gap-2">
+        <Button label='Next Turn' size='small' icon='pi pi-angle-double-right' onClick={processNextTurn}/>
+        <div className="flex flex-row gap-1">
+            <Button className='flex-grow-1' severity="secondary" label='Foreign Powers' icon='pi pi-flag-fill' onClick={goToForeignPowers}/>
+            <Button className='flex-grow-1' severity="warning" label='Economy' icon='pi pi-wallet' onClick={goToEconomy}/>
+        </div>
         <Panel header="Federal Reserve" toggleable>
             {settlements.length > 0 ? <DisplayGoods 
                 stock={reserveGoods} 

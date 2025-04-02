@@ -43,9 +43,8 @@ export const NextTurn = async (game: string) => {
         // Update Settlement Stock
         next_goodsdist = roundGoods(addGoods(scaleGoods(produced,settlement.production_quota),next_goodsdist))
         produced = roundGoods(scaleGoods(produced,1-settlement.production_quota))
-        produced = subtractGoods(produced,settlement.consumption_rate)  
-
         const old_stock = {...settlement.stock}
+        settlement.stock = addGoods(settlement.stock,subtractGoods(produced,settlement.consumption_rate) )
         updateSettlmentStock(settlement)
         settlement.prices = calcPriceGoods(settlement.prices,old_stock,settlement.stock)
         

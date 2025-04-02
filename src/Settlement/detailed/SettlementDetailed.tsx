@@ -134,6 +134,14 @@ export default function SettlementDetailed() {
         )
     }
 
+    const setBonus = (id: clanTypes, type: string) => {
+        if(type === 'development') {setSettlement({...settlement,development_growth_bonus: id})}
+        else if(type === 'efficency') {setSettlement({...settlement,efficency_bonus: id})}
+        else if(type === 'loyalty') {setSettlement({...settlement,loyalty_bonus: id})}
+        else if(type === 'corvee') {setSettlement({...settlement,corvee_bonus: id})}
+        else if(type === 'population') {setSettlement({...settlement,population_growth_bonus: id})}
+    }
+
     return(
         <div className="flex flex-column gap-2">
             <Button label="Back to All Settlements" icon="pi pi-arrow-left" size="small" onClick={goBack}/>
@@ -177,7 +185,7 @@ export default function SettlementDetailed() {
 
             {/* Bureaucracy Bonus */}
             <Panel header='Bureaucracy Bonus' toggleable>
-                <BureaucracyBonus settlement={settlement}/>
+                <BureaucracyBonus settlement={settlement} updateFunc={setBonus}/>
             </Panel>
             
             {/* Show Clans */}

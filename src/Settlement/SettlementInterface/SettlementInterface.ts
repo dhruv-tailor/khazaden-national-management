@@ -225,6 +225,10 @@ export const updateSettlmentStock = (settlement: SettlementInterface) => {
         settlement.deficet.charcoal = Math.abs(settlement.stock.charcoal)
         settlement.stock.charcoal = 0
     }
+    if (settlement.stock.books < 0) {
+        settlement.deficet.books = Math.abs(settlement.stock.books)
+        settlement.stock.books = 0
+    }
 }
 
 export const popGrowth = (settlement: SettlementInterface, foreign_nations: ForeignPowerInterface[]) => {
