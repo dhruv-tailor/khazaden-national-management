@@ -4,7 +4,7 @@ import GameName from "./GameName";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router";
 
-function LoadGame() {
+export default function LoadGame() {
     const [savegames, setSavegames] = useState<string[]>([]);
     let navigate = useNavigate();
 
@@ -15,6 +15,10 @@ function LoadGame() {
 
     const goBack = () => {
         navigate('/')
+    }
+
+    const updatesaves = (name: string) => {
+        setSavegames(savegames.filter(save => save !== name))
     }
     
     useEffect(() => {
@@ -29,10 +33,8 @@ function LoadGame() {
                 <div className="flex flex-grow-1"></div>
             </div>
            {savegames.map((savegame) => {
-               return <GameName key={savegame} name={savegame} updateCall={getSaves}/>
+               return <GameName key={savegame} name={savegame} updateCall={updatesaves}/>
            })}
         </div>
     );
 }
-
-export default LoadGame;

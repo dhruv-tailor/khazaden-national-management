@@ -3,7 +3,7 @@ import { FloatLabel } from "primereact/floatlabel";
 import { InputText } from "primereact/inputtext";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { createNewSave } from "./utilities/SaveData";
+import { createNewSave } from "./utilities/SaveData"
 
 
 function NewGame() {

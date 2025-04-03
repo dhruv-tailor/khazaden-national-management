@@ -1,5 +1,5 @@
 import { Badge } from "primereact/badge"
-import { MilitaryAccess } from "../ForeignPowerInterface"
+import { MilitaryAccess } from "../Interface/ForeignPowerInterface";
 
 export const MilitaryAccessBadge = ({militaryAccess}:{militaryAccess: MilitaryAccess}) => {
 

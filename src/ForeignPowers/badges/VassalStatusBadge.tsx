@@ -1,5 +1,5 @@
 import { Badge } from "primereact/badge";
-import { VassalStatus } from "../ForeignPowerInterface";
+import { VassalStatus } from "../Interface/ForeignPowerInterface";
 
 export const VassalStatusBadge = ({vassalStatus}:{vassalStatus: VassalStatus}) => {
     

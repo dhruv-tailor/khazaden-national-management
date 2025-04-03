@@ -1,86 +1,37 @@
 import { InputNumber } from "primereact/inputnumber";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { FaBook, FaBriefcaseMedical, FaGem, FaShieldAlt, FaTools } from "react-icons/fa";
-import { GiBeerStein, GiClothes, GiCoalWagon, GiCrystalBall, GiGems, GiMagicShield, GiPouringChalice, GiRuneStone, GiThrownCharcoal, GiWoodPile } from "react-icons/gi";
-import { IoFastFood } from "react-icons/io5";
-import { LuHandCoins } from "react-icons/lu";
-import { PiCowFill } from "react-icons/pi";
+import { useEffect, useState } from "react";
+import MoneyIconTT from "../tooltips/goods/MoneyIconTT";
+import { Button } from "primereact/button";
+import { empty_goodsdist, goodsdist } from "../Goods/GoodsDist";
+import FoodIconTT from "../tooltips/goods/FoodIconTT";
+import BeerIconTT from "../tooltips/goods/BeerIconTT";
+import LeatherIconTT from "../tooltips/goods/LeatherIconTT";
+import ArtisinalIconTT from "../tooltips/goods/ArtisinalIconTT";
+import LivestockIconTT from "../tooltips/goods/LivestockIconTT";
+import OrnamentalIconTT from "../tooltips/goods/OrnamentalIconTT";
+import EnchantedArmsIconTT from "../tooltips/goods/EnchantedArmsTT";
+import TimberIconTT from "../tooltips/goods/TimberIconTT";
+import ToolsIconTT from "../tooltips/goods/ToolsIconTT";
+import CommonOresIconTT from "../tooltips/goods/CommonOresTT";
+import MedicalIconTT from "../tooltips/goods/MedicalIconTT";
+import RareOresIconTT from "../tooltips/goods/RareOresIconTT";
+import GemsIconTT from "../tooltips/goods/GemsIconTT";
+import RunesIconTT from "../tooltips/goods/RunesIconTT";
+import ArmsIconTT from "../tooltips/goods/ArmsIconTT";
+import BooksIconTT from "../tooltips/goods/BooksIconTT";
+import CharcoalIconTT from "../tooltips/goods/CharcoalIconTT";
 
-export interface goodsdist {
-    money: number;
-    food: number;
-    beer: number;
-    leather: number;
-    artisinal: number;
-    livestock: number;
-    ornamental: number;
-    enchanted: number;
-    timber: number;
-    tools: number;
-    common_ores: number;
-    medical: number;
-    rare_ores: number;
-    gems: number;
-    runes: number;
-    arms: number;
-    books: number;
-    enchanted_arms: number;
-    charcoal: number;
-}
+export default function ResourceDistribuition({goods_cap,updateFunc,existing_dist}:{goods_cap: goodsdist,updateFunc: (dist: goodsdist) => void,existing_dist?: goodsdist}) {
+    
+    const [goods,setGoods] = useState<goodsdist>({...empty_goodsdist});
+    const boxSize = 3
 
-export const empty_goodsdist: goodsdist = {
-    money: 0,
-    food: 0,
-    beer: 0,
-    leather: 0,
-    artisinal: 0,
-    livestock: 0,
-    ornamental: 0,
-    enchanted: 0,
-    timber: 0,
-    tools: 0,
-    common_ores: 0,
-    medical: 0,
-    rare_ores: 0,
-    gems: 0,
-    runes: 0,
-    arms: 0,
-    books: 0,
-    enchanted_arms: 0,
-    charcoal: 0
-}
-
-export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap: goodsdist,updateFunc: Dispatch<SetStateAction<goodsdist>>}) {
-    const [goods,setGoods] = useState<goodsdist>({
-        money: 0,
-        food: 0,
-        beer: 0,
-        leather: 0,
-        artisinal: 0,
-        livestock: 0,
-        ornamental: 0,
-        enchanted: 0,
-        timber: 0,
-        tools: 0,
-        common_ores: 0,
-        medical: 0,
-        rare_ores: 0,
-        gems: 0,
-        runes: 0,
-        arms: 0,
-        books: 0,
-        enchanted_arms: 0,
-        charcoal: 0
-    });
-
-    const [boxSize,setBoxSize] = useState<number>(3);
-
-    useEffect(()=>{updateFunc(goods)},[goods]);
+    useEffect(() => {if(existing_dist) {setGoods({...existing_dist})}},[])
 
     return(
         <div className="flex flex-column gap-3">
             <div>
-                <LuHandCoins/>
+                <MoneyIconTT/>
                 <InputNumber
                     value={goods.money} 
                     onValueChange={e => setGoods({...goods,money: e.value ?? 0})} 
@@ -90,7 +41,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
             </div>
             <div className="flex flex-row flex-wrap gap-3">
                 <div>
-                    <IoFastFood/>
+                    <FoodIconTT/>
                     <InputNumber 
                         size={boxSize} 
                         value={goods.food} 
@@ -100,7 +51,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                         max={goods_cap.food}/>
                 </div>
                 <div>
-                    <GiBeerStein/>
+                    <BeerIconTT/>
                     <InputNumber 
                         size={boxSize} 
                         value={goods.beer} 
@@ -110,7 +61,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                         max={goods_cap.beer}/>
                 </div>
                 <div>
-                    <GiClothes/>
+                    <LeatherIconTT/>
                     <InputNumber 
                         size={boxSize} 
                         value={goods.leather} 
@@ -122,7 +73,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
             </div>
             <div className="flex flex-row flex-wrap gap-3">
                 <div>
-                    <LuHandCoins/>
+                    <ArtisinalIconTT/>
                     <InputNumber 
                         size={boxSize} 
                         value={goods.artisinal} 
@@ -132,7 +83,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                         max={goods_cap.artisinal}/>
                 </div>
                 <div>
-                    <PiCowFill/>
+                    <LivestockIconTT/>
                     <InputNumber 
                         size={boxSize} 
                         value={goods.livestock} 
@@ -142,7 +93,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                         max={goods_cap.livestock}/>
                 </div>
                 <div>
-                    <GiPouringChalice/>
+                    <OrnamentalIconTT/>
                     <InputNumber 
                         size={boxSize} 
                         value={goods.ornamental} 
@@ -154,7 +105,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
             </div>
             <div className="flex flex-row flex-wrap gap-3">
                 <div>
-                    <GiCrystalBall/>
+                    <EnchantedArmsIconTT/>
                     <InputNumber 
                         size={boxSize} 
                         value={goods.enchanted} 
@@ -164,7 +115,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                         max={goods_cap.enchanted}/>
                 </div>
                 <div>
-                    <GiWoodPile/>
+                    <TimberIconTT/>
                     <InputNumber 
                         size={boxSize} 
                         value={goods.timber} 
@@ -174,7 +125,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                         max={goods_cap.timber}/>
                 </div>
                 <div>
-                    <FaTools/>
+                    <ToolsIconTT/>
                     <InputNumber 
                         size={boxSize} 
                         value={goods.tools} 
@@ -186,7 +137,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
             </div>
             <div className="flex flex-row flex-wrap gap-3">
                 <div>
-                    <GiCoalWagon/>
+                    <CommonOresIconTT/>
                     <InputNumber 
                         size={boxSize} 
                         value={goods.common_ores} 
@@ -196,7 +147,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                         max={goods_cap.common_ores}/>
                 </div>
                 <div>
-                    <FaBriefcaseMedical/>
+                    <MedicalIconTT/>
                     <InputNumber 
                         size={boxSize} 
                         value={goods.medical} 
@@ -206,7 +157,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                         max={goods_cap.medical}/>
                 </div>
                 <div>
-                    <FaGem/>
+                    <RareOresIconTT/>
                     <InputNumber 
                         size={boxSize} 
                         value={goods.rare_ores} 
@@ -218,7 +169,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
             </div>
             <div className="flex flex-row flex-wrap gap-3">
                 <div>
-                    <GiGems/>
+                    <GemsIconTT/>
                     <InputNumber 
                         size={boxSize} 
                         value={goods.gems} 
@@ -228,7 +179,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                         max={goods_cap.gems}/>
                 </div>
                 <div>
-                    <GiRuneStone/>
+                    <RunesIconTT/>
                     <InputNumber 
                         size={boxSize} 
                         value={goods.runes} 
@@ -238,7 +189,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                         max={goods_cap.runes}/>
                 </div>
                 <div>
-                    <FaShieldAlt/>
+                    <ArmsIconTT/>
                     <InputNumber 
                         size={boxSize} 
                         value={goods.arms} 
@@ -250,7 +201,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
             </div>
             <div className="flex flex-row flex-wrap gap-3">
                 <div>
-                    <FaBook/>
+                    <BooksIconTT/>
                     <InputNumber 
                         size={boxSize} 
                         value={goods.books} 
@@ -260,7 +211,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                         max={goods_cap.books}/>
                 </div>
                 <div>
-                    <GiMagicShield/>
+                    <EnchantedArmsIconTT/>
                     <InputNumber 
                         size={boxSize} 
                         value={goods.enchanted_arms} 
@@ -270,7 +221,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                         max={goods_cap.enchanted_arms}/>
                 </div>
                 <div>
-                    <GiThrownCharcoal/>
+                    <CharcoalIconTT/>
                     <InputNumber 
                         size={boxSize} 
                         value={goods.charcoal} 
@@ -280,6 +231,7 @@ export default function ResourceDistribuition({goods_cap, updateFunc}:{goods_cap
                         max={goods_cap.charcoal}/>
                 </div>
             </div>
+            <Button label="Confirm" icon='pi pi-send' onClick={() => updateFunc(goods)}/>
         </div>
     )
 }

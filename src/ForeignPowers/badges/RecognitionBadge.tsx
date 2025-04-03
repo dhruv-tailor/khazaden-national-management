@@ -1,5 +1,5 @@
 import { Badge } from "primereact/badge";
-import { ForeignRecognition } from "../ForeignPowerInterface";
+import { ForeignRecognition } from "../Interface/ForeignPowerInterface";
 
 export const RecognitionBadge = ({recognition}:{recognition: ForeignRecognition}) => {
     const val = () => {

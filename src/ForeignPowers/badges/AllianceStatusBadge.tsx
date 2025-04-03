@@ -1,5 +1,5 @@
 import { Badge } from "primereact/badge";
-import { AllianceStatus } from "../ForeignPowerInterface";
+import { AllianceStatus } from "../Interface/ForeignPowerInterface";
 
 export const AllianceStatusBadge = ({allianceStatus}:{allianceStatus: AllianceStatus}) => {
     

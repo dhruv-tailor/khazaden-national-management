@@ -1,12 +1,18 @@
+import { Button } from "primereact/button";
 import { InputNumber } from "primereact/inputnumber";
-import { Dispatch, SetStateAction, useEffect, useState } from "react"
-import { BiSolidCrown } from "react-icons/bi";
-import { FaArchive, FaHammer } from "react-icons/fa";
-import { GiAxeInStump, GiBlacksmith, GiFarmer } from "react-icons/gi";
-import { LuSword } from "react-icons/lu";
-import { MdChurch, MdEngineering } from "react-icons/md";
-import { RiCriminalFill } from "react-icons/ri";
-import { TbMoneybag, TbPick } from "react-icons/tb";
+import { useEffect, useState } from "react"
+import RulersIconTT from "../tooltips/clans/RulersIconTT";
+import ArchivistsIconTT from "../tooltips/clans/ArchivistsIconTT";
+import EngineersIconTT from "../tooltips/clans/EngineersIconTT";
+import RuneSmithsIconTT from "../tooltips/clans/RuneSmithsIconTT";
+import CraftsmenIconTT from "../tooltips/clans/CraftsmenIconTT";
+import MerchantsIconTT from "../tooltips/clans/MerchantsIconTT";
+import ClericsIconTT from "../tooltips/clans/ClericsIconTT";
+import MinersIconTT from "../tooltips/clans/MinersIconTT";
+import FarmersIconTT from "../tooltips/clans/FarmersIconTT";
+import WarriorsIconTT from "../tooltips/clans/WarriorsIconTT";
+import ForestersIconTT from "../tooltips/clans/ForestersIconTT";
+import CriminalsIconTT from "../tooltips/clans/CriminalsIconTT";
 
 export interface popdist {
     rulers: number;
@@ -38,7 +44,22 @@ export const default_popdist: popdist = {
     criminals: 0
 }
 
-export default function PopDistribution({max_pops,updateFunc} : {max_pops: number,updateFunc: Dispatch<SetStateAction<popdist>>}) {
+export const empty_popdist: popdist = {
+    rulers: 0,
+    archivists: 0,
+    engineers: 0,
+    runeSmiths: 0,
+    craftsmen: 0,
+    merchants: 0,
+    clerics: 0,
+    miners: 0,
+    farmers: 0,
+    warriors: 0,
+    foresters: 0,
+    criminals: 0
+}
+
+export default function PopDistribution({max_pops,updateFunc,existingPops} : {max_pops: number,updateFunc: (p: popdist) => void,existingPops: popdist}) {
 
     const [remaining,setRemaining] = useState<number>(max_pops);
     const [rulers,setRulers] = useState<number>(0);
@@ -54,29 +75,30 @@ export default function PopDistribution({max_pops,updateFunc} : {max_pops: numbe
     const [foresters,setForesters] = useState<number>(0);
     const [criminals,setCriminals] = useState<number>(0);
 
+    useEffect(() => {
+        setRulers(existingPops.rulers)
+        setArchivists(existingPops.archivists)
+        setEngineers(existingPops.engineers)
+        setRuneSmiths(existingPops.runeSmiths)
+        setCraftsmen(existingPops.craftsmen)
+        setMerchants(existingPops.merchants)
+        setClerics(existingPops.clerics)
+        setMiners(existingPops.miners)
+        setFarmers(existingPops.farmers)
+        setWarriors(existingPops.warriors)
+        setForesters(existingPops.foresters)
+        setCriminals(existingPops.criminals)
+    },[])
+
     useEffect(()=>{
         setRemaining(max_pops-rulers-archivists-engineers-runeSmiths-craftsmen-merchants-clerics-miners-farmers-warriors-foresters-criminals)
-        updateFunc({
-            rulers: rulers,
-            archivists: archivists,
-            engineers: engineers,
-            runeSmiths: runeSmiths,
-            craftsmen: craftsmen,
-            merchants: merchants,
-            clerics: clerics,
-            miners: miners,
-            farmers: farmers,
-            warriors: warriors,
-            foresters: foresters,
-            criminals: criminals
-        })
     },[rulers,archivists,engineers,runeSmiths,craftsmen,merchants,clerics,miners,farmers,warriors,foresters,criminals])
 
     return (
         <div className="flex flex-column gap-3">
             <div className="flex flex-row flex-wrap gap-3">
                 <div>
-                    <BiSolidCrown/>
+                    <RulersIconTT/>
                     <InputNumber 
                         size={2} 
                         value={rulers} 
@@ -86,7 +108,7 @@ export default function PopDistribution({max_pops,updateFunc} : {max_pops: numbe
                         max={remaining+rulers}/>
                 </div>
                 <div>
-                    <FaArchive/>
+                    <ArchivistsIconTT/>
                     <InputNumber 
                     size={2} 
                     value={archivists} 
@@ -96,7 +118,7 @@ export default function PopDistribution({max_pops,updateFunc} : {max_pops: numbe
                     max={remaining+archivists}/>
                 </div>
                 <div>
-                    <MdEngineering/>
+                    <EngineersIconTT/>
                     <InputNumber 
                     size={2} 
                     value={engineers} 
@@ -108,7 +130,7 @@ export default function PopDistribution({max_pops,updateFunc} : {max_pops: numbe
             </div>
             <div className="flex flex-row flex-wrap gap-3">
                 <div>
-                    <GiBlacksmith/>
+                    <RuneSmithsIconTT/>
                     <InputNumber 
                     size={2} 
                     value={runeSmiths} 
@@ -118,7 +140,7 @@ export default function PopDistribution({max_pops,updateFunc} : {max_pops: numbe
                     max={remaining+runeSmiths}/>
                 </div>
                 <div>
-                    <FaHammer/>
+                    <CraftsmenIconTT/>
                     <InputNumber 
                     size={2} 
                     value={craftsmen} 
@@ -128,7 +150,7 @@ export default function PopDistribution({max_pops,updateFunc} : {max_pops: numbe
                     max={remaining+craftsmen}/>
                 </div>
                 <div>
-                    <TbMoneybag/>
+                    <MerchantsIconTT/>
                     <InputNumber 
                     size={2} 
                     value={merchants} 
@@ -140,7 +162,7 @@ export default function PopDistribution({max_pops,updateFunc} : {max_pops: numbe
             </div>
             <div className="flex flex-row flex-wrap gap-3">
                 <div>
-                    <MdChurch/>
+                    <ClericsIconTT/>
                     <InputNumber 
                     size={2} 
                     value={clerics} 
@@ -150,7 +172,7 @@ export default function PopDistribution({max_pops,updateFunc} : {max_pops: numbe
                     max={remaining+clerics}/>
                 </div>
                 <div>
-                    <TbPick/>
+                    <MinersIconTT/>
                     <InputNumber 
                     size={2} 
                     value={miners} 
@@ -160,7 +182,7 @@ export default function PopDistribution({max_pops,updateFunc} : {max_pops: numbe
                     max={remaining+miners}/>
                 </div>
                 <div>
-                    <GiFarmer/>
+                    <FarmersIconTT/>
                     <InputNumber 
                     size={2} 
                     value={farmers} 
@@ -172,7 +194,7 @@ export default function PopDistribution({max_pops,updateFunc} : {max_pops: numbe
             </div>
             <div className="flex flex-row flex-wrap gap-3">
                 <div>
-                    <LuSword/>
+                    <WarriorsIconTT/>
                     <InputNumber 
                     size={2} 
                     value={warriors} 
@@ -182,7 +204,7 @@ export default function PopDistribution({max_pops,updateFunc} : {max_pops: numbe
                     max={remaining+warriors}/>
                 </div>
                 <div>
-                    <GiAxeInStump/>
+                    <ForestersIconTT/>
                     <InputNumber 
                     size={2} 
                     value={foresters} 
@@ -192,7 +214,7 @@ export default function PopDistribution({max_pops,updateFunc} : {max_pops: numbe
                     max={remaining+foresters}/>
                 </div>
                 <div>
-                    <RiCriminalFill/>
+                    <CriminalsIconTT/>
                     <InputNumber 
                     size={2} 
                     value={criminals} 
@@ -202,6 +224,22 @@ export default function PopDistribution({max_pops,updateFunc} : {max_pops: numbe
                     max={remaining+criminals}/>
                 </div>
             </div>
+            <Button label="Confirm" onClick={() => {
+                updateFunc({
+                    rulers: rulers,
+                    archivists: archivists,
+                    engineers: engineers,
+                    runeSmiths: runeSmiths,
+                    craftsmen: craftsmen,
+                    merchants: merchants,
+                    clerics: clerics,
+                    miners: miners,
+                    farmers: farmers,
+                    warriors: warriors,
+                    foresters: foresters,
+                    criminals: criminals
+                })
+            }}/>
         </div>
     )
 }
