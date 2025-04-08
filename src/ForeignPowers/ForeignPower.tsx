@@ -35,7 +35,8 @@ export default function ForeignPower({power,updateTariff}: {power: ForeignPowerI
                     <VassalStatusBadge vassalStatus={power.vassalStatus}/>
                     <MilitaryAccessBadge militaryAccess={power.militaryAccess}/>
                 </div>
-                {!power.isEmbargoed ?<div>
+                {!power.isEmbargoed ?<div className="flex flex-column">
+                    <div>
                     <label htmlFor="tariff-rate">Tarrif Rate: </label>
                     <InputNumber 
                         size={5}
@@ -45,6 +46,8 @@ export default function ForeignPower({power,updateTariff}: {power: ForeignPowerI
                         id="tariff-rate" 
                         value={Math.round(power.tarriffs * 100)} 
                         onChange={e => updateTariff(power.name,(e.value ?? 0)/100)}/>
+                    </div>
+                    Retalitory Tariffs: {Math.round(power.retlaitory_tariffs * 100)} %
                 </div>:
                 <div style={{
                     backgroundColor: 'var(--red-500)', 

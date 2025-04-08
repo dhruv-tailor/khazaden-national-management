@@ -25,7 +25,7 @@ export const price_volitility: goodsdist = {
 
 export const calcPriceChange = (current_price: number, current_inventory: number, new_inventory: number, volitility: number) => {
     const val = Math.max(0,ensureNumber(current_price * (1 + volitility * Math.log(ensureNumber(current_inventory/new_inventory)))))
-    return((val !== 0) && (val !== null) ? val : current_price)
+    return((val !== 0) || (val !== null) ? val : current_price)
 }
 
 export const initial_prices: goodsdist = {
@@ -49,9 +49,10 @@ export const initial_prices: goodsdist = {
     enchanted_arms: 32,
     charcoal: 40
 }
+const fixPrice = (price: number) => (price === null || Math.round(price) === 0) 
 
 export const calcPriceGoods = (current_prices: goodsdist, current_inventory: goodsdist, new_inventory: goodsdist) => {
-    return {
+    const new_prices = {
         money: current_prices.money,
         food: calcPriceChange(current_prices.food,current_inventory.food,new_inventory.food,price_volitility.food),
         beer: calcPriceChange(current_prices.beer,current_inventory.beer,new_inventory.beer,price_volitility.beer),
@@ -71,5 +72,26 @@ export const calcPriceGoods = (current_prices: goodsdist, current_inventory: goo
         books: calcPriceChange(current_prices.books,current_inventory.books,new_inventory.books,price_volitility.books),
         enchanted_arms: calcPriceChange(current_prices.enchanted_arms,current_inventory.enchanted_arms,new_inventory.enchanted_arms,price_volitility.enchanted_arms),
         charcoal: calcPriceChange(current_prices.charcoal,current_inventory.charcoal,new_inventory.charcoal,price_volitility.charcoal),
+    }
+    return {
+        money: current_prices.money,
+        food: fixPrice(new_prices.food) ? initial_prices.food : new_prices.food,
+        beer: fixPrice(new_prices.beer) ? initial_prices.beer : new_prices.beer,
+        leather: fixPrice(new_prices.leather) ? initial_prices.leather : new_prices.leather,
+        artisinal: fixPrice(new_prices.artisinal) ? initial_prices.artisinal : new_prices.artisinal,
+        livestock: fixPrice(new_prices.livestock) ? initial_prices.livestock : new_prices.livestock,
+        ornamental: fixPrice(new_prices.ornamental) ? initial_prices.ornamental : new_prices.ornamental,
+        enchanted: fixPrice(new_prices.enchanted) ? initial_prices.enchanted : new_prices.enchanted,
+        timber: fixPrice(new_prices.timber) ? initial_prices.timber : new_prices.timber,
+        tools: fixPrice(new_prices.tools) ? initial_prices.tools : new_prices.tools,
+        common_ores: fixPrice(new_prices.common_ores) ? initial_prices.common_ores : new_prices.common_ores,
+        medical: fixPrice(new_prices.medical) ? initial_prices.medical : new_prices.medical,
+        rare_ores: fixPrice(new_prices.rare_ores) ? initial_prices.rare_ores : new_prices.rare_ores,
+        gems: fixPrice(new_prices.gems) ? initial_prices.gems : new_prices.gems,
+        runes: fixPrice(new_prices.runes) ? initial_prices.runes : new_prices.runes,
+        arms: fixPrice(new_prices.arms) ? initial_prices.arms : new_prices.arms,
+        books: fixPrice(new_prices.books) ? initial_prices.books : new_prices.books,
+        enchanted_arms: fixPrice(new_prices.enchanted_arms) ? initial_prices.enchanted_arms : new_prices.enchanted_arms,
+        charcoal: fixPrice(new_prices.charcoal) ? initial_prices.charcoal : new_prices.charcoal,
     }
 }

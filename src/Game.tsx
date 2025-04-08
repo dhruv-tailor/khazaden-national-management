@@ -156,7 +156,7 @@ export default function Game() {
                 goTo={navigateSettlement}
                 />)}
             {/* New Settlment Button */}
-            {reserveGoods.money < ((settlements.length ** 2) * 4500) ? 
+            {reserveGoods.money >= ((settlements.length ** 2) * 4500) ? 
             <Button icon="pi pi-plus" onClick={()=>{
                 setReserveGoods({...reserveGoods,money: reserveGoods.money - ((settlements.length ** 2) * 4500)})
                 setNewSettlementVisable(true)

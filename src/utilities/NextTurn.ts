@@ -13,7 +13,7 @@ export const NextTurn = async (game: string) => {
     const settlements = await store.get<SettlementInterface[]>('settlements');
     const current_goodsdist = await store.get<goodsdist>('Federal Reserve') ?? {...empty_goodsdist};
     let next_goodsdist = {...empty_goodsdist};
-    const foreign_nations = await store.get<ForeignPowerInterface[]>('Foreign Powers') ?? [];
+    const foreign_nations = await store.get<ForeignPowerInterface[]>('Foreign Powers');
     // Market Data
     const osc_months = await store.get<number>('Osc Period') ?? 0
     const osc_months_passed = await store.get<number>('Osc Months Passed')?? 0
@@ -49,7 +49,7 @@ export const NextTurn = async (game: string) => {
         settlement.prices = calcPriceGoods(settlement.prices,old_stock,settlement.stock)
         
         // Calculate popGrowth
-        popGrowth(settlement,foreign_nations)
+        popGrowth(settlement,foreign_nations??[])
 
         const p0 = settlement.clans.map(clan => clan.population).reduce((sum,val) => sum + val)
         if(Math.floor(settlement.projected_pop) > p0) {
@@ -96,7 +96,7 @@ export const NextTurn = async (game: string) => {
         }
     })
 
-    foreign_nations.forEach(nation => {
+    foreign_nations?.forEach(nation => {
         const market_health = randMarketHealth()
         const old_supply = {...nation.supply}
         nation.supply = scaleGoods(nation.supply, market_health * randMarketHealth() * market_modifier)
@@ -105,6 +105,20 @@ export const NextTurn = async (game: string) => {
         nation.prices = calcPriceGoods(nation.prices,old_supply,nation.supply)
         nation.available_supply = roundGoods(scaleGoods(nation.supply,0.05))
         nation.available_demand = roundGoods(scaleGoods(nation.demand,0.05))
+
+        // Adjust tariffs
+        // If Player is taxing more, then match the new tarriff rate
+        if (nation.tarriffs > nation.retlaitory_tariffs) {
+            nation.relations -= 1
+            nation.retlaitory_tariffs = nation.tarriffs
+            if (nation.relations < 0) {
+                nation.retlaitory_tariffs *= 1 + (Math.abs(nation.recognition) / 10 )
+            }
+        }
+        else if (nation.retlaitory_tariffs > 0) {
+            nation.retlaitory_tariffs -= (nation.tarriffs - nation.retlaitory_tariffs) / 100
+            nation.retlaitory_tariffs = Math.max(nation.retlaitory_tariffs,0)
+        }
     })
 
     if(osc_months_passed > osc_months) {
@@ -116,6 +130,7 @@ export const NextTurn = async (game: string) => {
         store.set('Osc Months Passed',osc_months_passed + 1)
     }
     store.set('settlements',settlements)
+    store.set('Foreign Powers',foreign_nations)
     store.set('Price History',[...price_history,federal_prices])
     federal_prices = calcPriceGoods(federal_prices,current_goodsdist,addGoods(current_goodsdist,next_goodsdist))
     store.set('Federal Prices', federal_prices)

@@ -142,6 +142,11 @@ export default function SettlementDetailed() {
         else if(type === 'population') {setSettlement({...settlement,population_growth_bonus: id})}
     }
 
+    const goToEconomy = async () => {
+        await saveData()
+        navigate(`economy`)
+    }
+
     return(
         <div className="flex flex-column gap-2">
             <Button label="Back to All Settlements" icon="pi pi-arrow-left" size="small" onClick={goBack}/>
@@ -170,6 +175,8 @@ export default function SettlementDetailed() {
                     {(settlement.tier ** 2) * 4000}
                 </div>
             </Button>:null}
+
+            <Button className='flex-grow-1' severity="warning" label='Economy' icon='pi pi-wallet' onClick={goToEconomy}/>
             
             <div className="flex flex-row gap-1">
                 {/* Show Reserve */}

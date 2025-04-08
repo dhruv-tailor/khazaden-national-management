@@ -10,6 +10,7 @@ import LoadGame from './LoadGame/LoadGame';
 import SettlementDetailed from './Settlement/detailed/SettlementDetailed';
 import ForeignPowers from './ForeignPowers/ForeignPowers';
 import Economy from './Economics/Economy';
+import SettlmentEconomy from './Economics/settlement/SettlmentEconomy';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
@@ -23,6 +24,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           <Route path="game/:game/settlement/:settlement" element={<SettlementDetailed/>} />
           <Route path="game/:game/foreignpowers" element={<ForeignPowers/>} />
           <Route path="game/:game/economy" element={<Economy/>} />
+          <Route path="game/:game/settlement/:settlement/economy" element={<SettlmentEconomy/>} />
         </Routes>
       </BrowserRouter>
     </PrimeReactProvider>
