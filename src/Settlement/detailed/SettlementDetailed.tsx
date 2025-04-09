@@ -55,29 +55,36 @@ export default function SettlementDetailed() {
 
     const upgradeSettlement = () => {
         const cost = (settlement.tier ** 2) * 4000
-        settlement.tier += 1
-        settlement.stock.money -= cost
-        settlement.production_cap = {
+        setSettlement({
+            ...settlement,
+            tier: settlement.tier + 1,
+            stock : {
+                ...settlement.stock,
+                money: settlement.stock.money - cost
+            },
+            production_cap: {
             money: -1,
-            food: Math.round(tierModifier(settlement.tier) * TerrainData[settlement.terrain_type].food_and_water_balancing),
-            beer: Math.round(tierModifier(settlement.tier) * TerrainData[settlement.terrain_type].beer_balancing),
-            leather: Math.round(tierModifier(settlement.tier) * TerrainData[settlement.terrain_type].leather_and_textiles_balancing),
+            food: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].food_and_water_balancing),
+            beer: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].beer_balancing),
+            leather: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].leather_and_textiles_balancing),
             artisinal: -1,
-            livestock: Math.round(tierModifier(settlement.tier) * TerrainData[settlement.terrain_type].livestock_balancing),
+            livestock: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].livestock_balancing),
             ornamental: -1,
             enchanted: -1,
-            timber: Math.round(tierModifier(settlement.tier) * TerrainData[settlement.terrain_type].timber_balancing),
+            timber: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].timber_balancing),
             tools: -1,
-            common_ores: Math.round(tierModifier(settlement.tier) * TerrainData[settlement.terrain_type].common_ores_balancing),
+            common_ores: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].common_ores_balancing),
             medical: -1,
-            rare_ores: Math.round(tierModifier(settlement.tier) * TerrainData[settlement.terrain_type].rare_ores_balancing),
-            gems: Math.round(tierModifier(settlement.tier) * TerrainData[settlement.terrain_type].gems_balancing),
+            rare_ores: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].rare_ores_balancing),
+            gems: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].gems_balancing),
             runes: -1,
             arms: -1,
             books: -1,
             enchanted_arms: -1,
-            charcoal: Math.round(tierModifier(settlement.tier) * TerrainData[settlement.terrain_type].enchanted_charcoal_balancing)
+            charcoal: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].enchanted_charcoal_balancing)
         }
+        })
+        
     }
 
     const updateTax = (id: clanTypes, newRate: number) => {

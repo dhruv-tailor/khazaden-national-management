@@ -11,6 +11,7 @@ import { newMiners } from "../../Clans/ClanInterface/Miners";
 import { newRulers } from "../../Clans/ClanInterface/Rulers";
 import { newRuneSmiths } from "../../Clans/ClanInterface/RuneSmiths";
 import { newWarriors } from "../../Clans/ClanInterface/Warriors";
+import { LoanInterface } from "../../Economics/loans/loanInterface";
 import { initial_prices } from "../../Economics/pricing/prices";
 import { ForeignPowerInterface } from "../../ForeignPowers/Interface/ForeignPowerInterface";
 import { addGoods, empty_goodsdist, goodsdist, roundGoods, scaleGoods, subtractGoods } from "../../Goods/GoodsDist";
@@ -53,6 +54,9 @@ export interface SettlementInterface {
     merchant_capacity: number;
 
     months_stored: number;
+    interest_rate: number;
+    available_loan: number;
+    loans: LoanInterface[];
 }
 
 export const empty_settlement: SettlementInterface = {
@@ -77,7 +81,10 @@ export const empty_settlement: SettlementInterface = {
     prices: {...initial_prices},
     price_history: [],
     merchant_capacity: 0,
-    months_stored: 1
+    months_stored: 1,
+    interest_rate: 0.05,
+    loans: [],
+    available_loan: 0
 }
 
 export const newSettlement = (name: string, terrain_type: TerrainType, visable_name?: string) => {
@@ -155,11 +162,7 @@ const setTaxedProductivities = (settlement: SettlementInterface) => {
     })
 }
 
-const setDevelopments = (settlement: SettlementInterface) => {
-    settlement.clans.forEach(clan => {
-        clan.development = calcDevelopment(clan,settlement)
-    })
-}
+const setDevelopments = (settlement: SettlementInterface) => settlement.clans.forEach(clan => clan.development += calcDevelopment(clan,settlement))
 
 export const tierModifier = (tier: SettlementTier) => (2 ** (tier - 1))
 
@@ -267,6 +270,8 @@ export const settlementChange = (settlement: SettlementInterface): goodsdist => 
         ).reduce((sum,val) => addGoods(sum,val)),
         money: settlement.clans.map(
             clan => Math.round(clan.tax_rate * clan.taxed_productivity * (1 - settlement.settlement_tax))
+        ).reduce((sum,val) => sum + val) - settlement.loans.map(
+            loan => Math.round(loan.amount / loan.months_left)
         ).reduce((sum,val) => sum + val)
     }
 }

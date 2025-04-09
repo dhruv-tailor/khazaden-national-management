@@ -18,6 +18,7 @@ Development - O
 
 In Progress
 ------------------
+Loans UI
 
 
 
@@ -32,5 +33,5 @@ Slavery?
 
 Known Bugs
 -----------------
-Development Bonus cause development to skyrocket
 Population might be growing fast
+

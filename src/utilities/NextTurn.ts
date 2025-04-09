@@ -6,11 +6,13 @@ import { goodsdist, empty_goodsdist, addGoods, subtractGoods, scaleGoods, roundG
 import { calcPriceGoods } from "../Economics/pricing/prices";
 import { clanTypes } from "../Clans/ClanInterface/ClanInterface";
 import { TerrainData } from "../Settlement/SettlementInterface/TerrainInterface";
+import { LoanInterface, takeLoan } from "../Economics/loans/loanInterface";
+import { ensureNumber } from "./SimpleFunctions";
 
 
 export const NextTurn = async (game: string) => {
     const store = await load(await saveLocation(game), {autoSave: false});
-    const settlements = await store.get<SettlementInterface[]>('settlements');
+    const settlements = await store.get<SettlementInterface[]>('settlements') ?? [];
     const current_goodsdist = await store.get<goodsdist>('Federal Reserve') ?? {...empty_goodsdist};
     let next_goodsdist = {...empty_goodsdist};
     const foreign_nations = await store.get<ForeignPowerInterface[]>('Foreign Powers');
@@ -23,6 +25,7 @@ export const NextTurn = async (game: string) => {
     const turns_passed = await store.get<number>('Turns Passed') ?? 0;
     let federal_prices = await store.get<goodsdist>('Federal Prices') ?? {...empty_goodsdist}
     const price_history = await store.get<goodsdist[]>('Price History') ?? []
+    let loans = await store.get<LoanInterface[]>('Loans') ?? []
 
     // Federal Merchant Capacity
     let merchant_capacity: number = 0
@@ -68,7 +71,8 @@ export const NextTurn = async (game: string) => {
         })
 
         // Merchant Capacity
-        const merchant_cap = settlement.clans.filter(clan => clan.id === clanTypes.merchants)[0].taxed_productivity
+        const merchants = settlement.clans.filter(clan => clan.id === clanTypes.merchants)[0]
+        const merchant_cap = merchants.taxed_productivity
         settlement.merchant_capacity = Math.round(merchant_cap * (1 - settlement.settlement_tax))
         merchant_capacity += Math.round(merchant_cap * settlement.settlement_tax)
 
@@ -93,6 +97,46 @@ export const NextTurn = async (game: string) => {
             books: -1,
             enchanted_arms: -1,
             charcoal: Math.round(tierModifier(settlement.tier) * TerrainData[settlement.terrain_type].enchanted_charcoal_balancing)
+        }
+
+        // Update available loan
+        settlement.available_loan += merchants.total_productivity - merchants.taxed_productivity
+        settlement.available_loan = Math.max(settlement.available_loan,0)
+
+        // Take Interest on Loans
+        settlement.loans.forEach(loan => {
+            settlement.stock.money -= Math.round(ensureNumber(loan.amount / loan.months_left))
+            loan.months_left -= 1
+        })
+
+        // Remove loans that have been paid off
+        settlement.loans = settlement.loans.filter(loan => loan.months_left > 0)
+
+        // Take out loans if needed
+        if (settlement.stock.money < 0) {
+            let desired_loan = Math.round(Math.abs(settlement.stock.money) * 1.20)
+            let new_loans: LoanInterface[] = []
+
+            settlements.sort((a,b) => b.available_loan - a.available_loan).forEach(s => {
+                if (s.available_loan > 0 && desired_loan > 0) {
+                    const loan = takeLoan(
+                        Math.min(desired_loan,s.available_loan),
+                        s.visible_name,
+                        s.name
+                    )
+                    new_loans.push(loan)
+                    desired_loan -= loan.amount
+                }
+            })
+            settlements.forEach(s => {
+                new_loans.forEach(loan => {
+                    if (loan.owner === s.name) {s.available_loan -= loan.amount}
+                })
+            })
+            new_loans.forEach(loan => {
+                settlement.stock.money += loan.amount
+            })
+            settlement.loans = [...settlement.loans,...new_loans]
         }
     })
 
@@ -127,18 +171,62 @@ export const NextTurn = async (game: string) => {
         store.set('Osc Months Passed',0)
         store.set('Market Trajectory',Math.random() * 0.005)
         store.set('Positive Global Market Trend',!global_market_trend)
-    } else {
-        store.set('Osc Months Passed',osc_months_passed + 1)
-    }
+    } else { store.set('Osc Months Passed',osc_months_passed + 1) }
     store.set('settlements',settlements)
     store.set('Foreign Powers',foreign_nations)
     store.set('Price History',[...price_history,federal_prices])
     federal_prices = calcPriceGoods(federal_prices,current_goodsdist,addGoods(current_goodsdist,next_goodsdist))
     store.set('Federal Prices', federal_prices)
-
     next_goodsdist = addGoods(current_goodsdist,next_goodsdist)
 
+    // Take Interest on Loans
+    loans.forEach(loan => {
+        next_goodsdist.money -= Math.round(ensureNumber(loan.amount / loan.months_left))
+        settlements.forEach(settlement => {
+            if (settlement.name === loan.owner) {
+                settlement.available_loan += Math.round(ensureNumber(loan.amount / loan.months_left))
+            }
+        })
+        loan.months_left -= 1
+    })
+
+    // Remove loans that have been paid off
+    loans = loans.filter(loan => loan.months_left > 0)
+
+    // Take out loans if needed
+    if (next_goodsdist.money < 0) {
+        let desired_loan = Math.round(Math.abs(next_goodsdist.money) * 1.20)
+        let new_loans: LoanInterface[] = []
+
+        settlements.sort((a,b) => b.available_loan - a.available_loan).forEach(settlement => {
+            if (settlement.available_loan > 0 && desired_loan > 0) {
+                const loan = takeLoan(
+                    Math.min(desired_loan,settlement.available_loan),
+                    settlement.visible_name,
+                    settlement.name
+                )
+                new_loans.push(loan)
+                desired_loan -= loan.amount
+            }
+        })
+        settlements.forEach(settlement => {
+            new_loans.forEach(loan => {
+                if (loan.owner === settlement.name) {settlement.available_loan -= loan.amount}
+            })
+        })
+        new_loans.forEach(loan => {
+            next_goodsdist.money += loan.amount
+        })
+        loans = [...loans,...new_loans]
+    }
+
+    // If there is still no money left, declare bankruptcy
+    if (next_goodsdist.money < 0) {
+        next_goodsdist = {...empty_goodsdist}
+        loans = []
+    }
     store.set('Federal Reserve', next_goodsdist)
+    store.set('Loans',loans)
     store.set('Turns Passed',turns_passed + 1)
     store.set('Merchant Capacity',Math.round(merchant_capacity))
     store.save()

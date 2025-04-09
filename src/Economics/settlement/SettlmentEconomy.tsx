@@ -16,6 +16,7 @@ import SellGoods from "../selling/SellGoods";
 import { InputNumber } from "primereact/inputnumber";
 import MonthsStoredTT from "../../tooltips/economy/monthsStoredTT";
 import { GetFederalGoodsStored } from "../../utilities/SimpleFunctions";
+import { LoanInterface } from "../loans/loanInterface";
 
 export default function SettlmentEconomy() {
     const gameId = useParams().game;
@@ -29,6 +30,7 @@ export default function SettlmentEconomy() {
     const [foreignPowers,setForeignPowers] = useState<ForeignPowerInterface[]>([]);
     const [showSell,setShowSell] = useState<boolean>(false);
     const [FederalMonthsStored,setFederalMonthsStored] = useState<number>(0);
+    const [FederalLoans,setFederalLoans] = useState<LoanInterface[]>([]);
 
     const navigateTo = async (location: string) => {
         await saveData()
@@ -42,6 +44,7 @@ export default function SettlmentEconomy() {
         store.get<goodsdist>('Federal Prices').then(value => {if (value) {setFederalPrices(value)}})
         store.get<ForeignPowerInterface[]>('Foreign Powers').then(value => {if (value) {setForeignPowers(value)}});
         store.get<number>('Months Stored').then(value => {if (value) {setFederalMonthsStored(value)}});
+        store.get<LoanInterface[]>('Loans').then(value => {if (value) {setFederalLoans(value)}});
         const current_settlement = settlements?.find(settlement => settlement.name === settlementId)
         if(current_settlement) {setSettlement(current_settlement)}
         if(settlements) {setSettlements(settlements)}
@@ -246,7 +249,7 @@ export default function SettlmentEconomy() {
                     <PriceCard
                         name={'Federal Reserve'}
                         id={'Federal Reserve'}
-                        goods={minPerGood(roundGoods(subtractGoods(reserveGoods,GetFederalGoodsStored(settlements,FederalMonthsStored))),0)}
+                        goods={minPerGood(roundGoods(subtractGoods(reserveGoods,GetFederalGoodsStored(settlements,FederalMonthsStored,FederalLoans))),0)}
                         prices={roundGoods(federalPrices)}
                         merchantCapacity={settlement.merchant_capacity}
                         maxCost={settlement.stock.money}
