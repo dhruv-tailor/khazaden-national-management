@@ -9,7 +9,7 @@ Pop Growth - O
 Pop Conversion/ Encourage Growth - X
 Military - X
 Goods Consumption - O
-Trade - X
+Trade - O
 Trade Potential - O
 Diplomacy - X
 Loans - X
@@ -18,17 +18,7 @@ Development - O
 
 In Progress
 ------------------
-    Buying
-    --------
-    Foreign
-    Settlement
-    Reserve
-    
-    Selling
 
-Buy and Sell from Other Nations
-Buy and Sell from Other Settlements
-Buy and Sell from Federal Reserve
 
 
 Future Features

@@ -112,10 +112,10 @@ export default function SellOrder(
                         onChange={e => setUnits(e.value ?? 0)}/>
                         / {getMax()} for
                         {<MoneyIconTT/>}
-                        {price}
+                        {Math.round(price)}
                         = 
                         {<MoneyIconTT/>}
-                        {units * price}
+                        {units * Math.round(price)}
                     </div>
                     <Button icon="pi pi-check" label="Sell" severity="success" onClick={() => {
                         setShowDialog(false)

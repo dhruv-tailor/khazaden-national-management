@@ -10,6 +10,8 @@ import { MilitaryAccessBadge } from "./badges/MilitaryAccessBadge";
 import { VassalStatusBadge } from "./badges/VassalStatusBadge";
 import { InputNumber } from "primereact/inputnumber";
 import { ProgressBar } from "primereact/progressbar";
+import TariffRateTT from "../tooltips/economy/tariffRateTT";
+import RetalitoryTariffRateTT from "../tooltips/economy/retalitoryTariffRateTT";
 
 export default function ForeignPower({power,updateTariff}: {power: ForeignPowerInterface,updateTariff: (name: string, amount: number) => void}) {
 
@@ -36,8 +38,8 @@ export default function ForeignPower({power,updateTariff}: {power: ForeignPowerI
                     <MilitaryAccessBadge militaryAccess={power.militaryAccess}/>
                 </div>
                 {!power.isEmbargoed ?<div className="flex flex-column">
-                    <div>
-                    <label htmlFor="tariff-rate">Tarrif Rate: </label>
+                    <div className="flex flex-row gap-1">
+                    <label htmlFor="tariff-rate"><TariffRateTT/> </label>
                     <InputNumber 
                         size={5}
                         min={0}
@@ -47,7 +49,9 @@ export default function ForeignPower({power,updateTariff}: {power: ForeignPowerI
                         value={Math.round(power.tarriffs * 100)} 
                         onChange={e => updateTariff(power.name,(e.value ?? 0)/100)}/>
                     </div>
-                    Retalitory Tariffs: {Math.round(power.retlaitory_tariffs * 100)} %
+                    <div className="flex flex-row gap-1">
+                        <RetalitoryTariffRateTT/> {Math.round(power.retlaitory_tariffs * 100)} %
+                    </div>
                 </div>:
                 <div style={{
                     backgroundColor: 'var(--red-500)', 

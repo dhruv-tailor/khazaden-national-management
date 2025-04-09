@@ -96,7 +96,8 @@ export const createNewSave = async (saveName: string)  => {
     store.set('Turns Passed',0) // Turns since game start
     store.set('Federal Prices',{...initial_prices}) // Prices for the goods in the federal reserve
     store.set('Price History',[]) // Tracks the history of prices in the nation
-    store.set('Merchant Capacity',0)
+    store.set('Merchant Capacity',0) // Merchant Capacity for the nation
+    store.set('Months Stored',1) // Months worth of goods that are stored in the nation
     await store.save();
     store.close();
 }

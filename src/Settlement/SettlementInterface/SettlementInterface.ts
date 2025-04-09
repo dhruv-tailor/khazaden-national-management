@@ -51,6 +51,8 @@ export interface SettlementInterface {
     prices: goodsdist
     price_history: goodsdist[]
     merchant_capacity: number;
+
+    months_stored: number;
 }
 
 export const empty_settlement: SettlementInterface = {
@@ -74,7 +76,8 @@ export const empty_settlement: SettlementInterface = {
     population_growth_bonus: clanTypes.rulers,
     prices: {...initial_prices},
     price_history: [],
-    merchant_capacity: 0
+    merchant_capacity: 0,
+    months_stored: 1
 }
 
 export const newSettlement = (name: string, terrain_type: TerrainType, visable_name?: string) => {
@@ -265,5 +268,35 @@ export const settlementChange = (settlement: SettlementInterface): goodsdist => 
         money: settlement.clans.map(
             clan => Math.round(clan.tax_rate * clan.taxed_productivity * (1 - settlement.settlement_tax))
         ).reduce((sum,val) => sum + val)
+    }
+}
+
+export const monthsStored = (s: SettlementInterface): goodsdist => {
+    const change_per_turn = settlementChange(s)
+
+    return scaleGoods(MonthsStoreGetChange(change_per_turn),s.months_stored)
+}
+
+export const MonthsStoreGetChange = (g: goodsdist): goodsdist => {
+    return {
+        money: g.money < 0 ? Math.abs(g.money) : 0,
+        food: g.food < 0 ? Math.abs(g.food) : 0,
+        beer: g.beer < 0 ? Math.abs(g.beer) : 0,
+        leather: g.leather < 0 ? Math.abs(g.leather) : 0,
+        artisinal: g.artisinal < 0 ? Math.abs(g.artisinal) : 0,
+        livestock: g.livestock < 0 ? Math.abs(g.livestock) : 0,
+        ornamental: g.ornamental < 0 ? Math.abs(g.ornamental) : 0,
+        enchanted: g.enchanted < 0 ? Math.abs(g.enchanted) : 0,
+        timber: g.timber < 0 ? Math.abs(g.timber) : 0,
+        tools: g.tools < 0 ? Math.abs(g.tools) : 0,
+        common_ores: g.common_ores < 0 ? Math.abs(g.common_ores) : 0,
+        medical: g.medical < 0 ? Math.abs(g.medical) : 0,
+        rare_ores: g.rare_ores < 0 ? Math.abs(g.rare_ores) : 0,
+        gems: g.gems < 0 ? Math.abs(g.gems) : 0,
+        runes: g.runes < 0 ? Math.abs(g.runes) : 0,
+        arms: g.arms < 0 ? Math.abs(g.arms) : 0,
+        books: g.books < 0 ? Math.abs(g.books) : 0,
+        enchanted_arms: g.enchanted_arms < 0 ? Math.abs(g.enchanted_arms) : 0,
+        charcoal: g.charcoal < 0 ? Math.abs(g.charcoal) : 0,
     }
 }

@@ -1,6 +1,6 @@
 import { Button } from "primereact/button";
 import { useNavigate, useParams } from "react-router";
-import { empty_settlement, settlementChange, SettlementInterface } from "../../Settlement/SettlementInterface/SettlementInterface";
+import { empty_settlement, monthsStored, settlementChange, SettlementInterface } from "../../Settlement/SettlementInterface/SettlementInterface";
 import { saveLocation } from "../../utilities/SaveData";
 import { load } from "@tauri-apps/plugin-store";
 import { useEffect, useState } from "react";
@@ -8,11 +8,14 @@ import { Panel } from "primereact/panel";
 import DisplayGoods from "../../components/goodsDislay";
 import PriceChart, { priceChartDataProp, priceChartOptionsProp } from "../pricing/PriceChart";
 import PriceCard from "../pricing/PriceCard";
-import { addGoods, empty_goodsdist, goodsdist, goodsId, multiplyGoods, roundGoods, scaleGoods, subtractGoods, totalGoods } from "../../Goods/GoodsDist";
+import { addGoods, empty_goodsdist, goodsdist, goodsId, minPerGood, multiplyGoods, roundGoods, scaleGoods, subtractGoods, totalGoods } from "../../Goods/GoodsDist";
 import { calcPriceGoods } from "../pricing/prices";
 import { ForeignPowerInterface } from "../../ForeignPowers/Interface/ForeignPowerInterface";
 import { Dialog } from "primereact/dialog";
 import SellGoods from "../selling/SellGoods";
+import { InputNumber } from "primereact/inputnumber";
+import MonthsStoredTT from "../../tooltips/economy/monthsStoredTT";
+import { GetFederalGoodsStored } from "../../utilities/SimpleFunctions";
 
 export default function SettlmentEconomy() {
     const gameId = useParams().game;
@@ -25,7 +28,7 @@ export default function SettlmentEconomy() {
     const [federalPrices,setFederalPrices] = useState<goodsdist>({...empty_goodsdist});
     const [foreignPowers,setForeignPowers] = useState<ForeignPowerInterface[]>([]);
     const [showSell,setShowSell] = useState<boolean>(false);
-
+    const [FederalMonthsStored,setFederalMonthsStored] = useState<number>(0);
 
     const navigateTo = async (location: string) => {
         await saveData()
@@ -38,6 +41,7 @@ export default function SettlmentEconomy() {
         store.get<goodsdist>('Federal Reserve').then(value => {if (value) {setReserveGoods(value);}});
         store.get<goodsdist>('Federal Prices').then(value => {if (value) {setFederalPrices(value)}})
         store.get<ForeignPowerInterface[]>('Foreign Powers').then(value => {if (value) {setForeignPowers(value)}});
+        store.get<number>('Months Stored').then(value => {if (value) {setFederalMonthsStored(value)}});
         const current_settlement = settlements?.find(settlement => settlement.name === settlementId)
         if(current_settlement) {setSettlement(current_settlement)}
         if(settlements) {setSettlements(settlements)}
@@ -53,6 +57,7 @@ export default function SettlmentEconomy() {
         store.set('Federal Reserve',reserveGoods)
         store.set('Federal Prices',federalPrices)
         store.set('settlements',updatedSettlements)
+        store.set('Months Stored',FederalMonthsStored)
         store.save()
     }
 
@@ -117,10 +122,14 @@ export default function SettlmentEconomy() {
                 ...settlement,
                 stock: {
                     ...new_stock,
-                    money: old_stock.money - totalGoods(multiplyGoods(order,roundGoods(scaleGoods(power.prices,power.retlaitory_tariffs + 1))))
+                    money: old_stock.money - totalGoods(multiplyGoods(order,roundGoods(scaleGoods(power.prices,power.tarriffs + 1))))
                 },
                 prices: new_prices,
                 merchant_capacity: settlement.merchant_capacity - capUsed
+            })
+            setReserveGoods({
+                ...reserveGoods,
+                money: reserveGoods.money + totalGoods(multiplyGoods(order,roundGoods(scaleGoods(power.prices,power.tarriffs))))
             })
             return {...power, available_supply: subtractGoods(power.available_supply,order)}
         })
@@ -209,6 +218,10 @@ export default function SettlmentEconomy() {
             {/* Local Goods */}
             <Panel header="Settlement Goods" toggleable>
                 <div className="flex flex-row gap-2">
+                    <div className="flex flex-column gap-1">
+                        <MonthsStoredTT/>
+                        <InputNumber showButtons size={4} min={0} value={settlement.months_stored} onChange={e => setSettlement({...settlement, months_stored: e.value as number})}/>
+                    </div>
                     {settlement.name !== '' ? <DisplayGoods stock={settlement.stock} change={settlementChange(settlement)}/>:null}
                     <Button label="Sell Goods" icon="pi pi-wallet" severity="success" onClick={() => setShowSell(true)}/>
                 </div>
@@ -223,7 +236,7 @@ export default function SettlmentEconomy() {
                     updateFunc={processSell}/>
             </Dialog>
             {/* Price Chart */}
-            <Panel header="Price Chart" toggleable>
+            <Panel header="Price Chart" toggleable collapsed>
                 <PriceChart data={priceChartDataProp(settlement.price_history,settlement.prices)} options={priceChartOptionsProp()}/>
             </Panel>
             {/* Local Goods */}
@@ -233,7 +246,7 @@ export default function SettlmentEconomy() {
                     <PriceCard
                         name={'Federal Reserve'}
                         id={'Federal Reserve'}
-                        goods={reserveGoods}
+                        goods={minPerGood(roundGoods(subtractGoods(reserveGoods,GetFederalGoodsStored(settlements,FederalMonthsStored))),0)}
                         prices={roundGoods(federalPrices)}
                         merchantCapacity={settlement.merchant_capacity}
                         maxCost={settlement.stock.money}
@@ -242,7 +255,7 @@ export default function SettlmentEconomy() {
                     {settlements.filter(s => s.name !== settlement.name).map(s => <PriceCard
                         name={s.visible_name}
                         id={s.name}
-                        goods={s.stock}
+                        goods={minPerGood(roundGoods(subtractGoods(s.stock,monthsStored(s))),0)}
                         prices={roundGoods(s.prices)}
                         merchantCapacity={settlement.merchant_capacity}
                         maxCost={settlement.stock.money}
@@ -259,7 +272,7 @@ export default function SettlmentEconomy() {
                             name={power.name}
                             id={power.name}
                             goods={roundGoods(power.available_supply)}
-                            prices={roundGoods(scaleGoods(power.prices,power.retlaitory_tariffs + 1))}
+                            prices={roundGoods(scaleGoods(power.prices,power.tarriffs + 1))}
                             merchantCapacity={settlement.merchant_capacity}
                             maxCost={reserveGoods.money}
                             updateFunc={processForeignOrder}

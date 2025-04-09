@@ -1,10 +1,10 @@
 import { Button } from "primereact/button";
 import { useNavigate, useParams } from "react-router";
-import { SettlementInterface } from "../Settlement/SettlementInterface/SettlementInterface";
+import { monthsStored, SettlementInterface } from "../Settlement/SettlementInterface/SettlementInterface";
 import { useEffect, useState } from "react";
 import { Panel } from "primereact/panel";
 import DisplayGoods from "../components/goodsDislay";
-import { addGoods, empty_goodsdist, goodsdist, goodsId, multiplyGoods, roundGoods, scaleGoods, subtractGoods, totalGoods } from "../Goods/GoodsDist";
+import { addGoods, empty_goodsdist, goodsdist, goodsId, minPerGood, multiplyGoods, roundGoods, scaleGoods, subtractGoods, totalGoods } from "../Goods/GoodsDist";
 import { load } from "@tauri-apps/plugin-store";
 import { saveLocation } from "../utilities/SaveData";
 import PriceChart, { priceChartDataProp, priceChartOptionsProp } from "./pricing/PriceChart";
@@ -13,6 +13,8 @@ import PriceCard from "./pricing/PriceCard";
 import { calcPriceGoods } from "./pricing/prices";
 import { Dialog } from "primereact/dialog";
 import SellGoods from "./selling/SellGoods";
+import MonthsStoredTT from "../tooltips/economy/monthsStoredTT";
+import { InputNumber } from "primereact/inputnumber";
 
 export default function Economy () {
     const gameId = useParams().game;
@@ -24,6 +26,7 @@ export default function Economy () {
     const [prices,setPrices] = useState<goodsdist>({...empty_goodsdist})
     const [priceHistory,setPriceHistory] = useState<goodsdist[]>([])
     const [merchantCapacity,setMerchantCapacity] = useState<number>(0);
+    const [FederalMonthsStored,setFederalMonthsStored] = useState<number>(0);
     const [foreignPowers,setForeignPowers] = useState<ForeignPowerInterface[]>([])
 
     const [showSell, setShowSell] = useState(false)
@@ -34,6 +37,7 @@ export default function Economy () {
         store.get<goodsdist>('Federal Prices').then(value => {if (value) {setPrices(value)}})
         store.get<goodsdist[]>('Price History').then(value => {if (value) {setPriceHistory(value);}})
         store.get<number>('Merchant Capacity').then(value => {if (value) {setMerchantCapacity(value)}});
+        store.get<number>('Months Stored').then(value => {if (value) {setFederalMonthsStored(value)}});
         store.get<ForeignPowerInterface[]>('Foreign Powers').then(value => {if (value) {setForeignPowers(value)}});
         const get_settlements = await store.get<SettlementInterface[]>('settlements') ?? [];
         setSettlements(get_settlements)
@@ -66,6 +70,7 @@ export default function Economy () {
         store.set('settlements',settlements)
         store.set('Foreign Powers',foreignPowers)
         store.set('Merchant Capacity',merchantCapacity)
+        store.set('Months Stored',FederalMonthsStored)
         store.save()
     }
 
@@ -103,7 +108,7 @@ export default function Economy () {
             setReserveGoods(
                 {
                     ...addGoods(order,reserveGoods),
-                    money: reserveGoods.money - totalGoods(multiplyGoods(order, roundGoods(scaleGoods(power.prices,power.retlaitory_tariffs + 1))))
+                    money: reserveGoods.money - totalGoods(multiplyGoods(order, roundGoods(scaleGoods(power.prices,power.tarriffs + 1))))
                 })
             setPrices(calcPriceGoods(prices,old_reserve,reserveGoods))
             return {...power, available_supply: subtractGoods(power.available_supply,order)}
@@ -189,20 +194,25 @@ export default function Economy () {
         <div className="flex flex-column gap-2">
             <Button label="Go Back" icon='pi pi-angle-double-left' onClick={()=>navigateTo(`/game/${gameId}`)}/>
             {/* National Stock */}
-            <div className="flex flex-row gap-1">
             <Panel header="Federal Reserve" toggleable>
-                {settlements.length > 0 ? <DisplayGoods 
-                    stock={reserveGoods} 
-                    change={{...changeGoods,money: 
-                    settlements.map(
-                        s => s.clans.map(
-                            c => Math.round(c.tax_rate * c.taxed_productivity * s.settlement_tax)
+                <div className="flex flex-row gap-1">
+                <div className="flex flex-column gap-1">
+                        <MonthsStoredTT/>
+                        <InputNumber showButtons size={4} min={0} value={FederalMonthsStored} onChange={e => setFederalMonthsStored(e.value as number)}/>
+                    </div>
+                    {settlements.length > 0 ? <DisplayGoods 
+                        stock={reserveGoods} 
+                        change={{...changeGoods,money: 
+                        settlements.map(
+                            s => s.clans.map(
+                                c => Math.round(c.tax_rate * c.taxed_productivity * s.settlement_tax)
+                                ).reduce((sum,val) => sum + val)
                             ).reduce((sum,val) => sum + val)
-                        ).reduce((sum,val) => sum + val)
-                    }}
-                />: null}
+                        }}
+                    />: null}
+                    <Button icon="pi pi-wallet" label="Sell Goods" severity="success" onClick={() => setShowSell(true)}/>
+                </div>
             </Panel>
-            <Button icon="pi pi-wallet" label="Sell Goods" severity="success" onClick={() => setShowSell(true)}/>
             <Dialog header="Sell Goods" visible={showSell} onHide={() => setShowSell(false)}>
                     <SellGoods
                         merchantCapacity={merchantCapacity}
@@ -212,9 +222,8 @@ export default function Economy () {
                         competingPrices={settlements.map(s => s.prices)}
                         updateFunc={processSell}/>
             </Dialog>
-            </div>
             {/* Price Chart */}
-            <Panel header='Federal Prices' toggleable>
+            <Panel header='Federal Prices' toggleable collapsed>
                 <PriceChart data={priceChartDataProp(priceHistory,prices)} options={priceChartOptionsProp()}/>
             </Panel>
             {/* Local Goods */}
@@ -224,7 +233,7 @@ export default function Economy () {
                     {settlements.map(s => <PriceCard
                         name={s.visible_name}
                         id={s.name}
-                        goods={s.stock}
+                        goods={minPerGood(roundGoods(subtractGoods(s.stock,monthsStored(s))),0)}
                         prices={roundGoods(s.prices)}
                         merchantCapacity={merchantCapacity}
                         maxCost={reserveGoods.money}
@@ -241,7 +250,7 @@ export default function Economy () {
                             name={power.name}
                             id={power.name}
                             goods={roundGoods(power.available_supply)}
-                            prices={roundGoods(scaleGoods(power.prices,power.retlaitory_tariffs + 1))}
+                            prices={roundGoods(scaleGoods(power.prices,power.tarriffs + 1))}
                             merchantCapacity={merchantCapacity}
                             maxCost={reserveGoods.money}
                             updateFunc={processForeignOrder}

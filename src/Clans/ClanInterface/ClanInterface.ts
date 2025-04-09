@@ -189,7 +189,8 @@ export const calcDevelopment = (clan: ClanInterface, settlement: SettlementInter
     // Natural Development Growth
     let bonus = 1;
     if(clan.id === settlement.development_growth_bonus) {
-       bonus = 8 * settlement.clans.filter(clan => clan.id === clanTypes.merchants)[0].total_productivity * (clan.total_productivity - clan.taxed_productivity) * 0.03
+       bonus = settlement.clans.filter(clan => clan.id === clanTypes.merchants)[0].total_productivity * (clan.total_productivity - clan.taxed_productivity) * 0.00008
+       bonus += 1
     }
     return (clan.total_productivity - clan.taxed_productivity) * 0.3 * bonus
 }

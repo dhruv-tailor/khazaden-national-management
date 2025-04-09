@@ -104,7 +104,6 @@ export const NextTurn = async (game: string) => {
         nation.price_history = [...nation.price_history,nation.prices]
         nation.prices = calcPriceGoods(nation.prices,old_supply,nation.supply)
         nation.available_supply = roundGoods(scaleGoods(nation.supply,0.05))
-        nation.available_demand = roundGoods(scaleGoods(nation.demand,0.05))
 
         // Adjust tariffs
         // If Player is taxing more, then match the new tarriff rate
@@ -119,6 +118,8 @@ export const NextTurn = async (game: string) => {
             nation.retlaitory_tariffs -= (nation.tarriffs - nation.retlaitory_tariffs) / 100
             nation.retlaitory_tariffs = Math.max(nation.retlaitory_tariffs,0)
         }
+
+        nation.available_demand = roundGoods(scaleGoods(nation.demand,Math.max(0.05 * (1 - nation.retlaitory_tariffs),0)))
     })
 
     if(osc_months_passed > osc_months) {

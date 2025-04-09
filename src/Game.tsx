@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router"
 import { SettlementInterface } from "./Settlement/SettlementInterface/SettlementInterface";
 import { load } from "@tauri-apps/plugin-store";
 import { saveLocation } from "./utilities/SaveData";
-import { addGoods, empty_goodsdist, goodsdist, roundGoods, scaleGoods, subtractGoods } from "./Goods/GoodsDist";
+import { addGoods, empty_goodsdist, goodsdist, subtractGoods } from "./Goods/GoodsDist";
 import { Panel } from "primereact/panel";
 import DisplayGoods from "./components/goodsDislay";
 import Settlement from "./Settlement/Settlement";
@@ -14,6 +14,7 @@ import MoneyIconTT from "./tooltips/goods/MoneyIconTT";
 import NewSettlement from "./Settlement/NewSettlement";
 import { calcPriceGoods } from "./Economics/pricing/prices";
 import { NextTurn } from "./utilities/NextTurn";
+import { FederalChange } from "./utilities/SimpleFunctions";
 
 export default function Game() {
     const gameId = useParams().game
@@ -42,21 +43,7 @@ export default function Game() {
         updateSettlements()
     }
     
-    const updateSettlements = () => {
-        const change_reserve = settlements.map(settlement => {
-            return settlement.clans.map(
-                clan => roundGoods(scaleGoods(clan.production,settlement.production_quota))
-            ).reduce((sum,val) => addGoods(sum,val))
-        }).reduce((sum,val) => addGoods(sum,val))
-
-        change_reserve.money = Math.round(settlements.map(settlement => {
-            return settlement.clans.map(
-                clan => clan.tax_rate * clan.taxed_productivity
-            ).reduce((sum,val) => sum + val) * settlement.settlement_tax
-         }).reduce((sum,val) => sum + val))
-
-         setChangeGoods(change_reserve)
-    }
+    const updateSettlements = () => setChangeGoods(FederalChange(settlements))
 
     const setSettlementTax = (name: string, val: number) => {
         setSettlements(settlements.map(s => {

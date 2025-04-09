@@ -280,3 +280,27 @@ export const floorGoods = (a: goodsdist): goodsdist => {
         charcoal: Math.floor(a.charcoal)
     }
 }
+
+export const minPerGood = (a: goodsdist,b: number): goodsdist => {
+    return {
+        money: Math.min(a.money,b),
+        food: Math.min(a.food,b),
+        beer: Math.min(a.beer,b),
+        leather: Math.min(a.leather,b),
+        artisinal: Math.min(a.artisinal,b),
+        livestock: Math.min(a.livestock,b),
+        ornamental: Math.min(a.ornamental,b),
+        enchanted: Math.min(a.enchanted,b),
+        timber: Math.min(a.timber,b),
+        tools: Math.min(a.tools,b),
+        common_ores: Math.min(a.common_ores,b),
+        medical: Math.min(a.medical,b),
+        rare_ores: Math.min(a.rare_ores,b),
+        gems: Math.min(a.gems,b),
+        runes: Math.min(a.runes,b),
+        arms: Math.min(a.arms,b),
+        books: Math.min(a.books,b),
+        enchanted_arms: Math.min(a.enchanted_arms,b),
+        charcoal: Math.min(a.charcoal,b)
+    }
+}

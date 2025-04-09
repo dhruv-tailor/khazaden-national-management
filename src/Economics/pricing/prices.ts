@@ -25,7 +25,7 @@ export const price_volitility: goodsdist = {
 
 export const calcPriceChange = (current_price: number, current_inventory: number, new_inventory: number, volitility: number) => {
     const val = Math.max(0,ensureNumber(current_price * (1 + volitility * Math.log(ensureNumber(current_inventory/new_inventory)))))
-    return((val !== 0) || (val !== null) ? val : current_price)
+    return(fixPrice(val) ? current_price : val)
 }
 
 export const initial_prices: goodsdist = {
@@ -49,7 +49,7 @@ export const initial_prices: goodsdist = {
     enchanted_arms: 32,
     charcoal: 40
 }
-const fixPrice = (price: number) => (price === null || Math.round(price) === 0) 
+const fixPrice = (price: number) => (price === null || Math.round(price) === 0 || price === undefined || Number.isNaN(price) || price === Infinity || price === -Infinity) 
 
 export const calcPriceGoods = (current_prices: goodsdist, current_inventory: goodsdist, new_inventory: goodsdist) => {
     const new_prices = {
