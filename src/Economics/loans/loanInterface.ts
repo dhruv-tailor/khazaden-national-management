@@ -10,7 +10,7 @@ export const takeLoan = (amount: number,owner: string, owner_id: string): LoanIn
         owner: owner,
         owner_name: owner_id,
         amount: amount * ((1 + (0.05/12)) ** 72),
-        months_left: 12
+        months_left: 72
     }
     
 }

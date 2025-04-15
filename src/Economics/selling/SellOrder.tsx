@@ -7,6 +7,9 @@ import { Dialog } from "primereact/dialog";
 import { useState } from "react";
 import { InputNumber } from "primereact/inputnumber";
 import MoneyIconTT from "../../tooltips/goods/MoneyIconTT";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import { Divider } from "primereact/divider";
 
 export default function SellOrder(
     {type,buyers,supply,merchantCapacity,price,updateFunc}: 
@@ -90,43 +93,100 @@ export default function SellOrder(
         return Math.min(foreign_max,merchantCapacity,local_max)
     }
 
-    
+    const buyerTemplate = (rowData: ForeignPowerInterface) => {
+        return (
+            <Button 
+                label={rowData.name} 
+                icon="pi pi-shopping-cart" 
+                className="w-full"
+                onClick={() => {
+                    setShowDialog(true)
+                    setSelectedBuyer(rowData)
+                    setUnits(0)
+                }}
+            />
+        );
+    };
+
     return (
-        <Card title={releventGoodTT[type]}>
-            <Dialog 
-            header={<div className="flex flex-row gap-2">
-                Sell
-                {releventGoodTT[type]}
-                to {selectedBuyer?.name}
-            </div>} 
-            visible={showDialog} 
-            onHide={() => setShowDialog(false)}>
+        <Card title={<div className="flex align-items-center gap-2">{releventGoodTT[type]}</div>} className="w-20rem">
+            <div className="flex flex-column gap-3">
                 <div className="flex flex-column gap-2">
-                    <div className="flex flex-row gap-2">
-                    <InputNumber 
-                        value={units} 
-                        min={0} 
-                        max={getMax()} 
-                        size={4} 
-                        showButtons 
-                        onChange={e => setUnits(e.value ?? 0)}/>
-                        / {getMax()} for
-                        {<MoneyIconTT/>}
-                        {Math.round(price)}
-                        = 
-                        {<MoneyIconTT/>}
-                        {units * Math.round(price)}
+                    <span className="text-sm text-500">Available Buyers</span>
+                    <DataTable 
+                        value={buyers} 
+                        showGridlines
+                        size="small"
+                    >
+                        <Column body={buyerTemplate} />
+                    </DataTable>
+                </div>
+                <Divider />
+                <div className="flex flex-column gap-2">
+                    <span className="text-sm text-500">Current Price</span>
+                    <div className="flex align-items-center gap-1">
+                        <MoneyIconTT/>
+                        <span className="text-lg">{Math.round(price)}</span>
                     </div>
-                    <Button icon="pi pi-check" label="Sell" severity="success" onClick={() => {
-                        setShowDialog(false)
-                        updateFunc(type,units,selectedBuyer?.name ?? '')
-                    }}/>
+                </div>
+            </div>
+
+            <Dialog 
+                header={<div className="flex align-items-center gap-2">
+                    Sell {releventGoodTT[type]} to {selectedBuyer?.name}
+                </div>} 
+                visible={showDialog} 
+                onHide={() => setShowDialog(false)}
+                className="w-30rem"
+            >
+                <div className="flex flex-column gap-4">
+                    <div className="flex flex-column gap-2">
+                        <div className="flex flex-row align-items-center justify-content-between">
+                            <span>Units to Sell:</span>
+                            <InputNumber 
+                                value={units} 
+                                min={0} 
+                                max={getMax()} 
+                                size={4} 
+                                showButtons 
+                                onChange={e => setUnits(e.value ?? 0)}
+                                className="w-8rem"
+                            />
+                        </div>
+                        <small className="text-500">Maximum available: {getMax()} units</small>
+                    </div>
+
+                    <Divider />
+
+                    <div className="flex flex-column gap-2">
+                        <div className="flex flex-row justify-content-between align-items-center">
+                            <span>Price per Unit:</span>
+                            <div className="flex align-items-center gap-1">
+                                <MoneyIconTT/>
+                                <span>{Math.round(price)}</span>
+                            </div>
+                        </div>
+                        <div className="flex flex-row justify-content-between align-items-center">
+                            <span>Total Price:</span>
+                            <div className="flex align-items-center gap-1">
+                                <MoneyIconTT/>
+                                <span>{units * Math.round(price)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <Button 
+                        icon="pi pi-check" 
+                        label="Confirm Sale" 
+                        severity="success" 
+                        className="w-full"
+                        onClick={() => {
+                            setShowDialog(false)
+                            updateFunc(type,units,selectedBuyer?.name ?? '')
+                        }}
+                    />
                 </div>
             </Dialog>
-            {buyers.map(buyer => <Button label={buyer.name} onClick={() => {
-                setShowDialog(true)
-                setSelectedBuyer(buyer)
-                }}/>)}
         </Card>
     )
 }

@@ -27,6 +27,9 @@ export const NextTurn = async (game: string) => {
     const price_history = await store.get<goodsdist[]>('Price History') ?? []
     let loans = await store.get<LoanInterface[]>('Loans') ?? []
 
+    const current_year = await store.get<number>('Current Year') ?? 0
+    const current_month = await store.get<number>('Current Month') ?? 0
+
     // Federal Merchant Capacity
     let merchant_capacity: number = 0
 
@@ -52,14 +55,30 @@ export const NextTurn = async (game: string) => {
         settlement.prices = calcPriceGoods(settlement.prices,old_stock,settlement.stock)
         
         // Calculate popGrowth
-        popGrowth(settlement,foreign_nations??[])
+        settlement.projected_pop = popGrowth(settlement,foreign_nations??[])
+        console.log(settlement.projected_pop,settlement.name)
 
         const p0 = settlement.clans.map(clan => clan.population).reduce((sum,val) => sum + val)
-        if(Math.floor(settlement.projected_pop) > p0) {
+        if(Math.floor(settlement.projected_pop) !== p0) {
             const delta_pop = Math.floor(settlement.projected_pop) - p0
-            for(let i = 0; i < delta_pop; i++) {
-                const newPop = Math.floor(Math.random() * 12)
-                settlement.clans.forEach(clan => { if (newPop == clan.id) { clan.population += 1 } })
+            if (delta_pop > 0) {
+                // Population growth
+                for(let i = 0; i < delta_pop; i++) {
+                    const newPop = Math.floor(Math.random() * 12)
+                    settlement.clans.forEach(clan => { if (newPop == clan.id) { clan.population += 1 } })
+                }
+            } else {
+                // Population decline
+                const popToRemove = Math.abs(delta_pop)
+                for(let i = 0; i < popToRemove; i++) {
+                    // Find clans with population > 0
+                    const populatedClans = settlement.clans.filter(clan => clan.population > 0)
+                    if (populatedClans.length === 0) break // Stop if no population left
+                    
+                    // Randomly select a clan to lose population
+                    const clanToAffect = populatedClans[Math.floor(Math.random() * populatedClans.length)]
+                    clanToAffect.population -= 1
+                }
             }
         }
         updateGoodsProduction(settlement)
@@ -219,16 +238,13 @@ export const NextTurn = async (game: string) => {
         })
         loans = [...loans,...new_loans]
     }
-
-    // If there is still no money left, declare bankruptcy
-    if (next_goodsdist.money < 0) {
-        next_goodsdist = {...empty_goodsdist}
-        loans = []
-    }
+    next_goodsdist = roundGoods(next_goodsdist)
     store.set('Federal Reserve', next_goodsdist)
     store.set('Loans',loans)
     store.set('Turns Passed',turns_passed + 1)
     store.set('Merchant Capacity',Math.round(merchant_capacity))
+    store.set('Current Month',(current_month + 1) % 12)
+    store.set('Current Year',current_year + Math.floor((current_month + 1) / 12))
     store.save()
 }
 

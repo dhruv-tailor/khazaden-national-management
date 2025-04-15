@@ -15,6 +15,8 @@ import NewSettlement from "./Settlement/NewSettlement";
 import { calcPriceGoods } from "./Economics/pricing/prices";
 import { NextTurn } from "./utilities/NextTurn";
 import { FederalChange } from "./utilities/SimpleFunctions";
+import { LoanInterface } from "./Economics/loans/loanInterface";
+import { MonthInfo } from "./components/MonthInfo";
 
 export default function Game() {
     const gameId = useParams().game
@@ -26,6 +28,7 @@ export default function Game() {
     const [reserveGoods,setReserveGoods] = useState<goodsdist>({...empty_goodsdist});
     const [changeGoods,setChangeGoods] = useState<goodsdist>({...empty_goodsdist});
     const [prices,setPrices] = useState<goodsdist>({...empty_goodsdist})
+    const [loans,setLoans] = useState<LoanInterface[]>([])
 
     // Stimulus
     const [whoToGive,setWhoToGive] = useState<string>('');
@@ -33,17 +36,22 @@ export default function Game() {
 
     // New Settlement Screen
     const [newSettlementVisable,setNewSettlementVisable] = useState<boolean>(false);
+
+    const [currentMonth,setCurrentMonth] = useState<number>(0)
+    const [currentYear,setCurrentYear] = useState<number>(0)
     
     const getSettlements = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
         store.get<goodsdist>('Federal Reserve').then(value => {if (value) {setReserveGoods(value);}});
         store.get<goodsdist>('Federal Prices').then(value => {if (value) {setPrices(value)}})
-        const get_settlements = await store.get<SettlementInterface[]>('settlements') ?? [];
-        setSettlements(get_settlements)
+        store.get<SettlementInterface[]>('settlements').then(value => {if (value) {setSettlements(value)}});
+        store.get<LoanInterface[]>('loans').then(value => {if (value) {setLoans(value)}});
+        store.get<number>('Current Month').then(value => {if (value) {setCurrentMonth(value)}});
+        store.get<number>('Current Year').then(value => {if (value) {setCurrentYear(value)}});
         updateSettlements()
     }
     
-    const updateSettlements = () => setChangeGoods(FederalChange(settlements))
+    const updateSettlements = () => setChangeGoods(FederalChange(settlements,loans))
 
     const setSettlementTax = (name: string, val: number) => {
         setSettlements(settlements.map(s => {
@@ -114,13 +122,13 @@ export default function Game() {
 
     useEffect(() => {getSettlements()},[])
     
-    return(
-    <div className="flex flex-column gap-2">
-        <Button label='Next Turn' size='small' icon='pi pi-angle-double-right' onClick={processNextTurn}/>
-        <div className="flex flex-row gap-1">
-            <Button className='flex-grow-1' severity="secondary" label='Foreign Powers' icon='pi pi-flag-fill' onClick={goToForeignPowers}/>
-            <Button className='flex-grow-1' severity="warning" label='Economy' icon='pi pi-wallet' onClick={goToEconomy}/>
-        </div>
+    return (
+        <div className="flex flex-column gap-2">
+            <Button label={`${MonthInfo[currentMonth as keyof typeof MonthInfo].name} ${currentYear} | Next Turn`} size='small' icon='pi pi-angle-double-right' onClick={processNextTurn}/>
+            <div className="flex flex-row gap-1">
+                <Button className='flex-grow-1' severity="secondary" label='Foreign Powers' icon='pi pi-flag-fill' onClick={goToForeignPowers}/>
+                <Button className='flex-grow-1' severity="warning" label='Economy' icon='pi pi-wallet' onClick={goToEconomy}/>
+            </div>
         <Panel header="Federal Reserve" toggleable>
             {settlements.length > 0 ? <DisplayGoods 
                 stock={reserveGoods} 

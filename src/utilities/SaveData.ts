@@ -99,6 +99,9 @@ export const createNewSave = async (saveName: string)  => {
     store.set('Merchant Capacity',0) // Merchant Capacity for the nation
     store.set('Months Stored',1) // Months worth of goods that are stored in the nation
     store.set('Loans',[]) // History of loans
+    store.set('Current Year',728) // Current Year
+    store.set('Current Month',0) // Current Month
+    store.set('Military Units',[]) // Military Units
     await store.save();
     store.close();
 }

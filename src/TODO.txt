@@ -1,25 +1,24 @@
 Initial Version Features
 ----------------------------
-Days Months and Years - X
+Days Months and Years - O
 Goods Production - O
 Bureaucratic Focus - O
 Settlements - O
 Resource Caps - O
 Pop Growth - O
-Pop Conversion/ Encourage Growth - X
+Pop Conversion/ Encourage Growth - O
 Military - X
 Goods Consumption - O
 Trade - O
 Trade Potential - O
 Diplomacy - X
-Loans - X
+Loans - O
 Development - O
 
 
 In Progress
 ------------------
-Loans UI
-
+Military
 
 
 Future Features

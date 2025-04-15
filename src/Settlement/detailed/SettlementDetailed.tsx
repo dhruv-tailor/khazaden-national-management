@@ -15,6 +15,7 @@ import { clanTypes } from "../../Clans/ClanInterface/ClanInterface";
 import NaturalResources from "./NaturalResources";
 import { addGoods, goodsdist } from "../../Goods/GoodsDist";
 import BureaucracyBonus from "./Bureaucracy/BureaucracyBonus";
+import PopConversion from "./PopConversion";
 
 export default function SettlementDetailed() {
     const gameId = useParams().game
@@ -25,6 +26,8 @@ export default function SettlementDetailed() {
     const [settlement, setSettlement] = useState<SettlementInterface>({...empty_settlement});
     const [rename,setRename] = useState<boolean>(false)
     const [newName,setNewName] = useState<string>('')
+    const [showPopConversion,setShowPopConversion] = useState<boolean>(false)
+
 
     const getSettlement = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
@@ -62,6 +65,7 @@ export default function SettlementDetailed() {
                 ...settlement.stock,
                 money: settlement.stock.money - cost
             },
+            pop_cap:Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].reference_pop_cap),
             production_cap: {
             money: -1,
             food: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].food_and_water_balancing),
@@ -154,6 +158,22 @@ export default function SettlementDetailed() {
         navigate(`economy`)
     }
 
+    const convertPops = (sourceClan: string, targetClan: string, amount: number, cost: number) => {
+        setShowPopConversion(false)
+        const clans = settlement.clans.map(clan => {
+            if(clan.name === sourceClan) {return {...clan,population: clan.population - amount}}
+            else if(clan.name === targetClan) {return {...clan,population: clan.population + amount}}
+            return {...clan}
+        })
+        setSettlement({...settlement,
+            clans: clans,
+            stock: {
+                ...settlement.stock,
+                money: settlement.stock.money - cost
+            }
+        })
+    }
+
     return(
         <div className="flex flex-column gap-2">
             <Button label="Back to All Settlements" icon="pi pi-arrow-left" size="small" onClick={goBack}/>
@@ -197,9 +217,17 @@ export default function SettlementDetailed() {
                 </Panel>
             </div>
 
-            {/* Bureaucracy Bonus */}
-            <Panel header='Bureaucracy Bonus' toggleable>
-                <BureaucracyBonus settlement={settlement} updateFunc={setBonus}/>
+            {/* Bureaucracy */}
+            <Panel header='Bureaucracy' toggleable>
+                <div className="flex flex-row gap-2 flex-wrap">
+                    {/* Pop Conversion Button */}
+                    <Button size="small" label='Convert Pops' icon='pi pi-users' onClick={() => setShowPopConversion(true)}/>
+                    <Dialog header="Convert Pops" visible={showPopConversion} onHide={() => setShowPopConversion(false)}>
+                        <PopConversion clans={settlement.clans} updateFunc={convertPops}/>
+                    </Dialog>
+                    {/* Bureaucracy Bonus */}
+                    <BureaucracyBonus settlement={settlement} updateFunc={setBonus}/>
+                </div>
             </Panel>
             
             {/* Show Clans */}

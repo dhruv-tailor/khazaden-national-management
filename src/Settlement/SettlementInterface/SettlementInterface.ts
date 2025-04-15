@@ -17,7 +17,7 @@ import { ForeignPowerInterface } from "../../ForeignPowers/Interface/ForeignPowe
 import { addGoods, empty_goodsdist, goodsdist, roundGoods, scaleGoods, subtractGoods } from "../../Goods/GoodsDist";
 import { ensureNumber } from "../../utilities/SimpleFunctions";
 import { TerrainData, TerrainType } from "./TerrainInterface";
-
+import { RegimentInterface } from "../../Military/units/RegimentInterface";
 export enum SettlementTier {
     Hamlet = 1,
     Village,
@@ -57,6 +57,9 @@ export interface SettlementInterface {
     interest_rate: number;
     available_loan: number;
     loans: LoanInterface[];
+
+    military_units: RegimentInterface[]
+
 }
 
 export const empty_settlement: SettlementInterface = {
@@ -84,7 +87,8 @@ export const empty_settlement: SettlementInterface = {
     months_stored: 1,
     interest_rate: 0.05,
     loans: [],
-    available_loan: 0
+    available_loan: 0,
+    military_units: []
 }
 
 export const newSettlement = (name: string, terrain_type: TerrainType, visable_name?: string) => {
@@ -256,11 +260,11 @@ export const popGrowth = (settlement: SettlementInterface, foreign_nations: Fore
     foreign_nations.forEach(nation => { MGM += nation.immigrationRate * nation.dwarfPopulation })
     const avg_growth = P0 * 17.5226452905812 - 113.226452905812
     const pop_final = (settlement.pop_cap * K * Math.exp(MGM*gained_pg/avg_growth))/(settlement.pop_cap + K * (Math.exp(MGM * gained_pg/avg_growth)-1))
-    settlement.projected_pop = pop_final
+    return pop_final
 }
 
 export const settlementChange = (settlement: SettlementInterface): goodsdist => {
-    return {...settlement.clans.map(clan => subtractGoods(
+    const change = {...settlement.clans.map(clan => subtractGoods(
         roundGoods(
             scaleGoods(
                 clan.production,
@@ -270,10 +274,14 @@ export const settlementChange = (settlement: SettlementInterface): goodsdist => 
         ).reduce((sum,val) => addGoods(sum,val)),
         money: settlement.clans.map(
             clan => Math.round(clan.tax_rate * clan.taxed_productivity * (1 - settlement.settlement_tax))
-        ).reduce((sum,val) => sum + val) - settlement.loans.map(
+        ).reduce((sum,val) => sum + val)
+    }
+    if (settlement.loans.length > 0) {
+        change.money -= settlement.loans.map(
             loan => Math.round(loan.amount / loan.months_left)
         ).reduce((sum,val) => sum + val)
     }
+    return change
 }
 
 export const monthsStored = (s: SettlementInterface): goodsdist => {

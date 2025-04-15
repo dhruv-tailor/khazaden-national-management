@@ -16,7 +16,8 @@ import SellGoods from "../selling/SellGoods";
 import { InputNumber } from "primereact/inputnumber";
 import MonthsStoredTT from "../../tooltips/economy/monthsStoredTT";
 import { GetFederalGoodsStored } from "../../utilities/SimpleFunctions";
-import { LoanInterface } from "../loans/loanInterface";
+import { LoanInterface, takeLoan } from "../loans/loanInterface";
+import ViewLoans from "../loans/ViewLoans";
 
 export default function SettlmentEconomy() {
     const gameId = useParams().game;
@@ -31,6 +32,7 @@ export default function SettlmentEconomy() {
     const [showSell,setShowSell] = useState<boolean>(false);
     const [FederalMonthsStored,setFederalMonthsStored] = useState<number>(0);
     const [FederalLoans,setFederalLoans] = useState<LoanInterface[]>([]);
+    const [showLoans,setShowLoans] = useState<boolean>(false);
 
     const navigateTo = async (location: string) => {
         await saveData()
@@ -215,9 +217,27 @@ export default function SettlmentEconomy() {
         setForeignPowers([...f])
     }
 
+    const loanTaken = (giver: string, amount: number) => {
+        const s = settlements.map(s => {
+            if (giver !== s.name) {return s}
+            const newLoans = [...settlement.loans, takeLoan(amount, s.visible_name, s.name)]
+            setSettlement({...settlement, loans: newLoans})
+            return {...s, available_loan: s.available_loan - amount}
+        })
+        setSettlements([...s])
+    }
+
+    const declareBankruptcy = () => {
+        setSettlement({...settlement, stock: {...empty_goodsdist}, loans: []})
+    }
+
     return (
         <div className="flex flex-column gap-2">
             <Button size="small" label="Go Back" icon='pi pi-angle-double-left' onClick={()=>navigateTo(`/game/${gameId}/settlement/${settlementId}`)}/>
+            <Button size="small" label="View Loans" icon='pi pi-money-bill' onClick={() => setShowLoans(true)}/>
+            <Dialog header="Loans" visible={showLoans} onHide={() => setShowLoans(false)}>
+                <ViewLoans loans={FederalLoans} settlements={settlements} updateFunc={loanTaken} declareBankruptcy={declareBankruptcy}/>
+            </Dialog>
             {/* Local Goods */}
             <Panel header="Settlement Goods" toggleable>
                 <div className="flex flex-row gap-2">

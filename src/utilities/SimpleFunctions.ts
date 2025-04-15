@@ -18,7 +18,11 @@ export const FederalChange = (settlements: SettlementInterface[],loans: LoanInte
         return settlement.clans.map(
             clan => clan.tax_rate * clan.taxed_productivity
         ).reduce((sum,val) => sum + val) * settlement.settlement_tax
-     }).reduce((sum,val) => sum + val)) - loans.map(loan => Math.round(loan.amount / loan.months_left)).reduce((sum,val) => sum + val)
+     }).reduce((sum,val) => sum + val))
+
+     if (loans.length > 0) {
+        change_reserve.money -= loans.map(loan => Math.round(loan.amount / loan.months_left)).reduce((sum,val) => sum + val)
+     }
 
      return(change_reserve)
 }

@@ -283,24 +283,24 @@ export const floorGoods = (a: goodsdist): goodsdist => {
 
 export const minPerGood = (a: goodsdist,b: number): goodsdist => {
     return {
-        money: Math.min(a.money,b),
-        food: Math.min(a.food,b),
-        beer: Math.min(a.beer,b),
-        leather: Math.min(a.leather,b),
-        artisinal: Math.min(a.artisinal,b),
-        livestock: Math.min(a.livestock,b),
-        ornamental: Math.min(a.ornamental,b),
-        enchanted: Math.min(a.enchanted,b),
-        timber: Math.min(a.timber,b),
-        tools: Math.min(a.tools,b),
-        common_ores: Math.min(a.common_ores,b),
-        medical: Math.min(a.medical,b),
-        rare_ores: Math.min(a.rare_ores,b),
-        gems: Math.min(a.gems,b),
-        runes: Math.min(a.runes,b),
-        arms: Math.min(a.arms,b),
-        books: Math.min(a.books,b),
-        enchanted_arms: Math.min(a.enchanted_arms,b),
-        charcoal: Math.min(a.charcoal,b)
+        money: Math.max(a.money,b),
+        food: Math.max(a.food,b),
+        beer: Math.max(a.beer,b),
+        leather: Math.max(a.leather,b),
+        artisinal: Math.max(a.artisinal,b),
+        livestock: Math.max(a.livestock,b),
+        ornamental: Math.max(a.ornamental,b),
+        enchanted: Math.max(a.enchanted,b),
+        timber: Math.max(a.timber,b),
+        tools: Math.max(a.tools,b),
+        common_ores: Math.max(a.common_ores,b),
+        medical: Math.max(a.medical,b),
+        rare_ores: Math.max(a.rare_ores,b),
+        gems: Math.max(a.gems,b),
+        runes: Math.max(a.runes,b),
+        arms: Math.max(a.arms,b),
+        books: Math.max(a.books,b),
+        enchanted_arms: Math.max(a.enchanted_arms,b),
+        charcoal: Math.max(a.charcoal,b)
     }
 }

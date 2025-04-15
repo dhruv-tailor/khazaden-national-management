@@ -15,7 +15,8 @@ import { Dialog } from "primereact/dialog";
 import SellGoods from "./selling/SellGoods";
 import MonthsStoredTT from "../tooltips/economy/monthsStoredTT";
 import { InputNumber } from "primereact/inputnumber";
-
+import { LoanInterface, takeLoan } from "./loans/loanInterface";
+import ViewLoans from "./loans/ViewLoans";
 export default function Economy () {
     const gameId = useParams().game;
     let navigate = useNavigate();
@@ -28,6 +29,8 @@ export default function Economy () {
     const [merchantCapacity,setMerchantCapacity] = useState<number>(0);
     const [FederalMonthsStored,setFederalMonthsStored] = useState<number>(0);
     const [foreignPowers,setForeignPowers] = useState<ForeignPowerInterface[]>([])
+    const [loans,setLoans] = useState<LoanInterface[]>([])
+    const [showLoans,setShowLoans] = useState<boolean>(false)
 
     const [showSell, setShowSell] = useState(false)
 
@@ -39,6 +42,7 @@ export default function Economy () {
         store.get<number>('Merchant Capacity').then(value => {if (value) {setMerchantCapacity(value)}});
         store.get<number>('Months Stored').then(value => {if (value) {setFederalMonthsStored(value)}});
         store.get<ForeignPowerInterface[]>('Foreign Powers').then(value => {if (value) {setForeignPowers(value)}});
+        store.get<LoanInterface[]>('Loans').then(value => {if (value) {setLoans(value)}});
         const get_settlements = await store.get<SettlementInterface[]>('settlements') ?? [];
         setSettlements(get_settlements)
         updateSettlements()
@@ -71,6 +75,7 @@ export default function Economy () {
         store.set('Foreign Powers',foreignPowers)
         store.set('Merchant Capacity',merchantCapacity)
         store.set('Months Stored',FederalMonthsStored)
+        store.set('Loans',loans)
         store.save()
     }
 
@@ -190,9 +195,28 @@ export default function Economy () {
         setForeignPowers([...f])
     }
 
+    const loanTaken = (settlement: string, amount: number) => {
+        const s = settlements.map(s => {
+            if (settlement !== s.name) {return s}
+            setLoans([...loans,takeLoan(amount,s.visible_name,s.name)])
+            return {...s, available_loan: s.available_loan - amount}
+        })
+        setSettlements([...s])
+    }
+
+    const declareBankruptcy = () => {
+        setReserveGoods({...empty_goodsdist})
+        setLoans([])
+    }
+
     return(
         <div className="flex flex-column gap-2">
             <Button label="Go Back" icon='pi pi-angle-double-left' onClick={()=>navigateTo(`/game/${gameId}`)}/>
+            {/* Loans */}
+            <Button label="View Loans" icon='pi pi-money-bill' onClick={() => setShowLoans(true)}/>
+            <Dialog header="Loans" visible={showLoans} onHide={() => setShowLoans(false)}>
+                <ViewLoans loans={loans} settlements={settlements} updateFunc={loanTaken} declareBankruptcy={declareBankruptcy}/>
+            </Dialog>
             {/* National Stock */}
             <Panel header="Federal Reserve" toggleable>
                 <div className="flex flex-row gap-1">

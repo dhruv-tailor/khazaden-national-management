@@ -20,218 +20,134 @@ import RunesIconTT from "../tooltips/goods/RunesIconTT";
 import ArmsIconTT from "../tooltips/goods/ArmsIconTT";
 import BooksIconTT from "../tooltips/goods/BooksIconTT";
 import CharcoalIconTT from "../tooltips/goods/CharcoalIconTT";
+import { Divider } from "primereact/divider";
 
 export default function ResourceDistribuition({goods_cap,updateFunc,existing_dist}:{goods_cap: goodsdist,updateFunc: (dist: goodsdist) => void,existing_dist?: goodsdist}) {
     
     const [goods,setGoods] = useState<goodsdist>({...empty_goodsdist});
-    const boxSize = 3
+    const boxSize = 3;
 
-    useEffect(() => {if(existing_dist) {setGoods({...existing_dist})}},[])
+    useEffect(() => {if(existing_dist) {setGoods({...existing_dist})}},[]);
+
+    const renderResourceInput = (Icon: any, key: keyof goodsdist, label: string) => (
+        <div className="flex flex-column align-items-center gap-1 p-2 surface-100 border-round">
+            <div className="flex align-items-center gap-2">
+                <Icon/>
+                <span className="font-semibold">{label}</span>
+            </div>
+            <InputNumber 
+                size={boxSize} 
+                value={goods[key]} 
+                onValueChange={e => setGoods({...goods,[key]: e.value ?? 0})} 
+                showButtons 
+                min={0} 
+                max={goods_cap[key]}
+                className="w-8rem"
+            />
+        </div>
+    );
 
     return(
-        <div className="flex flex-column gap-3">
-            <div>
+        <div className="flex flex-column gap-4">
+            {/* Money Section */}
+            <div className="flex align-items-center gap-3 p-2 surface-100 border-round">
                 <MoneyIconTT/>
                 <InputNumber
                     value={goods.money} 
                     onValueChange={e => setGoods({...goods,money: e.value ?? 0})} 
                     showButtons 
                     min={0} 
-                    max={goods_cap.money}/>
+                    max={goods_cap.money}
+                    className="w-8rem"
+                />
             </div>
-            <div className="flex flex-row flex-wrap gap-3">
-                <div>
-                    <FoodIconTT/>
-                    <InputNumber 
-                        size={boxSize} 
-                        value={goods.food} 
-                        onValueChange={e => setGoods({...goods,food: e.value ?? 0})} 
-                        showButtons 
-                        min={0} 
-                        max={goods_cap.food}/>
+
+            {/* Basic Resources */}
+            <div className="grid">
+                <div className="col-12 md:col-4">
+                    {renderResourceInput(FoodIconTT, 'food', 'Food')}
                 </div>
-                <div>
-                    <BeerIconTT/>
-                    <InputNumber 
-                        size={boxSize} 
-                        value={goods.beer} 
-                        onValueChange={e => setGoods({...goods,beer: e.value ?? 0})} 
-                        showButtons 
-                        min={0} 
-                        max={goods_cap.beer}/>
+                <div className="col-12 md:col-4">
+                    {renderResourceInput(BeerIconTT, 'beer', 'Beer')}
                 </div>
-                <div>
-                    <LeatherIconTT/>
-                    <InputNumber 
-                        size={boxSize} 
-                        value={goods.leather} 
-                        onValueChange={e => setGoods({...goods,leather: e.value ?? 0})} 
-                        showButtons 
-                        min={0} 
-                        max={goods_cap.leather}/>
+                <div className="col-12 md:col-4">
+                    {renderResourceInput(LeatherIconTT, 'leather', 'Leather')}
                 </div>
             </div>
-            <div className="flex flex-row flex-wrap gap-3">
-                <div>
-                    <ArtisinalIconTT/>
-                    <InputNumber 
-                        size={boxSize} 
-                        value={goods.artisinal} 
-                        onValueChange={e => setGoods({...goods,artisinal: e.value ?? 0})} 
-                        showButtons 
-                        min={0} 
-                        max={goods_cap.artisinal}/>
+
+            {/* Crafted Goods */}
+            <div className="grid">
+                <div className="col-12 md:col-4">
+                    {renderResourceInput(ArtisinalIconTT, 'artisinal', 'Artisinal')}
                 </div>
-                <div>
-                    <LivestockIconTT/>
-                    <InputNumber 
-                        size={boxSize} 
-                        value={goods.livestock} 
-                        onValueChange={e => setGoods({...goods,livestock: e.value ?? 0})} 
-                        showButtons 
-                        min={0} 
-                        max={goods_cap.livestock}/>
+                <div className="col-12 md:col-4">
+                    {renderResourceInput(LivestockIconTT, 'livestock', 'Livestock')}
                 </div>
-                <div>
-                    <OrnamentalIconTT/>
-                    <InputNumber 
-                        size={boxSize} 
-                        value={goods.ornamental} 
-                        onValueChange={e => setGoods({...goods,ornamental: e.value ?? 0})} 
-                        showButtons 
-                        min={0} 
-                        max={goods_cap.ornamental}/>
+                <div className="col-12 md:col-4">
+                    {renderResourceInput(OrnamentalIconTT, 'ornamental', 'Ornamental')}
                 </div>
             </div>
-            <div className="flex flex-row flex-wrap gap-3">
-                <div>
-                    <EnchantedArmsIconTT/>
-                    <InputNumber 
-                        size={boxSize} 
-                        value={goods.enchanted} 
-                        onValueChange={e => setGoods({...goods,enchanted: e.value ?? 0})} 
-                        showButtons 
-                        min={0} 
-                        max={goods_cap.enchanted}/>
+
+            {/* Industrial Resources */}
+            <div className="grid">
+                <div className="col-12 md:col-4">
+                    {renderResourceInput(EnchantedArmsIconTT, 'enchanted', 'Enchanted')}
                 </div>
-                <div>
-                    <TimberIconTT/>
-                    <InputNumber 
-                        size={boxSize} 
-                        value={goods.timber} 
-                        onValueChange={e => setGoods({...goods,timber: e.value ?? 0})} 
-                        showButtons 
-                        min={0} 
-                        max={goods_cap.timber}/>
+                <div className="col-12 md:col-4">
+                    {renderResourceInput(TimberIconTT, 'timber', 'Timber')}
                 </div>
-                <div>
-                    <ToolsIconTT/>
-                    <InputNumber 
-                        size={boxSize} 
-                        value={goods.tools} 
-                        onValueChange={e => setGoods({...goods,tools: e.value ?? 0})} 
-                        showButtons 
-                        min={0} 
-                        max={goods_cap.tools}/>
+                <div className="col-12 md:col-4">
+                    {renderResourceInput(ToolsIconTT, 'tools', 'Tools')}
                 </div>
             </div>
-            <div className="flex flex-row flex-wrap gap-3">
-                <div>
-                    <CommonOresIconTT/>
-                    <InputNumber 
-                        size={boxSize} 
-                        value={goods.common_ores} 
-                        onValueChange={e => setGoods({...goods,common_ores: e.value ?? 0})} 
-                        showButtons 
-                        min={0} 
-                        max={goods_cap.common_ores}/>
+
+            {/* Raw Materials */}
+            <div className="grid">
+                <div className="col-12 md:col-4">
+                    {renderResourceInput(CommonOresIconTT, 'common_ores', 'Common Ores')}
                 </div>
-                <div>
-                    <MedicalIconTT/>
-                    <InputNumber 
-                        size={boxSize} 
-                        value={goods.medical} 
-                        onValueChange={e => setGoods({...goods,medical: e.value ?? 0})} 
-                        showButtons 
-                        min={0} 
-                        max={goods_cap.medical}/>
+                <div className="col-12 md:col-4">
+                    {renderResourceInput(MedicalIconTT, 'medical', 'Medical')}
                 </div>
-                <div>
-                    <RareOresIconTT/>
-                    <InputNumber 
-                        size={boxSize} 
-                        value={goods.rare_ores} 
-                        onValueChange={e => setGoods({...goods,rare_ores: e.value ?? 0})} 
-                        showButtons 
-                        min={0} 
-                        max={goods_cap.rare_ores}/>
+                <div className="col-12 md:col-4">
+                    {renderResourceInput(RareOresIconTT, 'rare_ores', 'Rare Ores')}
                 </div>
             </div>
-            <div className="flex flex-row flex-wrap gap-3">
-                <div>
-                    <GemsIconTT/>
-                    <InputNumber 
-                        size={boxSize} 
-                        value={goods.gems} 
-                        onValueChange={e => setGoods({...goods,gems: e.value ?? 0})} 
-                        showButtons 
-                        min={0} 
-                        max={goods_cap.gems}/>
+
+            {/* Luxury Goods */}
+            <div className="grid">
+                <div className="col-12 md:col-4">
+                    {renderResourceInput(GemsIconTT, 'gems', 'Gems')}
                 </div>
-                <div>
-                    <RunesIconTT/>
-                    <InputNumber 
-                        size={boxSize} 
-                        value={goods.runes} 
-                        onValueChange={e => setGoods({...goods,runes: e.value ?? 0})} 
-                        showButtons 
-                        min={0} 
-                        max={goods_cap.runes}/>
+                <div className="col-12 md:col-4">
+                    {renderResourceInput(RunesIconTT, 'runes', 'Runes')}
                 </div>
-                <div>
-                    <ArmsIconTT/>
-                    <InputNumber 
-                        size={boxSize} 
-                        value={goods.arms} 
-                        onValueChange={e => setGoods({...goods,arms: e.value ?? 0})} 
-                        showButtons 
-                        min={0} 
-                        max={goods_cap.arms}/>
+                <div className="col-12 md:col-4">
+                    {renderResourceInput(ArmsIconTT, 'arms', 'Arms')}
                 </div>
             </div>
-            <div className="flex flex-row flex-wrap gap-3">
-                <div>
-                    <BooksIconTT/>
-                    <InputNumber 
-                        size={boxSize} 
-                        value={goods.books} 
-                        onValueChange={e => setGoods({...goods,books: e.value ?? 0})} 
-                        showButtons 
-                        min={0} 
-                        max={goods_cap.books}/>
+
+            {/* Special Items */}
+            <div className="grid">
+                <div className="col-12 md:col-4">
+                    {renderResourceInput(BooksIconTT, 'books', 'Books')}
                 </div>
-                <div>
-                    <EnchantedArmsIconTT/>
-                    <InputNumber 
-                        size={boxSize} 
-                        value={goods.enchanted_arms} 
-                        onValueChange={e => setGoods({...goods,enchanted_arms: e.value ?? 0})} 
-                        showButtons 
-                        min={0} 
-                        max={goods_cap.enchanted_arms}/>
+                <div className="col-12 md:col-4">
+                    {renderResourceInput(EnchantedArmsIconTT, 'enchanted_arms', 'Enchanted Arms')}
                 </div>
-                <div>
-                    <CharcoalIconTT/>
-                    <InputNumber 
-                        size={boxSize} 
-                        value={goods.charcoal} 
-                        onValueChange={e => setGoods({...goods,charcoal: e.value ?? 0})} 
-                        showButtons 
-                        min={0} 
-                        max={goods_cap.charcoal}/>
+                <div className="col-12 md:col-4">
+                    {renderResourceInput(CharcoalIconTT, 'charcoal', 'Charcoal')}
                 </div>
             </div>
-            <Button label="Confirm" icon='pi pi-send' onClick={() => updateFunc(goods)}/>
+
+            <Divider/>
+
+            <Button 
+                label="Confirm Distribution" 
+                icon='pi pi-send' 
+                onClick={() => updateFunc(goods)}
+                className="p-button-primary w-full"
+            />
         </div>
-    )
+    );
 }
