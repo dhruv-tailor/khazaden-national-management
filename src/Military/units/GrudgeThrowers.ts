@@ -1,14 +1,17 @@
 import { clanTypes } from "../../Clans/ClanInterface/ClanInterface";
 import { addGoods, multiplyGoods, empty_goodsdist } from "../../Goods/GoodsDist";
-import { regiment_consumption_factor, EliteVarient, RegimentInterface } from "./RegimentInterface";
+import { regiment_consumption_factor, RegimentInterface, empty_regiment, regiment_types } from "./RegimentInterface";
 
-export const GrudgeThrowers: RegimentInterface = {
-    name: "Wall Renderers",
-    type: "GrudgeThrowers",
-    clan_type: clanTypes.engineers,
-    pops_conusmed: 4,
-    turns_to_levy: 3,
-    consumption_rate: addGoods(multiplyGoods(regiment_consumption_factor, {
+export const GrudgeThrowers = () : RegimentInterface => {
+    return {
+        ...empty_regiment(),
+        name: "Wall Renderers",
+        type: regiment_types.GrudgeThrowers,
+        clan_type: clanTypes.engineers,
+        pops_conusmed: 4,
+        max_pops: 4,
+        turns_to_levy: 3,
+        consumption_rate: addGoods(multiplyGoods(regiment_consumption_factor, {
         ...empty_goodsdist,
         tools: 1,
         medical: 0,
@@ -37,6 +40,5 @@ export const GrudgeThrowers: RegimentInterface = {
         enchanted_arms: 0,
         charcoal: 0
     }),
-    elite_varient: EliteVarient.standard,
-    health: 100
+    }
 }

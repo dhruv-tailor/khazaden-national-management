@@ -1,14 +1,17 @@
 import { clanTypes } from "../../Clans/ClanInterface/ClanInterface";
 import { addGoods, multiplyGoods, empty_goodsdist } from "../../Goods/GoodsDist";
-import { regiment_consumption_factor, EliteVarient, RegimentInterface } from "./RegimentInterface";
+import { regiment_consumption_factor, RegimentInterface, empty_regiment, regiment_types } from "./RegimentInterface";
 
-export const Thunderers: RegimentInterface = {
-    name: "Powdercrankers",
-    type: "Thunderers",
-    clan_type: clanTypes.warriors,
-    pops_conusmed: 10,
-    turns_to_levy: 3,
-    consumption_rate: addGoods(multiplyGoods(regiment_consumption_factor, {
+export const Thunderers = () : RegimentInterface => {
+    return {
+        ...empty_regiment(),
+        name: "Thunderers",
+        type: regiment_types.Thunderers,
+        clan_type: clanTypes.warriors,
+        pops_conusmed: 10,
+        max_pops: 10,
+        turns_to_levy: 3,
+        consumption_rate: addGoods(multiplyGoods(regiment_consumption_factor, {
         ...empty_goodsdist,
         tools: 1,
         medical: 1,
@@ -37,6 +40,5 @@ export const Thunderers: RegimentInterface = {
         enchanted_arms: 0,
         charcoal: 0
     }),
-    elite_varient: EliteVarient.standard,
-    health: 100
+    }
 }

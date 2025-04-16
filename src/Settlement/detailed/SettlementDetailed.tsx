@@ -16,6 +16,7 @@ import NaturalResources from "./NaturalResources";
 import { addGoods, goodsdist } from "../../Goods/GoodsDist";
 import BureaucracyBonus from "./Bureaucracy/BureaucracyBonus";
 import PopConversion from "./PopConversion";
+import { Card } from "primereact/card";
 
 export default function SettlementDetailed() {
     const gameId = useParams().game
@@ -27,7 +28,6 @@ export default function SettlementDetailed() {
     const [rename,setRename] = useState<boolean>(false)
     const [newName,setNewName] = useState<string>('')
     const [showPopConversion,setShowPopConversion] = useState<boolean>(false)
-
 
     const getSettlement = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
@@ -67,28 +67,27 @@ export default function SettlementDetailed() {
             },
             pop_cap:Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].reference_pop_cap),
             production_cap: {
-            money: -1,
-            food: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].food_and_water_balancing),
-            beer: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].beer_balancing),
-            leather: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].leather_and_textiles_balancing),
-            artisinal: -1,
-            livestock: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].livestock_balancing),
-            ornamental: -1,
-            enchanted: -1,
-            timber: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].timber_balancing),
-            tools: -1,
-            common_ores: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].common_ores_balancing),
-            medical: -1,
-            rare_ores: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].rare_ores_balancing),
-            gems: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].gems_balancing),
-            runes: -1,
-            arms: -1,
-            books: -1,
-            enchanted_arms: -1,
-            charcoal: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].enchanted_charcoal_balancing)
-        }
+                money: -1,
+                food: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].food_and_water_balancing),
+                beer: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].beer_balancing),
+                leather: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].leather_and_textiles_balancing),
+                artisinal: -1,
+                livestock: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].livestock_balancing),
+                ornamental: -1,
+                enchanted: -1,
+                timber: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].timber_balancing),
+                tools: -1,
+                common_ores: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].common_ores_balancing),
+                medical: -1,
+                rare_ores: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].rare_ores_balancing),
+                gems: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].gems_balancing),
+                runes: -1,
+                arms: -1,
+                books: -1,
+                enchanted_arms: -1,
+                charcoal: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].enchanted_charcoal_balancing)
+            }
         })
-        
     }
 
     const updateTax = (id: clanTypes, newRate: number) => {
@@ -174,23 +173,19 @@ export default function SettlementDetailed() {
         })
     }
 
+    const goToMilitary = async () => {
+        await saveData()
+        navigate(`military`)
+    }
+
     return(
         <div className="flex flex-column gap-2">
-            <Button label="Back to All Settlements" icon="pi pi-arrow-left" size="small" onClick={goBack}/>
-            
-            {/* Settlement Name */}
-            <div className="flex flex-row gap-2">
-                <h1>{settlement.visible_name}</h1>
-                <Button size="small" icon='pi pi-pencil' rounded text onClick={() => setRename(true)}/>
-                <Dialog header="Rename Settlement" visible={rename} closable={false} onHide={() => setRename(false)}>
-                    <div className="p-inputgroup flex-1">
-                        <InputText value={newName} onChange={e => setNewName(e.target.value)}/>
-                        <Button className="p-button-success" icon="pi pi-check" onClick={() => {
-                            settlement.visible_name = newName
-                            setRename(false)
-                        }}/>
-                    </div>
-                </Dialog>
+            <div className="flex flex-row justify-content-between align-items-center">
+                <Button label="Back to All Settlements" icon="pi pi-arrow-left" size="small" onClick={goBack}/>
+                <div className="flex flex-row align-items-center gap-2">
+                    <h1 className="m-0">{settlement.visible_name}</h1>
+                    <Button size="small" icon='pi pi-pencil' rounded text onClick={() => setRename(true)}/>
+                </div>
             </div>
             
             {/* Upgrade Settlement Button */}
@@ -203,7 +198,11 @@ export default function SettlementDetailed() {
                 </div>
             </Button>:null}
 
-            <Button className='flex-grow-1' severity="warning" label='Economy' icon='pi pi-wallet' onClick={goToEconomy}/>
+            {/* Buttons to go to Economy and Military */}
+            <div className="flex flex-row gap-1">
+                <Button className='flex-grow-1' severity="warning" label='Economy' icon='pi pi-wallet' onClick={goToEconomy}/>
+                <Button className='flex-grow-1' severity="danger" label='Army' icon='pi pi-users' onClick={goToMilitary}/>
+            </div>
             
             <div className="flex flex-row gap-1">
                 {/* Show Reserve */}
@@ -246,6 +245,16 @@ export default function SettlementDetailed() {
                     return <></>
                 })}
             </div>
+
+            <Dialog header="Rename Settlement" visible={rename} closable={false} onHide={() => setRename(false)}>
+                <div className="p-inputgroup flex-1">
+                    <InputText value={newName} onChange={e => setNewName(e.target.value)}/>
+                    <Button className="p-button-success" icon="pi pi-check" onClick={() => {
+                        settlement.visible_name = newName
+                        setRename(false)
+                    }}/>
+                </div>
+            </Dialog>
         </div>
     )
 }

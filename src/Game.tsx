@@ -4,7 +4,6 @@ import { SettlementInterface } from "./Settlement/SettlementInterface/Settlement
 import { load } from "@tauri-apps/plugin-store";
 import { saveLocation } from "./utilities/SaveData";
 import { addGoods, empty_goodsdist, goodsdist, subtractGoods } from "./Goods/GoodsDist";
-import { Panel } from "primereact/panel";
 import DisplayGoods from "./components/goodsDislay";
 import Settlement from "./Settlement/Settlement";
 import { Dialog } from "primereact/dialog";
@@ -17,6 +16,7 @@ import { NextTurn } from "./utilities/NextTurn";
 import { FederalChange } from "./utilities/SimpleFunctions";
 import { LoanInterface } from "./Economics/loans/loanInterface";
 import { MonthInfo } from "./components/MonthInfo";
+import { Card } from "primereact/card";
 
 export default function Game() {
     const gameId = useParams().game
@@ -119,69 +119,143 @@ export default function Game() {
         navigate(`economy`)
     }
 
+    const goToMilitary = async () => {
+        await saveData()
+        navigate(`military`)
+    }
+
 
     useEffect(() => {getSettlements()},[])
     
     return (
-        <div className="flex flex-column gap-2">
-            <Button label={`${MonthInfo[currentMonth as keyof typeof MonthInfo].name} ${currentYear} | Next Turn`} size='small' icon='pi pi-angle-double-right' onClick={processNextTurn}/>
-            <div className="flex flex-row gap-1">
-                <Button className='flex-grow-1' severity="secondary" label='Foreign Powers' icon='pi pi-flag-fill' onClick={goToForeignPowers}/>
-                <Button className='flex-grow-1' severity="warning" label='Economy' icon='pi pi-wallet' onClick={goToEconomy}/>
-            </div>
-        <Panel header="Federal Reserve" toggleable>
-            {settlements.length > 0 ? <DisplayGoods 
-                stock={reserveGoods} 
-                change={{...changeGoods,money: 
-                settlements.map(
-                    s => s.clans.map(
-                        c => Math.round(c.tax_rate * c.taxed_productivity * s.settlement_tax)
-                        ).reduce((sum,val) => sum + val)
-                    ).reduce((sum,val) => sum + val)
-                }}
-            />: null}
-        </Panel>
-        <div className="flex flex-row flex-wrap gap-2">
-            {settlements.map(s => <Settlement 
-                key={s.name} 
-                settlement={s} 
-                updateTax={setSettlementTax}
-                updateQuota={setSettlementQuota}
-                stimulus={giveGoods}
-                goTo={navigateSettlement}
-                />)}
-            {/* New Settlment Button */}
-            {reserveGoods.money >= ((settlements.length ** 2) * 4500) ? 
-            <Button icon="pi pi-plus" onClick={()=>{
-                setReserveGoods({...reserveGoods,money: reserveGoods.money - ((settlements.length ** 2) * 4500)})
-                setNewSettlementVisable(true)
-            }}>
-                <div className="flex flex-row gap-1">
-                    New Settlement
-                    <MoneyIconTT/>
-                    {(settlements.length ** 2) * 4500}
+        <div className="flex flex-column gap-3 p-3">
+            {/* Header Section */}
+            <div className="flex flex-column gap-2">
+                <div className="flex flex-row align-items-center justify-content-between">
+                    <h1 className="m-0">Game Management</h1>
+                    <Button 
+                        label={`${MonthInfo[currentMonth as keyof typeof MonthInfo].name} ${currentYear} | Next Turn`} 
+                        size='small' 
+                        icon='pi pi-angle-double-right' 
+                        onClick={processNextTurn}
+                        severity="success"
+                    />
                 </div>
-            </Button>: null}
+                <div className="flex flex-row gap-2">
+                    <Button 
+                        className='flex-grow-1' 
+                        severity="secondary" 
+                        label='Foreign Powers' 
+                        icon='pi pi-flag-fill' 
+                        onClick={goToForeignPowers}
+                    />
+                    <Button 
+                        className='flex-grow-1' 
+                        severity="warning" 
+                        label='Economy' 
+                        icon='pi pi-wallet' 
+                        onClick={goToEconomy}
+                    />
+                    <Button 
+                        className='flex-grow-1' 
+                        severity="danger" 
+                        label='Military' 
+                        icon='pi pi-users' 
+                        onClick={goToMilitary}
+                    />
+                </div>
+            </div>
 
+            {/* Federal Reserve Section */}
+            <Card>
+                <div className="flex flex-column gap-3">
+                    <div className="flex flex-row justify-content-between align-items-center">
+                        <h2 className="m-0">Federal Reserve</h2>
+                        {settlements.length > 0 && (
+                            <DisplayGoods 
+                                stock={reserveGoods} 
+                                change={{
+                                    ...changeGoods,
+                                    money: settlements.map(
+                                        s => s.clans.map(
+                                            c => Math.round(c.tax_rate * c.taxed_productivity * s.settlement_tax)
+                                        ).reduce((sum,val) => sum + val)
+                                    ).reduce((sum,val) => sum + val)
+                                }}
+                            />
+                        )}
+                    </div>
+                </div>
+            </Card>
+
+            {/* Settlements Section */}
+            <div className="grid">
+                {settlements.map(s => (
+                    <div key={s.name} className="col-12 md:col-6 lg:col-4">
+                        <Settlement 
+                            settlement={s} 
+                            updateTax={setSettlementTax}
+                            updateQuota={setSettlementQuota}
+                            stimulus={giveGoods}
+                            goTo={navigateSettlement}
+                        />
+                    </div>
+                ))}
+            </div>
+
+            {/* New Settlement Button */}
+            {reserveGoods.money >= ((settlements.length ** 2) * 4500) && (
+                <Card>
+                    <Button 
+                        icon="pi pi-plus" 
+                        onClick={() => {
+                            setReserveGoods({
+                                ...reserveGoods,
+                                money: reserveGoods.money - ((settlements.length ** 2) * 4500)
+                            })
+                            setNewSettlementVisable(true)
+                        }}
+                        className="w-full"
+                        severity="info"
+                    >
+                        <div className="flex flex-row align-items-center justify-content-center gap-2">
+                            New Settlement
+                            <MoneyIconTT/>
+                            <span className="font-bold">{(settlements.length ** 2) * 4500}</span>
+                        </div>
+                    </Button>
+                </Card>
+            )}
+
+            {/* Stimulus Dialog */}
+            <Dialog 
+                header="Stimulus" 
+                visible={giveGoodsVisable} 
+                onHide={() => {
+                    setGiveGoodsVisable(false)
+                    setWhoToGive('')
+                }}
+                className="w-30rem"
+            >
+                <ResourceDistribuition 
+                    goods_cap={reserveGoods} 
+                    updateFunc={stimulus}
+                />
+            </Dialog>
+
+            {/* New Settlement Dialog */}
+            <Dialog
+                header="New Settlement"
+                closable={false}
+                visible={newSettlementVisable}
+                onHide={() => setNewSettlementVisable(false)}
+                className="w-30rem"
+            >
+                <NewSettlement 
+                    max_resources={reserveGoods} 
+                    updateFunc={createSettlement}
+                />
+            </Dialog>
         </div>
-        {/* Stimulus Dialog */}
-        <Dialog header={'Stimulus'} visible={giveGoodsVisable} onHide={() => {
-            setGiveGoodsVisable(false)
-            setWhoToGive('')
-        }}>
-            <ResourceDistribuition goods_cap={reserveGoods} updateFunc={stimulus}/>
-        </Dialog>
-
-        {/* New Settlment Dialog */}
-        <Dialog
-            header={'New Settlement'}
-            closable={false}
-            visible={newSettlementVisable}
-            onHide={() => {setNewSettlementVisable(false)}}
-        >
-            <NewSettlement max_resources={reserveGoods} updateFunc={createSettlement}/>
-        </Dialog>
-
-    </div>
     )
 }

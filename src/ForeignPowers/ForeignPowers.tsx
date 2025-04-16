@@ -5,22 +5,22 @@ import { saveLocation } from "../utilities/SaveData"
 import { load } from "@tauri-apps/plugin-store"
 import { Button } from "primereact/button"
 import ForeignPower from "./ForeignPower"
+import { Card } from "primereact/card"
 
-export default function ForeignPowers () {
-
+export default function ForeignPowers() {
     const gameId = useParams().game
-    const [foreignPowers,setForeignPowers] = useState<ForeignPowerInterface[]>([])
+    const [foreignPowers, setForeignPowers] = useState<ForeignPowerInterface[]>([])
     let navigate = useNavigate();
 
     const loadForeignPowers = async () => {
-        const store = await load(await saveLocation(gameId ?? ''),{autoSave: false});
+        const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
         const foreign_powers = await store.get<ForeignPowerInterface[]>('Foreign Powers') ?? []
         setForeignPowers([...foreign_powers])
     }
 
     const saveData = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
-        await store.set('Foreign Powers',foreignPowers);
+        await store.set('Foreign Powers', foreignPowers);
         store.save()
     }
 
@@ -37,17 +37,31 @@ export default function ForeignPowers () {
         setForeignPowers([...updatedPowers]);
     }
 
-    useEffect(() => {loadForeignPowers()},[])
-    return(
-        <div className="flex flex-column gap-2">
-            <Button label='Go Back' icon='pi pi-angle-double-left' onClick={goBack}/>
-            <h1>Foreign Powers</h1>
-            <div className="flex flex-row flex-wrap gap-2">
-                {foreignPowers.map(power => <ForeignPower 
-                    power={power} 
-                    key={power.name}
-                    updateTariff={updateTariff}
-                />)}
+    useEffect(() => {loadForeignPowers()}, [])
+
+    return (
+        <div className="flex flex-column gap-3 p-3">
+            {/* Header Section */}
+            <div className="flex flex-row align-items-center justify-content-between">
+                <Button 
+                    label='Go Back' 
+                    icon='pi pi-angle-double-left' 
+                    onClick={goBack}
+                    severity="secondary"
+                />
+                <h1 className="m-0">Foreign Powers</h1>
+            </div>
+
+            {/* Foreign Powers Grid */}
+            <div className="grid">
+                {foreignPowers.map(power => (
+                    <div key={power.name} className="col-12 md:col-6 lg:col-4">
+                        <ForeignPower 
+                            power={power} 
+                            updateTariff={updateTariff}
+                        />
+                    </div>
+                ))}
             </div>
         </div>
     )

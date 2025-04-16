@@ -1,14 +1,17 @@
 import { clanTypes } from "../../Clans/ClanInterface/ClanInterface";
 import { addGoods, multiplyGoods, empty_goodsdist } from "../../Goods/GoodsDist";
-import { regiment_consumption_factor, EliteVarient, RegimentInterface } from "./RegimentInterface";
+import { regiment_consumption_factor, RegimentInterface, empty_regiment, regiment_types } from "./RegimentInterface";
 
-export const Ironbreakers: RegimentInterface = {
-    name: "The Adamantine Guard",
-    type: "Ironbreakers",
-    clan_type: clanTypes.warriors,
-    pops_conusmed: 20,
-    turns_to_levy: 6,
-    consumption_rate: addGoods(multiplyGoods(regiment_consumption_factor, {
+export const Ironbreakers = () : RegimentInterface => {
+    return {
+        ...empty_regiment(),
+        name: "The Adamantine Guard",
+        type: regiment_types.Ironbreakers,
+        clan_type: clanTypes.warriors,
+        pops_conusmed: 20,
+        max_pops: 20,
+        turns_to_levy: 6,
+        consumption_rate: addGoods(multiplyGoods(regiment_consumption_factor, {
         ...empty_goodsdist,
         tools: 1,
         medical: 1,
@@ -37,6 +40,5 @@ export const Ironbreakers: RegimentInterface = {
         enchanted_arms: 0,
         charcoal: 0
     }),
-    elite_varient: EliteVarient.standard,
-    health: 100
+    }
 }

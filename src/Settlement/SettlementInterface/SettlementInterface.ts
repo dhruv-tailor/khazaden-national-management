@@ -58,9 +58,9 @@ export interface SettlementInterface {
     available_loan: number;
     loans: LoanInterface[];
 
-    military_units: RegimentInterface[]
-
+    garrison: RegimentInterface[]
 }
+
 
 export const empty_settlement: SettlementInterface = {
     name: "",
@@ -88,7 +88,7 @@ export const empty_settlement: SettlementInterface = {
     interest_rate: 0.05,
     loans: [],
     available_loan: 0,
-    military_units: []
+    garrison: [],
 }
 
 export const newSettlement = (name: string, terrain_type: TerrainType, visable_name?: string) => {
@@ -264,7 +264,7 @@ export const popGrowth = (settlement: SettlementInterface, foreign_nations: Fore
 }
 
 export const settlementChange = (settlement: SettlementInterface): goodsdist => {
-    const change = {...settlement.clans.map(clan => subtractGoods(
+    let change = {...settlement.clans.map(clan => subtractGoods(
         roundGoods(
             scaleGoods(
                 clan.production,
@@ -281,6 +281,8 @@ export const settlementChange = (settlement: SettlementInterface): goodsdist => 
             loan => Math.round(loan.amount / loan.months_left)
         ).reduce((sum,val) => sum + val)
     }
+    // Cost of Military
+    change = subtractGoods(change,settlement.garrison.reduce((sum,val) => addGoods(sum,val.consumption_rate),{...empty_goodsdist}))
     return change
 }
 

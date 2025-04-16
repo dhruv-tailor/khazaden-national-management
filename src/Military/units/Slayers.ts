@@ -1,14 +1,17 @@
 import { addGoods, empty_goodsdist, multiplyGoods } from "../../Goods/GoodsDist";
 import { clanTypes } from "../../Clans/ClanInterface/ClanInterface";
-import { EliteVarient, regiment_consumption_factor, RegimentInterface } from "./RegimentInterface";
+import { regiment_consumption_factor, RegimentInterface, empty_regiment, regiment_types } from "./RegimentInterface";
 
-export const Slayers: RegimentInterface = {
-    name: "Good For Nothins",
-    type: "Slayers",
-    clan_type: clanTypes.criminals,
-    pops_conusmed: 10,
-    turns_to_levy: 1,
-    consumption_rate: addGoods(multiplyGoods(regiment_consumption_factor, {
+export const Slayers = () : RegimentInterface => {
+    return {
+        ...empty_regiment(),
+        name: "Good For Nothins",
+        type: regiment_types.Slayers,
+        clan_type: clanTypes.criminals,
+        pops_conusmed: 10,
+        max_pops: 10,
+        turns_to_levy: 1,
+        consumption_rate: addGoods(multiplyGoods(regiment_consumption_factor, {
         ...empty_goodsdist,
         tools: 2.5,
         money: 0.25,
@@ -33,6 +36,5 @@ export const Slayers: RegimentInterface = {
         enchanted_arms: 0,
         charcoal: 0
     }),
-    elite_varient: EliteVarient.standard,
-    health: 100
+    }
 }

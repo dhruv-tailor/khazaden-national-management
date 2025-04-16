@@ -1,21 +1,24 @@
 import { clanTypes } from "../../Clans/ClanInterface/ClanInterface";
 import { addGoods, multiplyGoods, empty_goodsdist } from "../../Goods/GoodsDist";
-import { regiment_consumption_factor, EliteVarient, RegimentInterface } from "./RegimentInterface";
+import { regiment_consumption_factor, RegimentInterface, empty_regiment, regiment_types } from "./RegimentInterface";
 
-export const LongBeards: RegimentInterface = {
-    name: "Khazaden Bulwarks",
-    type: "LongBeards",
-    clan_type: clanTypes.warriors,
-    pops_conusmed: 10,
-    turns_to_levy: 4,
-    consumption_rate: addGoods(multiplyGoods(regiment_consumption_factor, {
+export const Longbeards = () : RegimentInterface => {
+    return {
+        ...empty_regiment(),
+        name: "Khazaden Bulwarks",
+        type: regiment_types.Longbeards,    
+        clan_type: clanTypes.warriors,
+        pops_conusmed: 10,
+        max_pops: 10,
+        turns_to_levy: 4,
+        consumption_rate: addGoods(multiplyGoods(regiment_consumption_factor, {
         ...empty_goodsdist,
         tools: 1,
         medical: 1,
         livestock: 1,
         arms: 2,
         money: 4.5,
-    }),{
+    }),{    
         money: 0,
         food: 1,
         beer: 1,
@@ -36,6 +39,5 @@ export const LongBeards: RegimentInterface = {
         enchanted_arms: 0,
         charcoal: 0
     }),
-    elite_varient: EliteVarient.standard,
-    health: 100
+    }
 }

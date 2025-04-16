@@ -1,14 +1,17 @@
 import { addGoods, empty_goodsdist, multiplyGoods } from "../../Goods/GoodsDist";
 import { clanTypes } from "../../Clans/ClanInterface/ClanInterface";
-import { EliteVarient, regiment_consumption_factor, RegimentInterface } from "./RegimentInterface";
+import { regiment_consumption_factor, RegimentInterface, empty_regiment, regiment_types } from "./RegimentInterface";
 
-export const DwarfWarriors: RegimentInterface = {
-    name: "Greenbeard Bruisers",
-    type: "DwarfWarriors",
-    clan_type: clanTypes.warriors,
-    pops_conusmed: 5,
-    turns_to_levy: 2,
-    consumption_rate: addGoods(multiplyGoods(regiment_consumption_factor, {
+export const DwarfWarriors = () : RegimentInterface => {
+    return {
+        ...empty_regiment(),
+        name: "Dwarf Warriors",
+        type: regiment_types.DwarfWarriors,
+        clan_type: clanTypes.warriors,
+        pops_conusmed: 5,
+        max_pops: 5,
+        turns_to_levy: 2,
+        consumption_rate: addGoods(multiplyGoods(regiment_consumption_factor, {
         ...empty_goodsdist,
         tools: 1,
         medical: 1,
@@ -36,6 +39,5 @@ export const DwarfWarriors: RegimentInterface = {
         enchanted_arms: 0,
         charcoal: 0
     }),
-    elite_varient: EliteVarient.standard,
-    health: 100
+    }
 }

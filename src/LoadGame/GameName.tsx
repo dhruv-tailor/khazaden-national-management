@@ -7,7 +7,6 @@ import { deleteSavegame } from "../utilities/SaveData";
 import { useNavigate } from "react-router";
 
 export default function GameName({name, updateCall} : {name: string, updateCall: (name: string) => void}) {
-
     const toast = useRef<Toast>(null);
     let navigate = useNavigate();
 
@@ -37,18 +36,34 @@ export default function GameName({name, updateCall} : {name: string, updateCall:
         }
     };
 
-  return (
-    <>
-        <Toast ref={toast} />
-        <ConfirmPopup />
-        <Card> 
-            <div className='flex overflow-hidden gap-3'>
-                <h2>{name}</h2>
-                <div className="flex-grow-1"></div>
-                <Button onClick={loadGame} icon='pi pi-file-import' label={'Load'} />
-                <Button onClick={confimDelete} icon='pi pi-trash' severity="danger" label={'Delete'} />
-            </div>
-        </Card>
-    </>
-  )
+    return (
+        <>
+            <Toast ref={toast} />
+            <ConfirmPopup />
+            <Card className="shadow-2 border-1 border-round surface-border"> 
+                <div className='flex align-items-center gap-3'>
+                    <i className="pi pi-save text-xl"></i>
+                    <span className="text-xl">{name}</span>
+                    <div className="flex-grow-1"></div>
+                    <div className="flex gap-2">
+                        <Button 
+                            onClick={loadGame} 
+                            icon='pi pi-file-import' 
+                            label='Load'
+                            size="small"
+                            className="p-button-raised"
+                        />
+                        <Button 
+                            onClick={confimDelete} 
+                            icon='pi pi-trash' 
+                            severity="danger" 
+                            label='Delete'
+                            size="small"
+                            className="p-button-raised"
+                        />
+                    </div>
+                </div>
+            </Card>
+        </>
+    );
 }

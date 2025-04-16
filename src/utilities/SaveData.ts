@@ -101,7 +101,7 @@ export const createNewSave = async (saveName: string)  => {
     store.set('Loans',[]) // History of loans
     store.set('Current Year',728) // Current Year
     store.set('Current Month',0) // Current Month
-    store.set('Military Units',[]) // Military Units
+    store.set('Armies',[]) // Armies
     await store.save();
     store.close();
 }

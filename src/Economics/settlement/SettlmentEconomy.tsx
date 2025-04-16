@@ -54,8 +54,7 @@ export default function SettlmentEconomy() {
 
     const saveData = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
-        const settlements = await store.get<SettlementInterface[]>('settlements');
-        const updatedSettlements = settlements?.map(s => {
+        const updatedSettlements = settlements.map(s => {
             if (s.name === settlement.name) {return({...settlement})}
             return {...s}
         })
@@ -218,6 +217,7 @@ export default function SettlmentEconomy() {
     }
 
     const loanTaken = (giver: string, amount: number) => {
+        setShowLoans(false)
         const s = settlements.map(s => {
             if (giver !== s.name) {return s}
             const newLoans = [...settlement.loans, takeLoan(amount, s.visible_name, s.name)]
@@ -232,77 +232,149 @@ export default function SettlmentEconomy() {
     }
 
     return (
-        <div className="flex flex-column gap-2">
-            <Button size="small" label="Go Back" icon='pi pi-angle-double-left' onClick={()=>navigateTo(`/game/${gameId}/settlement/${settlementId}`)}/>
-            <Button size="small" label="View Loans" icon='pi pi-money-bill' onClick={() => setShowLoans(true)}/>
-            <Dialog header="Loans" visible={showLoans} onHide={() => setShowLoans(false)}>
-                <ViewLoans loans={FederalLoans} settlements={settlements} updateFunc={loanTaken} declareBankruptcy={declareBankruptcy}/>
-            </Dialog>
-            {/* Local Goods */}
+        <div className="flex flex-column gap-3">
+            {/* Header Section */}
+            <div className="flex flex-row justify-content-between align-items-center">
+                <Button 
+                    size="small" 
+                    label="Go Back" 
+                    icon='pi pi-angle-double-left' 
+                    onClick={()=>navigateTo(`/game/${gameId}/settlement/${settlementId}`)}
+                    className="p-button-text"
+                />
+                <Button 
+                    size="small" 
+                    label="View Loans" 
+                    icon='pi pi-money-bill' 
+                    onClick={() => setShowLoans(true)}
+                    severity="info"
+                />
+            </div>
+
+            {/* Settlement Goods Section */}
             <Panel header="Settlement Goods" toggleable>
-                <div className="flex flex-row gap-2">
-                    <div className="flex flex-column gap-1">
-                        <MonthsStoredTT/>
-                        <InputNumber showButtons size={4} min={0} value={settlement.months_stored} onChange={e => setSettlement({...settlement, months_stored: e.value as number})}/>
+                <div className="flex flex-column gap-3">
+                    <div className="flex flex-row align-items-center gap-3">
+                        <div className="flex flex-column gap-1">
+                            <MonthsStoredTT/>
+                            <InputNumber 
+                                showButtons 
+                                size={4} 
+                                min={0} 
+                                value={settlement.months_stored} 
+                                onChange={e => setSettlement({...settlement, months_stored: e.value as number})}
+                            />
+                        </div>
+                        {settlement.name !== '' && (
+                            <DisplayGoods 
+                                stock={settlement.stock} 
+                                change={settlementChange(settlement)}
+                            />
+                        )}
+                        <Button 
+                            label="Sell Goods" 
+                            icon="pi pi-wallet" 
+                            severity="success" 
+                            onClick={() => setShowSell(true)}
+                            className="ml-auto"
+                        />
                     </div>
-                    {settlement.name !== '' ? <DisplayGoods stock={settlement.stock} change={settlementChange(settlement)}/>:null}
-                    <Button label="Sell Goods" icon="pi pi-wallet" severity="success" onClick={() => setShowSell(true)}/>
                 </div>
             </Panel>
-            <Dialog header="Sell Goods" visible={showSell} onHide={() => setShowSell(false)}>
+
+            {/* Price Chart Section */}
+            <Panel header="Price Chart" toggleable collapsed>
+                <PriceChart 
+                    data={priceChartDataProp(settlement.price_history,settlement.prices)} 
+                    options={priceChartOptionsProp()}
+                />
+            </Panel>
+
+            {/* Local Goods Section */}
+            <Panel header='Local Goods' toggleable>
+                <div className="flex flex-column gap-3">
+                    <div className="font-bold">Merchant Capacity: {settlement.merchant_capacity}</div>
+                    <div className="grid">
+                        <div className="col-12 md:col-6 lg:col-4">
+                            <PriceCard
+                                name={'Federal Reserve'}
+                                id={'Federal Reserve'}
+                                goods={minPerGood(roundGoods(subtractGoods(reserveGoods,GetFederalGoodsStored(settlements,FederalMonthsStored,FederalLoans))),0)}
+                                prices={roundGoods(federalPrices)}
+                                merchantCapacity={settlement.merchant_capacity}
+                                maxCost={settlement.stock.money}
+                                updateFunc={processFederalOrder}
+                            />
+                        </div>
+                        {settlements.filter(s => s.name !== settlement.name).map(s => (
+                            <div key={s.name} className="col-12 md:col-6 lg:col-4">
+                                <PriceCard
+                                    name={s.visible_name}
+                                    id={s.name}
+                                    goods={minPerGood(roundGoods(subtractGoods(s.stock,monthsStored(s))),0)}
+                                    prices={roundGoods(s.prices)}
+                                    merchantCapacity={settlement.merchant_capacity}
+                                    maxCost={settlement.stock.money}
+                                    updateFunc={processSettlementOrder}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </Panel>
+
+            {/* Global Goods Section */}
+            <Panel header='Global Goods' toggleable>
+                <div className="flex flex-column gap-3">
+                    <div className="font-bold">Merchant Capacity: {settlement.merchant_capacity}</div>
+                    <div className="grid">
+                        {foreignPowers.filter(power => !power.isEmbargoed).map(power => (
+                            <div key={power.name} className="col-12 md:col-6 lg:col-4">
+                                <PriceCard
+                                    name={power.name}
+                                    id={power.name}
+                                    goods={roundGoods(power.available_supply)}
+                                    prices={roundGoods(scaleGoods(power.prices,power.tarriffs + 1))}
+                                    merchantCapacity={settlement.merchant_capacity}
+                                    maxCost={reserveGoods.money}
+                                    updateFunc={processForeignOrder}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </Panel>
+
+            {/* Dialogs */}
+            <Dialog 
+                header="Sell Goods" 
+                visible={showSell} 
+                onHide={() => setShowSell(false)}
+                className="w-30rem"
+            >
                 <SellGoods
                     merchantCapacity={settlement.merchant_capacity}
                     supply={settlement.stock}
                     foreignPowers={foreignPowers.filter(power => !power.isEmbargoed)}
                     prices={settlement.prices}
                     competingPrices={settlements.filter(s => s.name !== settlement.name).map(s => s.prices).concat(federalPrices)}
-                    updateFunc={processSell}/>
+                    updateFunc={processSell}
+                />
             </Dialog>
-            {/* Price Chart */}
-            <Panel header="Price Chart" toggleable collapsed>
-                <PriceChart data={priceChartDataProp(settlement.price_history,settlement.prices)} options={priceChartOptionsProp()}/>
-            </Panel>
-            {/* Local Goods */}
-            <Panel header='Local Goods' toggleable>
-                Merchant Capacity: {settlement.merchant_capacity}
-                <div className="flex flex-row gap-2 flex-wrap">
-                    <PriceCard
-                        name={'Federal Reserve'}
-                        id={'Federal Reserve'}
-                        goods={minPerGood(roundGoods(subtractGoods(reserveGoods,GetFederalGoodsStored(settlements,FederalMonthsStored,FederalLoans))),0)}
-                        prices={roundGoods(federalPrices)}
-                        merchantCapacity={settlement.merchant_capacity}
-                        maxCost={settlement.stock.money}
-                        updateFunc={processFederalOrder}
-                    />
-                    {settlements.filter(s => s.name !== settlement.name).map(s => <PriceCard
-                        name={s.visible_name}
-                        id={s.name}
-                        goods={minPerGood(roundGoods(subtractGoods(s.stock,monthsStored(s))),0)}
-                        prices={roundGoods(s.prices)}
-                        merchantCapacity={settlement.merchant_capacity}
-                        maxCost={settlement.stock.money}
-                        updateFunc={processSettlementOrder}
-                    />)}
-                </div>
-            </Panel>
-            {/* Global Goods */}
-            <Panel header='Global Goods' toggleable>
-                Merchant Capacity: {settlement.merchant_capacity}
-                <div className="flex flex-row gap-2 flex-wrap">
-                    {foreignPowers.filter(power => !power.isEmbargoed).map(power => {
-                        return <PriceCard
-                            name={power.name}
-                            id={power.name}
-                            goods={roundGoods(power.available_supply)}
-                            prices={roundGoods(scaleGoods(power.prices,power.tarriffs + 1))}
-                            merchantCapacity={settlement.merchant_capacity}
-                            maxCost={reserveGoods.money}
-                            updateFunc={processForeignOrder}
-                        />
-                    })}
-                </div>
-            </Panel>
+
+            <Dialog 
+                header="Loans" 
+                visible={showLoans} 
+                onHide={() => setShowLoans(false)}
+                className=""
+            >
+                <ViewLoans 
+                    loans={settlement.loans} 
+                    settlements={settlements} 
+                    updateFunc={loanTaken} 
+                    declareBankruptcy={declareBankruptcy}
+                />
+            </Dialog>
         </div>
     )
 }

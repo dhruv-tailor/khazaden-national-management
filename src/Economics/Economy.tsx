@@ -17,7 +17,10 @@ import MonthsStoredTT from "../tooltips/economy/monthsStoredTT";
 import { InputNumber } from "primereact/inputnumber";
 import { LoanInterface, takeLoan } from "./loans/loanInterface";
 import ViewLoans from "./loans/ViewLoans";
-export default function Economy () {
+import { Card } from "primereact/card";
+import { ProgressBar } from "primereact/progressbar";
+
+export default function Economy() {
     const gameId = useParams().game;
     let navigate = useNavigate();
 
@@ -209,79 +212,155 @@ export default function Economy () {
         setLoans([])
     }
 
-    return(
-        <div className="flex flex-column gap-2">
-            <Button label="Go Back" icon='pi pi-angle-double-left' onClick={()=>navigateTo(`/game/${gameId}`)}/>
-            {/* Loans */}
-            <Button label="View Loans" icon='pi pi-money-bill' onClick={() => setShowLoans(true)}/>
-            <Dialog header="Loans" visible={showLoans} onHide={() => setShowLoans(false)}>
-                <ViewLoans loans={loans} settlements={settlements} updateFunc={loanTaken} declareBankruptcy={declareBankruptcy}/>
+    return (
+        <div className="flex flex-column gap-3 p-3">
+            {/* Header Section */}
+            <div className="flex flex-row align-items-center justify-content-between">
+                <Button 
+                    label="Go Back" 
+                    icon='pi pi-angle-double-left' 
+                    onClick={() => navigateTo(`/game/${gameId}`)}
+                    severity="secondary"
+                />
+                <Button 
+                    label="View Loans" 
+                    icon='pi pi-money-bill' 
+                    onClick={() => setShowLoans(true)}
+                    severity="info"
+                />
+            </div>
+
+            {/* Loans Dialog */}
+            <Dialog 
+                header="Loans" 
+                visible={showLoans} 
+                onHide={() => setShowLoans(false)}
+            >
+                <ViewLoans 
+                    loans={loans} 
+                    settlements={settlements} 
+                    updateFunc={loanTaken} 
+                    declareBankruptcy={declareBankruptcy}
+                />
             </Dialog>
-            {/* National Stock */}
-            <Panel header="Federal Reserve" toggleable>
-                <div className="flex flex-row gap-1">
-                <div className="flex flex-column gap-1">
-                        <MonthsStoredTT/>
-                        <InputNumber showButtons size={4} min={0} value={FederalMonthsStored} onChange={e => setFederalMonthsStored(e.value as number)}/>
+
+            {/* Federal Reserve Section */}
+            <Card>
+                <div className="flex flex-column gap-3">
+                    <div className="flex flex-row justify-content-between align-items-center">
+                        <h2 className="m-0">Federal Reserve</h2>
+                        <div className="flex flex-row align-items-center gap-2">
+                            <MonthsStoredTT/>
+                            <InputNumber 
+                                showButtons 
+                                size={4} 
+                                min={0} 
+                                value={FederalMonthsStored} 
+                                onChange={e => setFederalMonthsStored(e.value as number)}
+                            />
+                        </div>
                     </div>
-                    {settlements.length > 0 ? <DisplayGoods 
-                        stock={reserveGoods} 
-                        change={{...changeGoods,money: 
-                        settlements.map(
-                            s => s.clans.map(
-                                c => Math.round(c.tax_rate * c.taxed_productivity * s.settlement_tax)
-                                ).reduce((sum,val) => sum + val)
-                            ).reduce((sum,val) => sum + val)
-                        }}
-                    />: null}
-                    <Button icon="pi pi-wallet" label="Sell Goods" severity="success" onClick={() => setShowSell(true)}/>
-                </div>
-            </Panel>
-            <Dialog header="Sell Goods" visible={showSell} onHide={() => setShowSell(false)}>
-                    <SellGoods
-                        merchantCapacity={merchantCapacity}
-                        supply={reserveGoods}
-                        foreignPowers={foreignPowers.filter(p => p.isEmbargoed === false)} 
-                        prices={prices} 
-                        competingPrices={settlements.map(s => s.prices)}
-                        updateFunc={processSell}/>
-            </Dialog>
-            {/* Price Chart */}
-            <Panel header='Federal Prices' toggleable collapsed>
-                <PriceChart data={priceChartDataProp(priceHistory,prices)} options={priceChartOptionsProp()}/>
-            </Panel>
-            {/* Local Goods */}
-            <Panel header='Local Goods' toggleable>
-                Merchant Capacity: {merchantCapacity}
-                <div className="flex flex-row gap-2 flex-wrap">
-                    {settlements.map(s => <PriceCard
-                        name={s.visible_name}
-                        id={s.name}
-                        goods={minPerGood(roundGoods(subtractGoods(s.stock,monthsStored(s))),0)}
-                        prices={roundGoods(s.prices)}
-                        merchantCapacity={merchantCapacity}
-                        maxCost={reserveGoods.money}
-                        updateFunc={processSettlementOrder}
-                    />)}
-                </div>
-            </Panel>
-            {/* Global Goods */}
-            <Panel header='Global Goods' toggleable>
-                Merchant Capacity: {merchantCapacity}
-                <div className="flex flex-row gap-2 flex-wrap">
-                    {foreignPowers.filter(power => !power.isEmbargoed).map(power => {
-                        return <PriceCard
-                            name={power.name}
-                            id={power.name}
-                            goods={roundGoods(power.available_supply)}
-                            prices={roundGoods(scaleGoods(power.prices,power.tarriffs + 1))}
-                            merchantCapacity={merchantCapacity}
-                            maxCost={reserveGoods.money}
-                            updateFunc={processForeignOrder}
+                    <div className="flex flex-row gap-3">
+                        {settlements.length > 0 && (
+                            <DisplayGoods 
+                                stock={reserveGoods} 
+                                change={{
+                                    ...changeGoods,
+                                    money: settlements.map(
+                                        s => s.clans.map(
+                                            c => Math.round(c.tax_rate * c.taxed_productivity * s.settlement_tax)
+                                        ).reduce((sum,val) => sum + val)
+                                    ).reduce((sum,val) => sum + val)
+                                }}
+                            />
+                        )}
+                        <Button 
+                            icon="pi pi-wallet" 
+                            label="Sell Goods" 
+                            severity="success" 
+                            onClick={() => setShowSell(true)}
                         />
-                    })}
+                    </div>
                 </div>
-            </Panel>
+            </Card>
+
+            {/* Sell Goods Dialog */}
+            <Dialog 
+                header="Sell Goods" 
+                visible={showSell} 
+                onHide={() => setShowSell(false)}
+                className="w-30rem"
+            >
+                <SellGoods
+                    merchantCapacity={merchantCapacity}
+                    supply={reserveGoods}
+                    foreignPowers={foreignPowers.filter(p => p.isEmbargoed === false)} 
+                    prices={prices} 
+                    competingPrices={settlements.map(s => s.prices)}
+                    updateFunc={processSell}
+                />
+            </Dialog>
+
+            {/* Price Chart Section */}
+            <Card>
+                <div className="flex flex-column gap-3">
+                    <h2 className="m-0">Federal Prices</h2>
+                    <PriceChart 
+                        data={priceChartDataProp(priceHistory,prices)} 
+                        options={priceChartOptionsProp()}
+                    />
+                </div>
+            </Card>
+
+            {/* Local Goods Section */}
+            <Card>
+                <div className="flex flex-column gap-3">
+                    <div className="flex flex-row justify-content-between align-items-center">
+                        <h2 className="m-0">Local Goods</h2>
+                        <span className="font-bold">Merchant Capacity: {merchantCapacity}</span>
+                    </div>
+                    <div className="grid">
+                        {settlements.map(s => (
+                            <div key={s.name} className="col-12 md:col-6 lg:col-4">
+                                <PriceCard
+                                    name={s.visible_name}
+                                    id={s.name}
+                                    goods={minPerGood(roundGoods(subtractGoods(s.stock,monthsStored(s))),0)}
+                                    prices={roundGoods(s.prices)}
+                                    merchantCapacity={merchantCapacity}
+                                    maxCost={reserveGoods.money}
+                                    updateFunc={processSettlementOrder}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </Card>
+
+            {/* Global Goods Section */}
+            <Card>
+                <div className="flex flex-column gap-3">
+                    <div className="flex flex-row justify-content-between align-items-center">
+                        <h2 className="m-0">Global Goods</h2>
+                        <span className="font-bold">Merchant Capacity: {merchantCapacity}</span>
+                    </div>
+                    <div className="grid">
+                        {foreignPowers.filter(power => !power.isEmbargoed).map(power => (
+                            <div key={power.name} className="col-12 md:col-6 lg:col-4">
+                                <PriceCard
+                                    name={power.name}
+                                    id={power.name}
+                                    goods={roundGoods(power.available_supply)}
+                                    prices={roundGoods(scaleGoods(power.prices,power.tarriffs + 1))}
+                                    merchantCapacity={merchantCapacity}
+                                    maxCost={reserveGoods.money}
+                                    updateFunc={processForeignOrder}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </Card>
         </div>
     )
 }

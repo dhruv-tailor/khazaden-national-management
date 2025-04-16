@@ -1,21 +1,24 @@
 import { clanTypes } from "../../Clans/ClanInterface/ClanInterface";
 import { addGoods, multiplyGoods, empty_goodsdist } from "../../Goods/GoodsDist";
-import { regiment_consumption_factor, EliteVarient, RegimentInterface } from "./RegimentInterface";
+import { regiment_consumption_factor, RegimentInterface, empty_regiment, regiment_types } from "./RegimentInterface";
 
-export const FlameCannons: RegimentInterface = {
-    name: "Flame Cannons",
-    type: "FlameCannons",
-    clan_type: clanTypes.engineers,
-    pops_conusmed: 6,
-    turns_to_levy: 6,
-    consumption_rate: addGoods(multiplyGoods(regiment_consumption_factor, {
+export const FlameCannons = () : RegimentInterface => {
+    return {
+        ...empty_regiment(),
+        name: "Flame Cannons",
+        type: regiment_types.FlameCannons,
+        clan_type: clanTypes.engineers,
+        pops_conusmed: 6,
+        max_pops: 6,
+        turns_to_levy: 6,
+        consumption_rate: addGoods(multiplyGoods(regiment_consumption_factor, {
         ...empty_goodsdist,
         tools: 1,
         medical: 0,
         livestock: 3,
         arms: 16,
         enchanted_arms: 6,
-        money: 10,
+        money: 10,  
     }),{
         money: 0,
         food: 1,
@@ -37,6 +40,5 @@ export const FlameCannons: RegimentInterface = {
         enchanted_arms: 0,
         charcoal: 0
     }),
-    elite_varient: EliteVarient.standard,
-    health: 100
+    }
 }

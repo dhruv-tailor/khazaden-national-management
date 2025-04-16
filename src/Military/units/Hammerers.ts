@@ -1,17 +1,20 @@
 import { clanTypes } from "../../Clans/ClanInterface/ClanInterface";
 import { addGoods, multiplyGoods, empty_goodsdist } from "../../Goods/GoodsDist";
-import { regiment_consumption_factor, EliteVarient, RegimentInterface } from "./RegimentInterface";
+import { regiment_consumption_factor, RegimentInterface, empty_regiment, regiment_types } from "./RegimentInterface";
 
-export const Hammerers: RegimentInterface = {
-    name: "Banner Breakers",
-    type: "Hammerers",
-    clan_type: clanTypes.warriors,
-    pops_conusmed: 20,
-    turns_to_levy: 6,
-    consumption_rate: addGoods(multiplyGoods(regiment_consumption_factor, {
+export const Hammerers = () : RegimentInterface => {
+    return {
+        ...empty_regiment(),
+        name: "Banner Breakers",
+        type: regiment_types.Hammerers,
+        clan_type: clanTypes.warriors,
+        pops_conusmed: 20,
+        max_pops: 20,
+        turns_to_levy: 6,
+        consumption_rate: addGoods(multiplyGoods(regiment_consumption_factor, {
         ...empty_goodsdist,
         tools: 1,
-        medical: 1,
+        medical: 1, 
         livestock: 2,
         arms: 5,
         enchanted_arms: 2,
@@ -37,6 +40,5 @@ export const Hammerers: RegimentInterface = {
         enchanted_arms: 0,
         charcoal: 0
     }),
-    elite_varient: EliteVarient.standard,
-    health: 100
+    }
 }

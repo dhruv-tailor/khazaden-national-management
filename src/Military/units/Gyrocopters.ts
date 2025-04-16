@@ -1,14 +1,17 @@
 import { clanTypes } from "../../Clans/ClanInterface/ClanInterface";
 import { addGoods, multiplyGoods, empty_goodsdist } from "../../Goods/GoodsDist";
-import { regiment_consumption_factor, EliteVarient, RegimentInterface } from "./RegimentInterface";
+import { regiment_consumption_factor, RegimentInterface, empty_regiment, regiment_types } from "./RegimentInterface";
 
-export const Gyrocopters: RegimentInterface = {
-    name: "Dragonfire Belchers",
-    type: "Gyrocopters",
-    clan_type: clanTypes.engineers,
-    pops_conusmed: 10,
-    turns_to_levy: 6,
-    consumption_rate: addGoods(multiplyGoods(regiment_consumption_factor, {
+export const Gyrocopters = () : RegimentInterface => {
+    return {
+        ...empty_regiment(),
+        name: "Gyrocopters",
+        type: regiment_types.Gyrocopters,
+        clan_type: clanTypes.engineers,
+        pops_conusmed: 10,
+        max_pops: 10,
+        turns_to_levy: 6,
+        consumption_rate: addGoods(multiplyGoods(regiment_consumption_factor, {
         ...empty_goodsdist,
         tools: 15,
         medical: 0,
@@ -37,6 +40,5 @@ export const Gyrocopters: RegimentInterface = {
         enchanted_arms: 0,
         charcoal: 0
     }),
-    elite_varient: EliteVarient.standard,
-    health: 100
+    }
 }

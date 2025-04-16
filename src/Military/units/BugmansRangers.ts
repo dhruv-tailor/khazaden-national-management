@@ -1,14 +1,17 @@
 import { clanTypes } from "../../Clans/ClanInterface/ClanInterface";
 import { addGoods, multiplyGoods, empty_goodsdist } from "../../Goods/GoodsDist";
-import { regiment_consumption_factor, EliteVarient, RegimentInterface } from "./RegimentInterface";
+import { regiment_consumption_factor, RegimentInterface, empty_regiment, regiment_types } from "./RegimentInterface";
 
-export const BugmansRangers: RegimentInterface = {
-    name: "Forest Fellers",
-    type: "BugmansRangers",
-    clan_type: clanTypes.foresters,
-    pops_conusmed: 40,
-    turns_to_levy: 3,
-    consumption_rate: addGoods(multiplyGoods(regiment_consumption_factor, {
+export const BugmansRangers = () : RegimentInterface => {
+    return {
+        ...empty_regiment(),
+        name: "Bugman's Rangers",
+        type: regiment_types.BugmansRangers,
+        clan_type: clanTypes.foresters,
+        pops_conusmed: 40,
+        max_pops: 40,
+        turns_to_levy: 3,
+        consumption_rate: addGoods(multiplyGoods(regiment_consumption_factor, {
         ...empty_goodsdist,
         tools: 0,
         medical: 0,
@@ -37,6 +40,5 @@ export const BugmansRangers: RegimentInterface = {
         enchanted_arms: 0,
         charcoal: 0
     }),
-    elite_varient: EliteVarient.standard,
-    health: 100
+    }
 }

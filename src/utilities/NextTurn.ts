@@ -8,7 +8,7 @@ import { clanTypes } from "../Clans/ClanInterface/ClanInterface";
 import { TerrainData } from "../Settlement/SettlementInterface/TerrainInterface";
 import { LoanInterface, takeLoan } from "../Economics/loans/loanInterface";
 import { ensureNumber } from "./SimpleFunctions";
-
+import { ArmyInterface } from "../Military/Army/Army";
 
 export const NextTurn = async (game: string) => {
     const store = await load(await saveLocation(game), {autoSave: false});
@@ -26,6 +26,7 @@ export const NextTurn = async (game: string) => {
     let federal_prices = await store.get<goodsdist>('Federal Prices') ?? {...empty_goodsdist}
     const price_history = await store.get<goodsdist[]>('Price History') ?? []
     let loans = await store.get<LoanInterface[]>('Loans') ?? []
+    let armies = await store.get<ArmyInterface[]>('Armies') ?? []
 
     const current_year = await store.get<number>('Current Year') ?? 0
     const current_month = await store.get<number>('Current Month') ?? 0
@@ -50,7 +51,10 @@ export const NextTurn = async (game: string) => {
         next_goodsdist = roundGoods(addGoods(scaleGoods(produced,settlement.production_quota),next_goodsdist))
         produced = roundGoods(scaleGoods(produced,1-settlement.production_quota))
         const old_stock = {...settlement.stock}
-        settlement.stock = addGoods(settlement.stock,subtractGoods(produced,settlement.consumption_rate) )
+        settlement.stock = addGoods(settlement.stock,subtractGoods(produced,settlement.consumption_rate))
+        // Garrison Consumption
+        settlement.stock = subtractGoods(settlement.stock,settlement.garrison.reduce((sum,val) => addGoods(sum,val.consumption_rate),{...empty_goodsdist}))
+        settlement.stock = roundGoods(settlement.stock)
         updateSettlmentStock(settlement)
         settlement.prices = calcPriceGoods(settlement.prices,old_stock,settlement.stock)
         
@@ -119,8 +123,9 @@ export const NextTurn = async (game: string) => {
         }
 
         // Update available loan
-        settlement.available_loan += merchants.total_productivity - merchants.taxed_productivity
+        settlement.available_loan += Math.abs(Math.round(merchants.total_productivity - merchants.taxed_productivity))
         settlement.available_loan = Math.max(settlement.available_loan,0)
+        console.log(settlement.available_loan,settlement.name)
 
         // Take Interest on Loans
         settlement.loans.forEach(loan => {
@@ -156,6 +161,18 @@ export const NextTurn = async (game: string) => {
                 settlement.stock.money += loan.amount
             })
             settlement.loans = [...settlement.loans,...new_loans]
+        }
+
+        // Recruitment Queue
+        settlement.garrison.forEach(regiment => {
+            if (regiment.turns_to_levy > 0) {regiment.turns_to_levy -= 1}
+        })
+
+        // Bankruptcy
+        if (settlement.stock.money < 0) {
+            settlement.garrison = []
+            settlement.loans = []
+            settlement.stock = {...empty_goodsdist}
         }
     })
 
@@ -238,13 +255,22 @@ export const NextTurn = async (game: string) => {
         })
         loans = [...loans,...new_loans]
     }
+
     next_goodsdist = roundGoods(next_goodsdist)
+
+    // Bankruptcy
+    if (next_goodsdist.money < 0) {
+        next_goodsdist = {...empty_goodsdist}
+        loans = []
+        armies = []
+    }
     store.set('Federal Reserve', next_goodsdist)
     store.set('Loans',loans)
     store.set('Turns Passed',turns_passed + 1)
     store.set('Merchant Capacity',Math.round(merchant_capacity))
     store.set('Current Month',(current_month + 1) % 12)
     store.set('Current Year',current_year + Math.floor((current_month + 1) / 12))
+    store.set('Armies',armies)
     store.save()
 }
 
