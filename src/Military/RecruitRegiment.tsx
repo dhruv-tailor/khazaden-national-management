@@ -151,12 +151,12 @@ export default function RecruitRegiment({settlement, onRecruit}: {settlement: Se
                             label="Recruit" 
                             icon="pi pi-plus" 
                             onClick={handleRecruit}
-                            // disabled={!selectedType || settlement.garrison.length >= 20 || settlement.clans.reduce((acc, clan) => {
-                            //     if (clan.id === selectedRegiment.clan_type) {
-                            //         return acc + clan.population
-                            //     }
-                            //     return acc
-                            // }, 0) < selectedRegiment.pops_conusmed}
+                            disabled={!selectedType || settlement.garrison.length >= 20 || settlement.clans.reduce((acc, clan) => {
+                                if (clan.id === selectedRegiment.clan_type) {
+                                    return acc + clan.population
+                                }
+                                return acc
+                            }, 0) < selectedRegiment.pops_conusmed}
                             tooltip={settlement.garrison.length >= 20 ? "Garrison is at maximum capacity" : undefined}
                         />
                     </div>

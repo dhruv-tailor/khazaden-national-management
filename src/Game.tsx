@@ -17,7 +17,7 @@ import { FederalChange } from "./utilities/SimpleFunctions";
 import { LoanInterface } from "./Economics/loans/loanInterface";
 import { MonthInfo } from "./components/MonthInfo";
 import { Card } from "primereact/card";
-
+import { ArmyInterface } from "./Military/Army/Army";
 export default function Game() {
     const gameId = useParams().game
     let navigate = useNavigate();
@@ -29,6 +29,7 @@ export default function Game() {
     const [changeGoods,setChangeGoods] = useState<goodsdist>({...empty_goodsdist});
     const [prices,setPrices] = useState<goodsdist>({...empty_goodsdist})
     const [loans,setLoans] = useState<LoanInterface[]>([])
+    const [armies,setArmies] = useState<ArmyInterface[]>([])
 
     // Stimulus
     const [whoToGive,setWhoToGive] = useState<string>('');
@@ -48,10 +49,11 @@ export default function Game() {
         store.get<LoanInterface[]>('loans').then(value => {if (value) {setLoans(value)}});
         store.get<number>('Current Month').then(value => {if (value) {setCurrentMonth(value)}});
         store.get<number>('Current Year').then(value => {if (value) {setCurrentYear(value)}});
+        store.get<ArmyInterface[]>('Armies').then(value => {if (value) {setArmies(value)}});
         updateSettlements()
     }
     
-    const updateSettlements = () => setChangeGoods(FederalChange(settlements,loans))
+    const updateSettlements = () => setChangeGoods(FederalChange(settlements,loans,armies))
 
     const setSettlementTax = (name: string, val: number) => {
         setSettlements(settlements.map(s => {
@@ -93,6 +95,8 @@ export default function Game() {
         store.set('settlements',settlements)
         store.set('Federal Reserve',reserveGoods)
         store.set('Federal Prices',prices)
+        store.set('loans',loans)
+        store.set('Armies',armies)
         store.save()
     }
 

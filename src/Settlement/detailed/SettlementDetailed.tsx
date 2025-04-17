@@ -16,7 +16,6 @@ import NaturalResources from "./NaturalResources";
 import { addGoods, goodsdist } from "../../Goods/GoodsDist";
 import BureaucracyBonus from "./Bureaucracy/BureaucracyBonus";
 import PopConversion from "./PopConversion";
-import { Card } from "primereact/card";
 
 export default function SettlementDetailed() {
     const gameId = useParams().game

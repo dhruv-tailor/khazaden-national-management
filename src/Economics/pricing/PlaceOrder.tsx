@@ -39,6 +39,7 @@ export default function PlaceOrder(
         }
         setOrder(addGoods(order,delta_goods))
         setCapUsed(capUsed + totalGoods(delta_goods))
+        console.log(maxCost)
     }
 
     const totalCost = totalGoods(multiplyGoods(order,prices))

@@ -104,7 +104,7 @@ export const calcLoyalty = (clan: ClanInterface, settlement: SettlementInterface
     clan.loyalty_modifiers.forEach(modifier => {loyalty += modifier.value})
     let bonus = 0
     if (settlement.loyalty_bonus === clan.id) {
-        bonus = settlement.clans.filter(clan => clan.id === clanTypes.archivists)[0].taxed_productivity * 17
+        bonus = settlement.clans.filter(clan => clan.id === clanTypes.archivists)[0].taxed_productivity * 0.00017
         const base_productivity = baseProductivity(clan)
         bonus = ensureNumber(bonus/base_productivity)
         bonus = ensureNumber(Math.floor(bonus))
@@ -168,7 +168,7 @@ export const calcEfficency = (clan: ClanInterface, settlement: SettlementInterfa
 
     let bonus = 1
     if (settlement.efficency_bonus === clan.id) {
-        bonus = settlement.clans.filter(clan => clan.id === clanTypes.rulers)[0].taxed_productivity * 13
+        bonus = settlement.clans.filter(clan => clan.id === clanTypes.rulers)[0].taxed_productivity * 0.00013
         const base_productivity = baseProductivity(clan)
         bonus = ensureNumber(bonus/base_productivity)
         bonus = ensureNumber(Math.sqrt(bonus))

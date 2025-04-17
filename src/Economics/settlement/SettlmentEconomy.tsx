@@ -18,7 +18,7 @@ import MonthsStoredTT from "../../tooltips/economy/monthsStoredTT";
 import { GetFederalGoodsStored } from "../../utilities/SimpleFunctions";
 import { LoanInterface, takeLoan } from "../loans/loanInterface";
 import ViewLoans from "../loans/ViewLoans";
-
+import { ArmyInterface } from "../../Military/Army/Army";
 export default function SettlmentEconomy() {
     const gameId = useParams().game;
     const settlementId = useParams().settlement;
@@ -33,7 +33,7 @@ export default function SettlmentEconomy() {
     const [FederalMonthsStored,setFederalMonthsStored] = useState<number>(0);
     const [FederalLoans,setFederalLoans] = useState<LoanInterface[]>([]);
     const [showLoans,setShowLoans] = useState<boolean>(false);
-
+    const [armies,setArmies] = useState<ArmyInterface[]>([]);
     const navigateTo = async (location: string) => {
         await saveData()
         navigate(location)
@@ -42,16 +42,28 @@ export default function SettlmentEconomy() {
     const getInfo = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
         const settlements = await store.get<SettlementInterface[]>('settlements') ?? [];
-        store.get<goodsdist>('Federal Reserve').then(value => {if (value) {setReserveGoods(value);}});
-        store.get<goodsdist>('Federal Prices').then(value => {if (value) {setFederalPrices(value)}})
-        store.get<ForeignPowerInterface[]>('Foreign Powers').then(value => {if (value) {setForeignPowers(value)}});
-        store.get<number>('Months Stored').then(value => {if (value) {setFederalMonthsStored(value)}});
-        store.get<LoanInterface[]>('Loans').then(value => {if (value) {setFederalLoans(value)}});
-        const current_settlement = settlements?.find(settlement => settlement.name === settlementId)
-        if(current_settlement) {setSettlement(current_settlement)}
-        if(settlements) {setSettlements(settlements)}
+        
+        if(settlements) {
+            setSettlements(settlements);
+            const current_settlement = settlements.find(settlement => settlement.name === settlementId);
+            if(current_settlement) {
+                setSettlement(current_settlement);
+            }
+        }
+        
+        // Load other data in parallel but wait for all to complete
+        await Promise.all([
+            store.get<goodsdist>('Federal Reserve').then(value => {if (value) {setReserveGoods(value);}}),
+            store.get<goodsdist>('Federal Prices').then(value => {if (value) {setFederalPrices(value)}}),
+            store.get<ForeignPowerInterface[]>('Foreign Powers').then(value => {if (value) {setForeignPowers(value)}}),
+            store.get<number>('Months Stored').then(value => {if (value) {setFederalMonthsStored(value)}}),
+            store.get<LoanInterface[]>('Loans').then(value => {if (value) {setFederalLoans(value)}}),
+            store.get<ArmyInterface[]>('Armies').then(value => {if (value) {setArmies(value)}})
+        ]);
     }
 
+    useEffect(()=>{getInfo()},[])
+    
     const saveData = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
         const updatedSettlements = settlements.map(s => {
@@ -62,11 +74,11 @@ export default function SettlmentEconomy() {
         store.set('Federal Prices',federalPrices)
         store.set('settlements',updatedSettlements)
         store.set('Months Stored',FederalMonthsStored)
+        store.set('Loans',FederalLoans)
+        store.set('Armies',armies)
         store.save()
     }
 
-    useEffect(()=>{getInfo()},[])
-    
     function processSettlementOrder(id: string, capUsed: number, order: goodsdist): void {
         const s = settlements.map(settlement => {
             if (id === settlement.name) { return settlement }
@@ -228,7 +240,12 @@ export default function SettlmentEconomy() {
     }
 
     const declareBankruptcy = () => {
-        setSettlement({...settlement, stock: {...empty_goodsdist}, loans: []})
+        setSettlement({...settlement, stock: {...empty_goodsdist}, loans: [],garrison: []})
+    }
+
+    // Add loading state
+    if (!settlement || !settlement.name || settlement.stock.money === undefined) {
+        return <div>Loading...</div>;
     }
 
     return (
@@ -293,13 +310,16 @@ export default function SettlmentEconomy() {
             {/* Local Goods Section */}
             <Panel header='Local Goods' toggleable>
                 <div className="flex flex-column gap-3">
-                    <div className="font-bold">Merchant Capacity: {settlement.merchant_capacity}</div>
+                    <div className="font-bold">
+                        Merchant Capacity: {settlement.merchant_capacity} | 
+                        Available Money: {settlement.stock.money}
+                    </div>
                     <div className="grid">
                         <div className="col-12 md:col-6 lg:col-4">
                             <PriceCard
                                 name={'Federal Reserve'}
                                 id={'Federal Reserve'}
-                                goods={minPerGood(roundGoods(subtractGoods(reserveGoods,GetFederalGoodsStored(settlements,FederalMonthsStored,FederalLoans))),0)}
+                                goods={minPerGood(roundGoods(subtractGoods(reserveGoods,GetFederalGoodsStored(settlements,FederalMonthsStored,FederalLoans,armies))),0)}
                                 prices={roundGoods(federalPrices)}
                                 merchantCapacity={settlement.merchant_capacity}
                                 maxCost={settlement.stock.money}
@@ -326,7 +346,10 @@ export default function SettlmentEconomy() {
             {/* Global Goods Section */}
             <Panel header='Global Goods' toggleable>
                 <div className="flex flex-column gap-3">
-                    <div className="font-bold">Merchant Capacity: {settlement.merchant_capacity}</div>
+                    <div className="font-bold">
+                        Merchant Capacity: {settlement.merchant_capacity} | 
+                        Available Money: {settlement.stock.money}
+                    </div>
                     <div className="grid">
                         {foreignPowers.filter(power => !power.isEmbargoed).map(power => (
                             <div key={power.name} className="col-12 md:col-6 lg:col-4">
@@ -336,7 +359,7 @@ export default function SettlmentEconomy() {
                                     goods={roundGoods(power.available_supply)}
                                     prices={roundGoods(scaleGoods(power.prices,power.tarriffs + 1))}
                                     merchantCapacity={settlement.merchant_capacity}
-                                    maxCost={reserveGoods.money}
+                                    maxCost={settlement.stock.money}
                                     updateFunc={processForeignOrder}
                                 />
                             </div>

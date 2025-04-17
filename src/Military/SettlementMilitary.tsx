@@ -42,6 +42,7 @@ export default function SettlementMilitary() {
         
         setSettlement({
             ...settlement,
+            projected_pop: settlement.projected_pop - newRegiment.pops_conusmed,
             garrison: [...settlement.garrison, newRegiment],
             clans: [...settlement.clans.map(c => {
                 if (c.id !== newRegiment.clan_type) {return {...c} as ClanInterface}
@@ -62,7 +63,7 @@ export default function SettlementMilitary() {
             if (c.id !== clan_type as clanTypes) {return {...c} as ClanInterface}
             return {...c, population: c.population - amount}
         })
-        setSettlement({...settlement, garrison: updatedGarrison, clans: updatedClans})
+        setSettlement({...settlement, garrison: updatedGarrison, clans: updatedClans, projected_pop: settlement.projected_pop - amount})
     }
 
     const saveData = async () => {
@@ -91,7 +92,8 @@ export default function SettlementMilitary() {
         })
         setSettlement({...settlement, 
             garrison: updatedGarrison,
-            clans: updatedClans
+            clans: updatedClans,
+            projected_pop: settlement.projected_pop + (population ?? 0)
         })
     }
 

@@ -2,7 +2,6 @@ import { Button } from "primereact/button";
 import { useNavigate, useParams } from "react-router";
 import { monthsStored, SettlementInterface } from "../Settlement/SettlementInterface/SettlementInterface";
 import { useEffect, useState } from "react";
-import { Panel } from "primereact/panel";
 import DisplayGoods from "../components/goodsDislay";
 import { addGoods, empty_goodsdist, goodsdist, goodsId, minPerGood, multiplyGoods, roundGoods, scaleGoods, subtractGoods, totalGoods } from "../Goods/GoodsDist";
 import { load } from "@tauri-apps/plugin-store";
@@ -18,8 +17,7 @@ import { InputNumber } from "primereact/inputnumber";
 import { LoanInterface, takeLoan } from "./loans/loanInterface";
 import ViewLoans from "./loans/ViewLoans";
 import { Card } from "primereact/card";
-import { ProgressBar } from "primereact/progressbar";
-
+import { ArmyInterface } from "../Military/Army/Army";
 export default function Economy() {
     const gameId = useParams().game;
     let navigate = useNavigate();
@@ -34,7 +32,7 @@ export default function Economy() {
     const [foreignPowers,setForeignPowers] = useState<ForeignPowerInterface[]>([])
     const [loans,setLoans] = useState<LoanInterface[]>([])
     const [showLoans,setShowLoans] = useState<boolean>(false)
-
+    const [armies,setArmies] = useState<ArmyInterface[]>([])
     const [showSell, setShowSell] = useState(false)
 
     const getInfo = async () => {
@@ -46,6 +44,7 @@ export default function Economy() {
         store.get<number>('Months Stored').then(value => {if (value) {setFederalMonthsStored(value)}});
         store.get<ForeignPowerInterface[]>('Foreign Powers').then(value => {if (value) {setForeignPowers(value)}});
         store.get<LoanInterface[]>('Loans').then(value => {if (value) {setLoans(value)}});
+        store.get<ArmyInterface[]>('Armies').then(value => {if (value) {setArmies(value)}});
         const get_settlements = await store.get<SettlementInterface[]>('settlements') ?? [];
         setSettlements(get_settlements)
         updateSettlements()
@@ -79,6 +78,7 @@ export default function Economy() {
         store.set('Merchant Capacity',merchantCapacity)
         store.set('Months Stored',FederalMonthsStored)
         store.set('Loans',loans)
+        store.set('Armies',armies)
         store.save()
     }
 
@@ -210,6 +210,7 @@ export default function Economy() {
     const declareBankruptcy = () => {
         setReserveGoods({...empty_goodsdist})
         setLoans([])
+        setArmies([])
     }
 
     return (

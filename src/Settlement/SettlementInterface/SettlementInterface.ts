@@ -244,7 +244,7 @@ export const updateSettlmentStock = (settlement: SettlementInterface) => {
 export const popGrowth = (settlement: SettlementInterface, foreign_nations: ForeignPowerInterface[]) => {
     const K = settlement.projected_pop
     let P0 = 0
-    let bonus = 7 * settlement.clans.filter(clan => clan.id === clanTypes.clerics)[0].taxed_productivity
+    let bonus = 0.00007 * settlement.clans.filter(clan => clan.id === clanTypes.clerics)[0].taxed_productivity
     let gained_pg = 0
     settlement.clans.forEach(clan => {
         P0 += clan.population
