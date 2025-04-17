@@ -117,7 +117,7 @@ export default function RecruitRegiment({settlement, onRecruit}: {settlement: Se
                             </div>
                             
                             <div className="flex flex-row gap-2 align-items-center">
-                                {releventClanTT[selectedRegiment.clan_type]}
+                                {releventClanTT[selectedRegiment.clan_type as clanTypes]}
                                 <span className="text-sm">Clan Type</span>
                             </div>
 

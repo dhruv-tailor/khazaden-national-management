@@ -2,7 +2,6 @@ import { Card } from "primereact/card";
 import { settlementChange, SettlementInterface, SettlementTierDetails } from "./SettlementInterface/SettlementInterface";
 import PopulationIconTT from "../tooltips/PopulationIconTT";
 import DisplayGoods from "../components/goodsDislay";
-import { Divider } from "primereact/divider";
 import { InputText } from "primereact/inputtext";
 import { Slider } from "primereact/slider";
 import { Button } from "primereact/button";

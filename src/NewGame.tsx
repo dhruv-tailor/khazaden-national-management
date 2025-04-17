@@ -1,5 +1,4 @@
 import { Button } from "primereact/button";
-import { FloatLabel } from "primereact/floatlabel";
 import { InputText } from "primereact/inputtext";
 import { useState } from "react";
 import { useNavigate } from "react-router";

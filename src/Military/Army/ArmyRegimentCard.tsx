@@ -1,4 +1,4 @@
-import { RegimentInterface, regiment_types } from "../units/RegimentInterface";
+import { RegimentInterface } from "../units/RegimentInterface";
 import { Card } from "primereact/card";
 import { ProgressBar } from "primereact/progressbar";
 import { releventRegimentTT } from "../../tooltips/regiments/ReleventRegimentTT";
@@ -37,9 +37,6 @@ export default function ArmyRegimentCard({
     
     // Get the appropriate icon from releventRegimentTT
     const unitIcon = releventRegimentTT[regiment.type];
-
-    // Calculate total consumption
-    const totalConsumption = Object.values(regiment.consumption_rate).reduce((sum, value) => sum + value, 0);
 
     const handleRename = () => {
         onRename(regiment.id, newName);
