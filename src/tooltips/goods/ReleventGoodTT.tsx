@@ -1,3 +1,4 @@
+import { ReactElement } from 'react';
 import { goodsId } from "../../Goods/GoodsDist";
 import ArmsIconTT from "./ArmsIconTT";
 import ArtisinalIconTT from "./ArtisinalIconTT";
@@ -19,7 +20,11 @@ import RunesIconTT from "./RunesIconTT";
 import TimberIconTT from "./TimberIconTT";
 import ToolsIconTT from "./ToolsIconTT";
 
-export const releventGoodTT = {
+export type GoodTooltipMap = {
+    [K in goodsId]: ReactElement;
+};
+
+export const releventGoodTT: GoodTooltipMap = {
     [goodsId.money]: <MoneyIconTT/>,
     [goodsId.food]: <FoodIconTT/>,
     [goodsId.beer]: <BeerIconTT/>,

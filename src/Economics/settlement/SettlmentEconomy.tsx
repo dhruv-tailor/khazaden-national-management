@@ -373,7 +373,6 @@ export default function SettlmentEconomy() {
                 header="Sell Goods" 
                 visible={showSell} 
                 onHide={() => setShowSell(false)}
-                className="w-30rem"
             >
                 <SellGoods
                     merchantCapacity={settlement.merchant_capacity}

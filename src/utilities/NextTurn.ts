@@ -202,6 +202,10 @@ export const NextTurn = async (game: string) => {
         nation.available_demand = roundGoods(scaleGoods(nation.demand,Math.max(0.05 * (1 - nation.retlaitory_tariffs),0)))
     })
 
+    // Calculate federal military expenses
+    const military_expenses = armies.reduce((sum,army) => addGoods(sum,army.units.reduce((ssum,unit) => addGoods(ssum,unit.consumption_rate),{...empty_goodsdist})),{...empty_goodsdist})
+    next_goodsdist = subtractGoods(next_goodsdist,military_expenses)
+
     if(osc_months_passed > osc_months) {
         store.set('Osc Period',Math.floor(Math.random() * 28) + 48)
         store.set('Osc Months Passed',0)
