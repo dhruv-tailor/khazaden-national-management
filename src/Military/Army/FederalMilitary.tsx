@@ -8,7 +8,7 @@ import { saveLocation } from "../../utilities/SaveData";
 import ArmyView from "./ArmyView";
 import { SettlementInterface } from "../../Settlement/SettlementInterface/SettlementInterface";
 import { RegimentInterface } from "../units/RegimentInterface";
-import { Dialog } from "primereact/dialog";
+
 export default function FederalMilitary() {
     const gameId = useParams().game
     const navigate = useNavigate()

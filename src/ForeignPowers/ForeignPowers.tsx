@@ -5,7 +5,6 @@ import { saveLocation } from "../utilities/SaveData"
 import { load } from "@tauri-apps/plugin-store"
 import { Button } from "primereact/button"
 import ForeignPower from "./ForeignPower"
-import { Card } from "primereact/card"
 
 export default function ForeignPowers() {
     const gameId = useParams().game
