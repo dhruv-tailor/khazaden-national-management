@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { ForeignPowerInterface } from "../../ForeignPowers/Interface/ForeignPowerInterface";
-import { empty_goodsdist, goodsdist, goodsId } from "../../Goods/GoodsDist";
+import { empty_goodsdist, goodsdist, goodsId, roundGoods } from "../../Goods/GoodsDist";
 import SellOrder from "./SellOrder";
 import { Card } from "primereact/card";
 import { Divider } from "primereact/divider";
+import DisplayGoods from "../../components/goodsDislay";
+import { settlementChange } from "../../Settlement/SettlementInterface/SettlementInterface";
 
 export default function SellGoods(
-    {foreignPowers,prices,competingPrices,supply,merchantCapacity,updateFunc}: 
-    {foreignPowers: ForeignPowerInterface[],prices: goodsdist,competingPrices: goodsdist[],supply: goodsdist,merchantCapacity: number,updateFunc: (type: goodsId,units: number,name: string) => void}
+    {foreignPowers,prices,competingPrices,supply,merchantCapacity,updateFunc,currentChange}: 
+    {foreignPowers: ForeignPowerInterface[],prices: goodsdist,competingPrices: goodsdist[],supply: goodsdist,merchantCapacity: number,updateFunc: (type: goodsId,units: number,name: string) => void,currentChange: goodsdist}
 ) {
     const [beingSold,setBeingSold] = useState<goodsdist>({...empty_goodsdist})
 
@@ -17,56 +19,62 @@ export default function SellGoods(
 
     // Price comparison effect
     useEffect(() => {
-        let cheapest_prices = {...prices}
+        let cheapest_prices = {...roundGoods(prices)}
         
         competingPrices.forEach(s => {
-            if(s.food < cheapest_prices.food) { cheapest_prices.food = s.food }
-            if(s.beer < cheapest_prices.beer) { cheapest_prices.beer = s.beer }
-            if(s.leather < cheapest_prices.leather) { cheapest_prices.leather = s.leather }
-            if(s.artisinal < cheapest_prices.artisinal) { cheapest_prices.artisinal = s.artisinal }
-            if(s.livestock < cheapest_prices.livestock) { cheapest_prices.livestock = s.livestock }
-            if(s.ornamental < cheapest_prices.ornamental) { cheapest_prices.ornamental = s.ornamental }
-            if(s.enchanted < cheapest_prices.enchanted) { cheapest_prices.enchanted = s.enchanted }
-            if(s.timber < cheapest_prices.timber) { cheapest_prices.timber = s.timber }
-            if(s.tools < cheapest_prices.tools) { cheapest_prices.tools = s.tools }
-            if(s.common_ores < cheapest_prices.common_ores) { cheapest_prices.common_ores = s.common_ores }
-            if(s.medical < cheapest_prices.medical) { cheapest_prices.medical = s.medical }
-            if(s.rare_ores < cheapest_prices.rare_ores) { cheapest_prices.rare_ores = s.rare_ores }
-            if(s.gems < cheapest_prices.gems) { cheapest_prices.gems = s.gems }
-            if(s.runes < cheapest_prices.runes) { cheapest_prices.runes = s.runes }
-            if(s.arms < cheapest_prices.arms) { cheapest_prices.arms = s.arms }
-            if(s.books < cheapest_prices.books) { cheapest_prices.books = s.books }
-            if(s.enchanted_arms < cheapest_prices.enchanted_arms) { cheapest_prices.enchanted_arms = s.enchanted_arms }
-            if(s.charcoal < cheapest_prices.charcoal) { cheapest_prices.charcoal = s.charcoal }
+            if(Math.round(s.food) < Math.round(cheapest_prices.food)) { cheapest_prices.food = Math.round(s.food) }
+            if(Math.round(s.beer) < Math.round(cheapest_prices.beer)) { cheapest_prices.beer = Math.round(s.beer) }
+            if(Math.round(s.leather) < Math.round(cheapest_prices.leather)) { cheapest_prices.leather = Math.round(s.leather) }
+            if(Math.round(s.artisanal) < Math.round(cheapest_prices.artisanal)) { cheapest_prices.artisanal = Math.round(s.artisanal) }
+            if(Math.round(s.livestock) < Math.round(cheapest_prices.livestock)) { cheapest_prices.livestock = Math.round(s.livestock) }
+            if(Math.round(s.ornamental) < Math.round(cheapest_prices.ornamental)) { cheapest_prices.ornamental = Math.round(s.ornamental) }
+            if(Math.round(s.enchanted) < Math.round(cheapest_prices.enchanted)) { cheapest_prices.enchanted = Math.round(s.enchanted) }
+            if(Math.round(s.timber) < Math.round(cheapest_prices.timber)) { cheapest_prices.timber = Math.round(s.timber) }
+            if(Math.round(s.tools) < Math.round(cheapest_prices.tools)) { cheapest_prices.tools = Math.round(s.tools) }
+            if(Math.round(s.common_ores) < Math.round(cheapest_prices.common_ores)) { cheapest_prices.common_ores = Math.round(s.common_ores) }
+            if(Math.round(s.medical) < Math.round(cheapest_prices.medical)) { cheapest_prices.medical = Math.round(s.medical) }
+            if(Math.round(s.rare_ores) < Math.round(cheapest_prices.rare_ores)) { cheapest_prices.rare_ores = Math.round(s.rare_ores) }
+            if(Math.round(s.gems) < Math.round(cheapest_prices.gems)) { cheapest_prices.gems = Math.round(s.gems) }
+            if(Math.round(s.runes) < Math.round(cheapest_prices.runes)) { cheapest_prices.runes = Math.round(s.runes) }
+            if(Math.round(s.arms) < Math.round(cheapest_prices.arms)) { cheapest_prices.arms = Math.round(s.arms) }
+            if(Math.round(s.books) < Math.round(cheapest_prices.books)) { cheapest_prices.books = Math.round(s.books) }
+            if(Math.round(s.enchanted_arms) < Math.round(cheapest_prices.enchanted_arms)) { cheapest_prices.enchanted_arms = Math.round(s.enchanted_arms) }
+            if(Math.round(s.charcoal) < Math.round(cheapest_prices.charcoal)) { cheapest_prices.charcoal = Math.round(s.charcoal) }
         })
         
         const newBeingSold = {
-            food: prices.food <= cheapest_prices.food ? 1 : 0,
-            beer: prices.beer <= cheapest_prices.beer ? 1 : 0,
-            leather: prices.leather <= cheapest_prices.leather ? 1 : 0,
-            artisinal: prices.artisinal <= cheapest_prices.artisinal ? 1 : 0,
-            livestock: prices.livestock <= cheapest_prices.livestock ? 1 : 0,
-            ornamental: prices.ornamental <= cheapest_prices.ornamental ? 1 : 0,
-            enchanted: prices.enchanted <= cheapest_prices.enchanted ? 1 : 0,
-            timber: prices.timber <= cheapest_prices.timber ? 1 : 0,
-            tools: prices.tools <= cheapest_prices.tools ? 1 : 0,
-            common_ores: prices.common_ores <= cheapest_prices.common_ores ? 1 : 0,
-            medical: prices.medical <= cheapest_prices.medical ? 1 : 0,
-            rare_ores: prices.rare_ores <= cheapest_prices.rare_ores ? 1 : 0,
-            gems: prices.gems <= cheapest_prices.gems ? 1 : 0,
-            runes: prices.runes <= cheapest_prices.runes ? 1 : 0,
-            arms: prices.arms <= cheapest_prices.arms ? 1 : 0,
-            books: prices.books <= cheapest_prices.books ? 1 : 0,
-            enchanted_arms: prices.enchanted_arms <= cheapest_prices.enchanted_arms ? 1 : 0,
+            food: Math.round(prices.food) <= Math.round(cheapest_prices.food) ? 1 : 0,
+            beer: Math.round(prices.beer) <= Math.round(cheapest_prices.beer) ? 1 : 0,
+            leather: Math.round(prices.leather) <= Math.round(cheapest_prices.leather) ? 1 : 0,
+            artisanal: Math.round(prices.artisanal) <= Math.round(cheapest_prices.artisanal) ? 1 : 0,
+            livestock: Math.round(prices.livestock) <= Math.round(cheapest_prices.livestock) ? 1 : 0,
+            ornamental: Math.round(prices.ornamental) <= Math.round(cheapest_prices.ornamental) ? 1 : 0,
+            enchanted: Math.round(prices.enchanted) <= Math.round(cheapest_prices.enchanted) ? 1 : 0,
+            timber: Math.round(prices.timber) <= Math.round(cheapest_prices.timber) ? 1 : 0,
+            tools: Math.round(prices.tools) <= Math.round(cheapest_prices.tools) ? 1 : 0,
+            common_ores: Math.round(prices.common_ores) <= Math.round(cheapest_prices.common_ores) ? 1 : 0,
+            medical: Math.round(prices.medical) <= Math.round(cheapest_prices.medical) ? 1 : 0,
+            rare_ores: Math.round(prices.rare_ores) <= Math.round(cheapest_prices.rare_ores) ? 1 : 0,
+            gems: Math.round(prices.gems) <= Math.round(cheapest_prices.gems) ? 1 : 0,
+            runes: Math.round(prices.runes) <= Math.round(cheapest_prices.runes) ? 1 : 0,
+            arms: Math.round(prices.arms) <= Math.round(cheapest_prices.arms) ? 1 : 0,
+            books: Math.round(prices.books) <= Math.round(cheapest_prices.books) ? 1 : 0,
+            enchanted_arms: Math.round(prices.enchanted_arms) <= Math.round(cheapest_prices.enchanted_arms) ? 1 : 0,
             money: 0,
-            charcoal: prices.charcoal <= cheapest_prices.charcoal ? 1 : 0,
+            charcoal: Math.round(prices.charcoal) <= Math.round(cheapest_prices.charcoal) ? 1 : 0,
         }
         setBeingSold({...newBeingSold})
     },[])
 
     return(
-        <Card title="Sell Goods" className="w-full">
+        <Card className="w-full">
             <div className="flex flex-column gap-3">
+                <Card header="Current Goods" className="sticky top-0 z-5 bg-black shadow-2">
+                    <DisplayGoods 
+                        stock={roundGoods(supply)} 
+                        change={roundGoods(currentChange)}
+                />
+                </Card>
                 <div className="flex flex-column gap-2">
                     <span className="text-sm text-500">Available Goods for Sale</span>
                     <div className="flex flex-row gap-2 flex-wrap">
@@ -97,13 +105,13 @@ export default function SellGoods(
                             price={prices.leather} 
                             updateFunc={orderPlaced}
                         />: <></>}
-                        {beingSold.artisinal === 1 && supply.artisinal > 0 ?<SellOrder 
-                            key={goodsId.artisinal}
+                        {beingSold.artisanal === 1 && supply.artisanal > 0 ?<SellOrder 
+                            key={goodsId.artisanal}
                             supply={supply} 
-                            type={goodsId.artisinal} 
+                            type={goodsId.artisanal} 
                             buyers={foreignPowers} 
                             merchantCapacity={merchantCapacity} 
-                            price={prices.artisinal} 
+                            price={prices.artisanal} 
                             updateFunc={orderPlaced}
                         />: <></>}
                         {beingSold.livestock === 1 && supply.livestock > 0 ?<SellOrder 

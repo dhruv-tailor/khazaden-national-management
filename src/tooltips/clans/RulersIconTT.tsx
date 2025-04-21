@@ -1,4 +1,4 @@
-import ArtisinalIconTT from "../goods/ArtisinalIconTT";
+import ArtisanalIconTT from "../goods/ArtisanalIconTT";
 import BeerIconTT from "../goods/BeerIconTT";
 import BooksIconTT from "../goods/BooksIconTT";
 import EnchantedIconTT from "../goods/EnchantedIconTT";
@@ -20,7 +20,7 @@ export default function RulersIconTT() {
                 <FoodIconTT/>
                 <BeerIconTT/>
                 <LeatherIconTT/>
-                <ArtisinalIconTT/>
+                <ArtisanalIconTT/>
                 <OrnamentalIconTT/>
                 <LivestockIconTT/>
                 <EnchantedIconTT/>

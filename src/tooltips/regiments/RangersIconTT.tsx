@@ -2,7 +2,7 @@ import { FaTree } from "react-icons/fa";
 import FoodIconTT from "../goods/FoodIconTT";
 import BeerIconTT from "../goods/BeerIconTT";
 import LeatherIconTT from "../goods/LeatherIconTT";
-import ArtisinalIconTT from "../goods/ArtisinalIconTT";
+import ArtisanalIconTT from "../goods/ArtisanalIconTT";
 import ToolsIconTT from "../goods/ToolsIconTT";
 import ArmsIconTT from "../goods/ArmsIconTT";
 import MoneyIconTT from "../goods/MoneyIconTT";
@@ -18,7 +18,7 @@ export default function RangersIconTT() {
                 <FoodIconTT/>
                 <BeerIconTT/>
                 <LeatherIconTT/>
-                <ArtisinalIconTT/>
+                <ArtisanalIconTT/>
                 <ToolsIconTT/>
                 <ArmsIconTT/>
                 <MoneyIconTT/>

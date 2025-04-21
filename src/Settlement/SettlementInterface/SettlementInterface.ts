@@ -14,7 +14,7 @@ import { newWarriors } from "../../Clans/ClanInterface/Warriors";
 import { LoanInterface } from "../../Economics/loans/loanInterface";
 import { initial_prices } from "../../Economics/pricing/prices";
 import { ForeignPowerInterface } from "../../ForeignPowers/Interface/ForeignPowerInterface";
-import { addGoods, empty_goodsdist, goodsdist, roundGoods, scaleGoods, subtractGoods } from "../../Goods/GoodsDist";
+import { addGoods, empty_goodsdist, goodsdist, inverseGoodPercentages, multiplyGoods, roundGoods, scaleGoods, subtractGoods } from "../../Goods/GoodsDist";
 import { ensureNumber } from "../../utilities/SimpleFunctions";
 import { TerrainData, TerrainType } from "./TerrainInterface";
 import { RegimentInterface } from "../../Military/units/RegimentInterface";
@@ -33,8 +33,8 @@ export interface SettlementInterface {
     pop_cap: number;
     tier: SettlementTier;
     projected_pop: number;
-    settlement_tax: number;
-    production_quota: number;
+    taxation: goodsdist;
+    merchant_tax: number;
 
     production_cap: goodsdist;
     stock: goodsdist;
@@ -69,8 +69,7 @@ export const empty_settlement: SettlementInterface = {
     pop_cap: 0,
     tier: SettlementTier.Hamlet,
     projected_pop: 0,
-    settlement_tax: 0,
-    production_quota: 0,
+    taxation: {...empty_goodsdist},
     production_cap: {...empty_goodsdist},
     stock: {...empty_goodsdist},
     deficet: {...empty_goodsdist},
@@ -89,6 +88,7 @@ export const empty_settlement: SettlementInterface = {
     loans: [],
     available_loan: 0,
     garrison: [],
+    merchant_tax: 0,
 }
 
 export const newSettlement = (name: string, terrain_type: TerrainType, visable_name?: string) => {
@@ -102,7 +102,7 @@ export const newSettlement = (name: string, terrain_type: TerrainType, visable_n
         food: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].food_and_water_balancing),
         beer: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].beer_balancing),
         leather: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].leather_and_textiles_balancing),
-        artisinal: -1,
+        artisanal: -1,
         livestock: Math.round(tierModifier(SettlementTier.Hamlet) * TerrainData[terrain_type].livestock_balancing),
         ornamental: -1,
         enchanted: -1,
@@ -183,9 +183,9 @@ export const updateSettlmentStock = (settlement: SettlementInterface) => {
         settlement.deficet.leather = Math.abs(settlement.stock.leather)
         settlement.stock.leather = 0
     }
-    if (settlement.stock.artisinal < 0) {
-        settlement.deficet.artisinal = Math.abs(settlement.stock.artisinal)
-        settlement.stock.artisinal = 0
+    if (settlement.stock.artisanal < 0) {
+        settlement.deficet.artisanal = Math.abs(settlement.stock.artisanal)
+        settlement.stock.artisanal = 0
     }
     if (settlement.stock.livestock < 0) {
         settlement.deficet.livestock = Math.abs(settlement.stock.livestock)
@@ -266,14 +266,12 @@ export const popGrowth = (settlement: SettlementInterface, foreign_nations: Fore
 export const settlementChange = (settlement: SettlementInterface): goodsdist => {
     let change = {...settlement.clans.map(clan => subtractGoods(
         roundGoods(
-            scaleGoods(
-                clan.production,
-                1-settlement.production_quota
-        )),
+            multiplyGoods(clan.production,inverseGoodPercentages(settlement.taxation))
+        ),
         scaleGoods(clan.consumption_rate,clan.population))
         ).reduce((sum,val) => addGoods(sum,val)),
         money: settlement.clans.map(
-            clan => Math.round(clan.tax_rate * clan.taxed_productivity * (1 - settlement.settlement_tax))
+            clan => Math.round(clan.tax_rate * clan.taxed_productivity * (1 - settlement.taxation.money))
         ).reduce((sum,val) => sum + val)
     }
     if (settlement.loans.length > 0) {
@@ -298,7 +296,7 @@ export const MonthsStoreGetChange = (g: goodsdist): goodsdist => {
         food: g.food < 0 ? Math.abs(g.food) : 0,
         beer: g.beer < 0 ? Math.abs(g.beer) : 0,
         leather: g.leather < 0 ? Math.abs(g.leather) : 0,
-        artisinal: g.artisinal < 0 ? Math.abs(g.artisinal) : 0,
+        artisanal: g.artisanal < 0 ? Math.abs(g.artisanal) : 0,
         livestock: g.livestock < 0 ? Math.abs(g.livestock) : 0,
         ornamental: g.ornamental < 0 ? Math.abs(g.ornamental) : 0,
         enchanted: g.enchanted < 0 ? Math.abs(g.enchanted) : 0,

@@ -2,7 +2,7 @@ import { load } from "@tauri-apps/plugin-store";
 import { saveLocation } from "./SaveData";
 import { popGrowth, SettlementInterface, tierModifier, updateGoodsProduction, updateSettlmentStock } from "../Settlement/SettlementInterface/SettlementInterface";
 import { ForeignPowerInterface } from "../ForeignPowers/Interface/ForeignPowerInterface";
-import { goodsdist, empty_goodsdist, addGoods, subtractGoods, scaleGoods, roundGoods, totalGoods, scaleDownGoods, floorGoods } from "../Goods/GoodsDist";
+import { goodsdist, empty_goodsdist, addGoods, subtractGoods, scaleGoods, roundGoods, totalGoods, scaleDownGoods, floorGoods, multiplyGoods, inverseGoodPercentages } from "../Goods/GoodsDist";
 import { calcPriceGoods } from "../Economics/pricing/prices";
 import { clanTypes } from "../Clans/ClanInterface/ClanInterface";
 import { TerrainData } from "../Settlement/SettlementInterface/TerrainInterface";
@@ -43,13 +43,13 @@ export const NextTurn = async (game: string) => {
             produced = addGoods(produced,clan.production)
         })
         base_tax = Math.round(base_tax)
-        settlement.stock.money += Math.round(base_tax * (1 - settlement.settlement_tax))
-        next_goodsdist.money += Math.round(base_tax * settlement.settlement_tax)
+        settlement.stock.money += Math.round(base_tax * (1 - settlement.taxation.money))
+        next_goodsdist.money += Math.round(base_tax * settlement.taxation.money)
         settlement.price_history = [...settlement.price_history,settlement.prices]
 
         // Update Settlement Stock
-        next_goodsdist = roundGoods(addGoods(scaleGoods(produced,settlement.production_quota),next_goodsdist))
-        produced = roundGoods(scaleGoods(produced,1-settlement.production_quota))
+        next_goodsdist = roundGoods(addGoods(multiplyGoods(produced,settlement.taxation),next_goodsdist))
+        produced = roundGoods(multiplyGoods(produced,inverseGoodPercentages(settlement.taxation)))
         const old_stock = {...settlement.stock}
         settlement.stock = addGoods(settlement.stock,subtractGoods(produced,settlement.consumption_rate))
         // Garrison Consumption
@@ -96,8 +96,8 @@ export const NextTurn = async (game: string) => {
         // Merchant Capacity
         const merchants = settlement.clans.filter(clan => clan.id === clanTypes.merchants)[0]
         const merchant_cap = merchants.taxed_productivity
-        settlement.merchant_capacity = Math.round(merchant_cap * (1 - settlement.settlement_tax))
-        merchant_capacity += Math.round(merchant_cap * settlement.settlement_tax)
+        settlement.merchant_capacity = Math.round(merchant_cap * (1 - settlement.merchant_tax))
+        merchant_capacity += Math.round(merchant_cap * settlement.merchant_tax)
 
         //Reset available natural resource
         settlement.production_cap = {
@@ -105,7 +105,7 @@ export const NextTurn = async (game: string) => {
             food: Math.round(tierModifier(settlement.tier) * TerrainData[settlement.terrain_type].food_and_water_balancing),
             beer: Math.round(tierModifier(settlement.tier) * TerrainData[settlement.terrain_type].beer_balancing),
             leather: Math.round(tierModifier(settlement.tier) * TerrainData[settlement.terrain_type].leather_and_textiles_balancing),
-            artisinal: -1,
+            artisanal: -1,
             livestock: Math.round(tierModifier(settlement.tier) * TerrainData[settlement.terrain_type].livestock_balancing),
             ornamental: -1,
             enchanted: -1,
@@ -191,12 +191,11 @@ export const NextTurn = async (game: string) => {
             nation.relations -= 1
             nation.retlaitory_tariffs = nation.tarriffs
             if (nation.relations < 0) {
-                nation.retlaitory_tariffs *= 1 + (Math.abs(nation.recognition) / 10 )
+                nation.retlaitory_tariffs *= 1 + ensureNumber((Math.abs(nation.relations) / 10) )
             }
         }
-        else if (nation.retlaitory_tariffs > 0) {
-            nation.retlaitory_tariffs -= (nation.tarriffs - nation.retlaitory_tariffs) / 100
-            nation.retlaitory_tariffs = Math.max(nation.retlaitory_tariffs,0)
+        else if (nation.retlaitory_tariffs > nation.tarriffs) {
+            nation.retlaitory_tariffs -= ensureNumber((nation.retlaitory_tariffs - nation.tarriffs) / 100)
         }
 
         nation.available_demand = roundGoods(scaleGoods(nation.demand,Math.max(0.05 * (1 - nation.retlaitory_tariffs),0)))

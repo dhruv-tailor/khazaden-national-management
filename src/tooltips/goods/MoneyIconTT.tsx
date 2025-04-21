@@ -5,7 +5,7 @@ export default function MoneyIconTT() {
     return <ToolTips 
         hover={<FaCoins/>}
         body={<>
-            <b>Finiance Points</b>
+            <b>Finance Points</b>
         </>}
     />
 }

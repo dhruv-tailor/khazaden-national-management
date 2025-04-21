@@ -5,7 +5,7 @@ import GoodsAllocator from "./GoodsAllocator";
 export default function GoodsAllocation({clan,natCap,updateFunc}: {clan: ClanInterface,natCap:goodsdist,updateFunc: (goods: goodsdist) => void}) {
 
     const available = clan.goods_produced - (clan.production.food + clan.production.beer + clan.production.leather + clan.production.livestock) - 
-                    (clan.production.artisinal + clan.production.ornamental + clan.production.enchanted + clan.production.timber) -
+                    (clan.production.artisanal + clan.production.ornamental + clan.production.enchanted + clan.production.timber) -
                     (clan.production.tools + clan.production.common_ores + clan.production.medical + clan.production.rare_ores) -
                     (clan.production.gems + clan.production.runes + clan.production.arms + clan.production.books + clan.production.enchanted_arms) -
                     (clan.production.charcoal)
@@ -21,7 +21,7 @@ export default function GoodsAllocation({clan,natCap,updateFunc}: {clan: ClanInt
             food: id === goodsId.food ? amount - clan.production.food : 0,
             beer: id === goodsId.beer ? amount - clan.production.beer : 0,
             leather: id === goodsId.leather ? amount - clan.production.leather : 0,
-            artisinal: id === goodsId.artisinal ? amount - clan.production.artisinal : 0,
+            artisanal: id === goodsId.artisanal ? amount - clan.production.artisanal : 0,
             livestock: id === goodsId.livestock ? amount - clan.production.livestock : 0,
             ornamental: id === goodsId.ornamental ? amount - clan.production.ornamental : 0,
             enchanted: id === goodsId.enchanted ? amount - clan.production.enchanted : 0,
@@ -62,10 +62,10 @@ export default function GoodsAllocation({clan,natCap,updateFunc}: {clan: ClanInt
                     assigned={clan.production.leather}
                     updateFunc={updateAllocation}
                 />:null}
-                {clan.isProduced.artisinal ? <GoodsAllocator 
-                    max={whichOne(natCap.artisinal,available)} 
-                    id={goodsId.artisinal}
-                    assigned={clan.production.artisinal}
+                {clan.isProduced.artisanal ? <GoodsAllocator 
+                    max={whichOne(natCap.artisanal,available)} 
+                    id={goodsId.artisanal}
+                    assigned={clan.production.artisanal}
                     updateFunc={updateAllocation}
                 />:null}
                 {clan.isProduced.livestock ? <GoodsAllocator 

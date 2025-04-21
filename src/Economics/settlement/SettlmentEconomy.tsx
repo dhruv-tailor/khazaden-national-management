@@ -4,7 +4,7 @@ import { empty_settlement, monthsStored, settlementChange, SettlementInterface }
 import { saveLocation } from "../../utilities/SaveData";
 import { load } from "@tauri-apps/plugin-store";
 import { useEffect, useState } from "react";
-import { Panel } from "primereact/panel";
+import { Card } from "primereact/card";
 import DisplayGoods from "../../components/goodsDislay";
 import PriceChart, { priceChartDataProp, priceChartOptionsProp } from "../pricing/PriceChart";
 import PriceCard from "../pricing/PriceCard";
@@ -159,7 +159,7 @@ export default function SettlmentEconomy() {
         if (type === goodsId.food) {money_gained = units * settlement.prices.food}
         if (type === goodsId.beer) {money_gained = units * settlement.prices.beer}
         if (type === goodsId.leather) {money_gained = units * settlement.prices.leather}
-        if (type === goodsId.artisinal) {money_gained = units * settlement.prices.artisinal}
+        if (type === goodsId.artisanal) {money_gained = units * settlement.prices.artisanal}
         if (type === goodsId.livestock) {money_gained = units * settlement.prices.livestock}
         if (type === goodsId.ornamental) {money_gained = units * settlement.prices.ornamental}
         if (type === goodsId.enchanted) {money_gained = units * settlement.prices.enchanted}
@@ -181,7 +181,7 @@ export default function SettlmentEconomy() {
                 food: type === goodsId.food ? settlement.stock.food - units : settlement.stock.food,
                 beer: type === goodsId.beer ? settlement.stock.beer - units : settlement.stock.beer,
                 leather: type === goodsId.leather ? settlement.stock.leather - units : settlement.stock.leather,
-                artisinal: type === goodsId.artisinal ? settlement.stock.artisinal - units : settlement.stock.artisinal,
+                artisanal: type === goodsId.artisanal ? settlement.stock.artisanal - units : settlement.stock.artisanal,
                 livestock: type === goodsId.livestock ? settlement.stock.livestock - units : settlement.stock.livestock,
                 ornamental: type === goodsId.ornamental ? settlement.stock.ornamental - units : settlement.stock.ornamental,    
                 enchanted: type === goodsId.enchanted ? settlement.stock.enchanted - units : settlement.stock.enchanted,
@@ -207,7 +207,7 @@ export default function SettlmentEconomy() {
                 food: power.available_supply.food - (type === goodsId.food ? units : 0),
                 beer: power.available_supply.beer - (type === goodsId.beer ? units : 0),
                 leather: power.available_supply.leather - (type === goodsId.leather ? units : 0),
-                artisinal: power.available_supply.artisinal - (type === goodsId.artisinal ? units : 0),
+                artisanal: power.available_supply.artisanal - (type === goodsId.artisanal ? units : 0),
                 livestock: power.available_supply.livestock - (type === goodsId.livestock ? units : 0),
                 ornamental: power.available_supply.ornamental - (type === goodsId.ornamental ? units : 0),
                 enchanted: power.available_supply.enchanted - (type === goodsId.enchanted ? units : 0),
@@ -269,7 +269,7 @@ export default function SettlmentEconomy() {
             </div>
 
             {/* Settlement Goods Section */}
-            <Panel header="Settlement Goods" toggleable>
+            <Card title="Settlement Goods" className="sticky top-0 z-5 bg-black shadow-2">
                 <div className="flex flex-column gap-3">
                     <div className="flex flex-row align-items-center gap-3">
                         <div className="flex flex-column gap-1">
@@ -284,8 +284,8 @@ export default function SettlmentEconomy() {
                         </div>
                         {settlement.name !== '' && (
                             <DisplayGoods 
-                                stock={settlement.stock} 
-                                change={settlementChange(settlement)}
+                                stock={roundGoods(settlement.stock)} 
+                                change={roundGoods(settlementChange(settlement))}
                             />
                         )}
                         <Button 
@@ -297,18 +297,18 @@ export default function SettlmentEconomy() {
                         />
                     </div>
                 </div>
-            </Panel>
+            </Card>
 
             {/* Price Chart Section */}
-            <Panel header="Price Chart" toggleable collapsed>
+            <Card title="Price Chart">
                 <PriceChart 
                     data={priceChartDataProp(settlement.price_history,settlement.prices)} 
                     options={priceChartOptionsProp()}
                 />
-            </Panel>
+            </Card>
 
             {/* Local Goods Section */}
-            <Panel header='Local Goods' toggleable>
+            <Card title='Local Goods'>
                 <div className="flex flex-column gap-3">
                     <div className="font-bold">
                         Merchant Capacity: {settlement.merchant_capacity} | 
@@ -324,6 +324,8 @@ export default function SettlmentEconomy() {
                                 merchantCapacity={settlement.merchant_capacity}
                                 maxCost={settlement.stock.money}
                                 updateFunc={processFederalOrder}
+                                myGoods={roundGoods(reserveGoods)}
+                                myChange={roundGoods(settlementChange(settlement))}
                             />
                         </div>
                         {settlements.filter(s => s.name !== settlement.name).map(s => (
@@ -336,15 +338,17 @@ export default function SettlmentEconomy() {
                                     merchantCapacity={settlement.merchant_capacity}
                                     maxCost={settlement.stock.money}
                                     updateFunc={processSettlementOrder}
+                                    myGoods={roundGoods(reserveGoods)}
+                                    myChange={roundGoods(settlementChange(settlement))}
                                 />
                             </div>
                         ))}
                     </div>
                 </div>
-            </Panel>
+            </Card>
 
             {/* Global Goods Section */}
-            <Panel header='Global Goods' toggleable>
+            <Card title='Global Goods'>
                 <div className="flex flex-column gap-3">
                     <div className="font-bold">
                         Merchant Capacity: {settlement.merchant_capacity} | 
@@ -361,12 +365,14 @@ export default function SettlmentEconomy() {
                                     merchantCapacity={settlement.merchant_capacity}
                                     maxCost={settlement.stock.money}
                                     updateFunc={processForeignOrder}
+                                    myGoods={roundGoods(reserveGoods)}
+                                    myChange={roundGoods(settlementChange(settlement))}
                                 />
                             </div>
                         ))}
                     </div>
                 </div>
-            </Panel>
+            </Card>
 
             {/* Dialogs */}
             <Dialog 
@@ -377,6 +383,7 @@ export default function SettlmentEconomy() {
                 <SellGoods
                     merchantCapacity={settlement.merchant_capacity}
                     supply={settlement.stock}
+                    currentChange={roundGoods(settlementChange(settlement))}
                     foreignPowers={foreignPowers.filter(power => !power.isEmbargoed)}
                     prices={settlement.prices}
                     competingPrices={settlements.filter(s => s.name !== settlement.name).map(s => s.prices).concat(federalPrices)}

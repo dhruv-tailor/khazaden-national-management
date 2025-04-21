@@ -8,12 +8,12 @@ import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import MoneyIconTT from "../../tooltips/goods/MoneyIconTT";
 import { TerrainData } from "../SettlementInterface/TerrainInterface";
-import { Panel } from "primereact/panel";
+import { Card } from "primereact/card";
 import DisplayGoods from "../../components/goodsDislay";
 import ClanInfo from "./ClanInfo";
 import { clanTypes } from "../../Clans/ClanInterface/ClanInterface";
 import NaturalResources from "./NaturalResources";
-import { addGoods, goodsdist } from "../../Goods/GoodsDist";
+import { addGoods, goodsdist, roundGoods } from "../../Goods/GoodsDist";
 import BureaucracyBonus from "./Bureaucracy/BureaucracyBonus";
 import PopConversion from "./PopConversion";
 
@@ -70,7 +70,7 @@ export default function SettlementDetailed() {
                 food: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].food_and_water_balancing),
                 beer: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].beer_balancing),
                 leather: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].leather_and_textiles_balancing),
-                artisinal: -1,
+                artisanal: -1,
                 livestock: Math.round(tierModifier(settlement.tier + 1) * TerrainData[settlement.terrain_type].livestock_balancing),
                 ornamental: -1,
                 enchanted: -1,
@@ -107,7 +107,7 @@ export default function SettlementDetailed() {
             food: -goods.food,
             beer: -goods.beer,
             leather: -goods.leather,
-            artisinal: 0,
+            artisanal: 0,
             livestock: -goods.livestock,
             ornamental: 0,
             enchanted: 0,
@@ -203,20 +203,20 @@ export default function SettlementDetailed() {
                 <Button className='flex-grow-1' severity="danger" label='Army' icon='pi pi-users' onClick={goToMilitary}/>
             </div>
             
-            <div className="flex flex-row gap-1">
+            <div className="flex flex-row gap-1 sticky top-0 z-5 bg-black shadow-2">
                 {/* Show Reserve */}
-                <Panel header="Settlement Reserve">
+                <Card title="Settlement Reserve" className="flex-grow-1">
                     {settlement.name !== '' ? 
-                    <DisplayGoods stock={settlement.stock} change={settlementChange(settlement)}/>:null}
-                </Panel>
+                    <DisplayGoods stock={roundGoods(settlement.stock)} change={roundGoods(settlementChange(settlement))}/>:null}
+                </Card>
                 {/* Natural Resources Available */}
-                <Panel header="Natural Resources">
+                <Card title="Natural Resources" className="flex-grow-1">
                     <NaturalResources resources={settlement.production_cap}/>
-                </Panel>
+                </Card>
             </div>
 
             {/* Bureaucracy */}
-            <Panel header='Bureaucracy' toggleable>
+            <Card title="Bureaucracy">
                 <div className="flex flex-row gap-2 flex-wrap">
                     {/* Pop Conversion Button */}
                     <Button size="small" label='Convert Pops' icon='pi pi-users' onClick={() => setShowPopConversion(true)}/>
@@ -226,7 +226,7 @@ export default function SettlementDetailed() {
                     {/* Bureaucracy Bonus */}
                     <BureaucracyBonus settlement={settlement} updateFunc={setBonus}/>
                 </div>
-            </Panel>
+            </Card>
             
             {/* Show Clans */}
             <div className="flex flex-row gap-2 flex-wrap">

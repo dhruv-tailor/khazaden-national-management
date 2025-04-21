@@ -1,14 +1,15 @@
 import { useState } from "react";
-import { addGoods, empty_goodsdist, goodsdist, goodsId, multiplyGoods, totalGoods } from "../../Goods/GoodsDist";
+import { addGoods, empty_goodsdist, goodsdist, goodsId, multiplyGoods, roundGoods, totalGoods } from "../../Goods/GoodsDist";
 import OrderRow from "./OrderRow";
 import { Button } from "primereact/button";
 import MoneyIconTT from "../../tooltips/goods/MoneyIconTT";
 import { Card } from "primereact/card";
 import { ProgressBar } from "primereact/progressbar";
+import DisplayGoods from "../../components/goodsDislay";
 
 export default function PlaceOrder(
-    {goods,prices,merchantCapacity,maxCost,updateFunc} : 
-    {goods: goodsdist, prices: goodsdist, merchantCapacity: number,maxCost: number,updateFunc: (capUsed: number, order: goodsdist) => void}
+    {goods,prices,merchantCapacity,maxCost,updateFunc,myGoods,myChange} : 
+    {goods: goodsdist, prices: goodsdist, merchantCapacity: number,maxCost: number,updateFunc: (capUsed: number, order: goodsdist) => void,myGoods: goodsdist,myChange: goodsdist}
 ) {
     const [capUsed,setCapUsed] = useState<number>(0)
     const [order,setOrder] = useState<goodsdist>({...empty_goodsdist})
@@ -21,7 +22,7 @@ export default function PlaceOrder(
             food: id === goodsId.food ? units - order.food: 0,
             beer: id === goodsId.beer ? units - order.beer : 0,
             leather: id === goodsId.leather ? units - order.leather: 0,
-            artisinal: id === goodsId.artisinal ? units - order.artisinal : 0,
+            artisanal: id === goodsId.artisanal ? units - order.artisanal : 0,
             livestock: id === goodsId.livestock ? units - order.livestock : 0,
             ornamental: id === goodsId.ornamental ? units - order.ornamental : 0,
             enchanted: id === goodsId.enchanted ? units - order.enchanted : 0,
@@ -48,17 +49,25 @@ export default function PlaceOrder(
 
     return(
         <div className="flex flex-column gap-3">
-            <Card className="surface-ground">
-                <div className="flex flex-column gap-2">
-                    <div className="flex flex-row justify-content-between align-items-center">
-                        <span className="font-bold">Capacity Used: {capUsed} / {merchantCapacity}</span>
-                        <span className="text-500">{Math.round(capacityPercentage)}%</span>
+            <Card className="sticky top-0 z-5 bg-black shadow-2">
+                <div className="flex flex-row gap-3">
+                    <div className="flex-1">
+                        <DisplayGoods 
+                            stock={roundGoods(myGoods)} 
+                            change={roundGoods(myChange)}
+                        />
                     </div>
-                    <ProgressBar 
-                        value={capacityPercentage} 
-                        showValue={false}
-                        className={capacityPercentage > 90 ? 'p-progressbar-danger' : capacityPercentage > 70 ? 'p-progressbar-warning' : 'p-progressbar-success'}
-                    />
+                    <div className="flex-1 flex flex-column gap-2">
+                        <div className="flex flex-row justify-content-between align-items-center">
+                            <span className="font-bold">Capacity Used: {capUsed} / {merchantCapacity}</span>
+                            <span className="text-500">{Math.round(capacityPercentage)}%</span>
+                        </div>
+                        <ProgressBar 
+                            value={capacityPercentage} 
+                            showValue={false}
+                            className={capacityPercentage > 90 ? 'p-progressbar-danger' : capacityPercentage > 70 ? 'p-progressbar-warning' : 'p-progressbar-success'}
+                        />
+                    </div>
                 </div>
             </Card>
 
@@ -92,10 +101,10 @@ export default function PlaceOrder(
                 </div>
                 <div className="col-12 md:col-6 lg:col-4">
                     <OrderRow 
-                        goodType={goodsId.artisinal} 
-                        units={order.artisinal} 
-                        price={prices.artisinal} 
-                        max={whichOne(merchantCapacity - capUsed,goods.artisinal)} 
+                        goodType={goodsId.artisanal} 
+                        units={order.artisanal} 
+                        price={prices.artisanal} 
+                        max={whichOne(merchantCapacity - capUsed,goods.artisanal)} 
                         updateFunc={updateOrder}
                     />
                 </div>

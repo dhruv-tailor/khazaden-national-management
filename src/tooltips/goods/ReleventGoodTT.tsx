@@ -1,7 +1,6 @@
 import { ReactElement } from 'react';
 import { goodsId } from "../../Goods/GoodsDist";
 import ArmsIconTT from "./ArmsIconTT";
-import ArtisinalIconTT from "./ArtisinalIconTT";
 import BeerIconTT from "./BeerIconTT";
 import BooksIconTT from "./BooksIconTT";
 import CharcoalIconTT from "./CharcoalIconTT";
@@ -19,6 +18,7 @@ import RareOresIconTT from "./RareOresIconTT";
 import RunesIconTT from "./RunesIconTT";
 import TimberIconTT from "./TimberIconTT";
 import ToolsIconTT from "./ToolsIconTT";
+import ArtisanalIconTT from './ArtisanalIconTT';
 
 export type GoodTooltipMap = {
     [K in goodsId]: ReactElement;
@@ -29,7 +29,7 @@ export const releventGoodTT: GoodTooltipMap = {
     [goodsId.food]: <FoodIconTT/>,
     [goodsId.beer]: <BeerIconTT/>,
     [goodsId.leather]: <LeatherIconTT/>,
-    [goodsId.artisinal]: <ArtisinalIconTT/>,
+    [goodsId.artisanal]: <ArtisanalIconTT/>,
     [goodsId.livestock]: <LivestockIconTT/>,
     [goodsId.ornamental]: <OrnamentalIconTT/>,
     [goodsId.enchanted]: <EnchantedIconTT/>,

@@ -20,7 +20,7 @@ export const Slayers = () : RegimentInterface => {
         food: 1,
         beer: 1,
         leather: 1,
-        artisinal: 1,
+        artisanal: 1,
         ornamental: 0,
         livestock: 0,
         enchanted: 0,
