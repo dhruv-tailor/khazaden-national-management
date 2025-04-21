@@ -19,6 +19,7 @@ import { GetFederalGoodsStored } from "../../utilities/SimpleFunctions";
 import { LoanInterface, takeLoan } from "../loans/loanInterface";
 import ViewLoans from "../loans/ViewLoans";
 import { ArmyInterface } from "../../Military/Army/Army";
+import TradeDealView from "../Trade/TradeDealView";
 export default function SettlmentEconomy() {
     const gameId = useParams().game;
     const settlementId = useParams().settlement;
@@ -34,6 +35,7 @@ export default function SettlmentEconomy() {
     const [FederalLoans,setFederalLoans] = useState<LoanInterface[]>([]);
     const [showLoans,setShowLoans] = useState<boolean>(false);
     const [armies,setArmies] = useState<ArmyInterface[]>([]);
+    const [showTradeDeal,setShowTradeDeal] = useState<boolean>(false);
     const navigateTo = async (location: string) => {
         await saveData()
         navigate(location)
@@ -248,10 +250,11 @@ export default function SettlmentEconomy() {
         return <div>Loading...</div>;
     }
 
+
     return (
-        <div className="flex flex-column gap-3">
+        <div className="flex flex-column gap-2">
             {/* Header Section */}
-            <div className="flex flex-row justify-content-between align-items-center">
+            <div className="flex flex-row justify-content-between align-items-center gap-2">
                 <Button 
                     size="small" 
                     label="Go Back" 
@@ -259,18 +262,34 @@ export default function SettlmentEconomy() {
                     onClick={()=>navigateTo(`/game/${gameId}/settlement/${settlementId}`)}
                     className="p-button-text"
                 />
-                <Button 
-                    size="small" 
-                    label="View Loans" 
-                    icon='pi pi-money-bill' 
-                    onClick={() => setShowLoans(true)}
-                    severity="info"
-                />
+                <div className="flex gap-2">
+                    <Button 
+                        size="small" 
+                        label="View Loans" 
+                        icon='pi pi-money-bill' 
+                        onClick={() => setShowLoans(true)}
+                        severity="info"
+                    />
+                    <Button 
+                        size="small"
+                        label="Sell Goods"
+                        icon="pi pi-wallet" 
+                        severity="success" 
+                        onClick={() => setShowSell(true)}
+                    />
+                    <Button 
+                        size="small"
+                        label="Trade Deals"
+                        icon="pi pi-arrow-right-arrow-left"
+                        severity="info"
+                        onClick={() => setShowTradeDeal(true)}
+                    />
+                </div>
             </div>
 
             {/* Settlement Goods Section */}
             <Card title="Settlement Goods" className="sticky top-0 z-5 bg-black shadow-2">
-                <div className="flex flex-column gap-3">
+                <div className="flex flex-column gap-2">
                     <div className="flex flex-row align-items-center gap-3">
                         <div className="flex flex-column gap-1">
                             <MonthsStoredTT/>
@@ -288,13 +307,6 @@ export default function SettlmentEconomy() {
                                 change={roundGoods(settlementChange(settlement))}
                             />
                         )}
-                        <Button 
-                            label="Sell Goods" 
-                            icon="pi pi-wallet" 
-                            severity="success" 
-                            onClick={() => setShowSell(true)}
-                            className="ml-auto"
-                        />
                     </div>
                 </div>
             </Card>
@@ -309,8 +321,8 @@ export default function SettlmentEconomy() {
 
             {/* Local Goods Section */}
             <Card title='Local Goods'>
-                <div className="flex flex-column gap-3">
-                    <div className="font-bold">
+                <div className="flex flex-column gap-2">
+                    <div className="font-bold text-sm">
                         Merchant Capacity: {settlement.merchant_capacity} | 
                         Available Money: {settlement.stock.money}
                     </div>
@@ -349,8 +361,8 @@ export default function SettlmentEconomy() {
 
             {/* Global Goods Section */}
             <Card title='Global Goods'>
-                <div className="flex flex-column gap-3">
-                    <div className="font-bold">
+                <div className="flex flex-column gap-2">
+                    <div className="font-bold text-sm">
                         Merchant Capacity: {settlement.merchant_capacity} | 
                         Available Money: {settlement.stock.money}
                     </div>
@@ -379,6 +391,8 @@ export default function SettlmentEconomy() {
                 header="Sell Goods" 
                 visible={showSell} 
                 onHide={() => setShowSell(false)}
+                className="w-11"
+                contentStyle={{ padding: '0.5rem' }}
             >
                 <SellGoods
                     merchantCapacity={settlement.merchant_capacity}
@@ -395,13 +409,32 @@ export default function SettlmentEconomy() {
                 header="Loans" 
                 visible={showLoans} 
                 onHide={() => setShowLoans(false)}
-                className=""
+                className="w-11"
+                contentStyle={{ padding: '0.5rem' }}
             >
                 <ViewLoans 
                     loans={settlement.loans} 
                     settlements={settlements} 
                     updateFunc={loanTaken} 
                     declareBankruptcy={declareBankruptcy}
+                />
+            </Dialog>
+
+            <Dialog 
+                header="Trade Deals" 
+                visible={showTradeDeal} 
+                onHide={() => setShowTradeDeal(false)}
+                className="w-11"
+                contentStyle={{ padding: '0.5rem' }}
+            >
+                <TradeDealView 
+                    tradedeals={settlement.trade_deals} 
+                    foreignPowers={foreignPowers} 
+                    settlements={settlements.filter(s => s.name !== settlement.name)} 
+                    currentStock={settlement.stock} 
+                    merchantCapacity={settlement.merchant_capacity} 
+                    prices={settlement.prices} 
+                    currentChange={roundGoods(settlementChange(settlement))}
                 />
             </Dialog>
         </div>

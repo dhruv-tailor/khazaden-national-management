@@ -102,6 +102,7 @@ export const createNewSave = async (saveName: string)  => {
     store.set('Current Year',728) // Current Year
     store.set('Current Month',0) // Current Month
     store.set('Armies',[]) // Armies
+    store.set('Trade Deals',[]) // Trade Deals
     await store.save();
     store.close();
 }
@@ -139,6 +140,7 @@ export const createCustomSave = async (saveName: string,custom_resources: goodsd
     store.set('Current Year',728) // Current Year
     store.set('Current Month',0) // Current Month
     store.set('Armies',[]) // Armies
+    store.set('Trade Deals',[]) // Trade Deals
     await store.save();
     store.close();
 }
@@ -220,6 +222,7 @@ export const createJan728Save = async (saveName: string) => {
     store.set('Current Year',728) // Current Year
     store.set('Current Month',1) // Current Month
     store.set('Armies',[]) // Armies
+    store.set('Trade Deals',[]) // Trade Deals
     await store.save();
     store.close();
 }
@@ -305,6 +308,7 @@ export const createJul728Save = async (saveName: string) => {
     store.set('Current Year',728) // Current Year
     store.set('Current Month',7) // Current Month
     store.set('Armies',[]) // Armies
+    store.set('Trade Deals',[]) // Trade Deals
     await store.save();
     store.close();
 }
@@ -393,6 +397,7 @@ export const createJan729Save = async (saveName: string) => {
     store.set('Current Year',728) // Current Year
     store.set('Current Month',7) // Current Month
     store.set('Armies',[]) // Armies
+    store.set('Trade Deals',[]) // Trade Deals
     await store.save();
     store.close();
 }

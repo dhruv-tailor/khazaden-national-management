@@ -18,6 +18,7 @@ import { addGoods, empty_goodsdist, goodsdist, inverseGoodPercentages, multiplyG
 import { ensureNumber } from "../../utilities/SimpleFunctions";
 import { TerrainData, TerrainType } from "./TerrainInterface";
 import { RegimentInterface } from "../../Military/units/RegimentInterface";
+import { TradeDealInterface } from "../../Economics/Trade/interface/TradeDealInterface";
 export enum SettlementTier {
     Hamlet = 1,
     Village,
@@ -59,6 +60,7 @@ export interface SettlementInterface {
     loans: LoanInterface[];
 
     garrison: RegimentInterface[]
+    trade_deals: TradeDealInterface[]
 }
 
 
@@ -89,6 +91,7 @@ export const empty_settlement: SettlementInterface = {
     available_loan: 0,
     garrison: [],
     merchant_tax: 0,
+    trade_deals: []
 }
 
 export const newSettlement = (name: string, terrain_type: TerrainType, visable_name?: string) => {
