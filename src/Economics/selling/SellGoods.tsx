@@ -5,7 +5,6 @@ import SellOrder from "./SellOrder";
 import { Card } from "primereact/card";
 import { Divider } from "primereact/divider";
 import DisplayGoods from "../../components/goodsDislay";
-import { settlementChange } from "../../Settlement/SettlementInterface/SettlementInterface";
 
 export default function SellGoods(
     {foreignPowers,prices,competingPrices,supply,merchantCapacity,updateFunc,currentChange}: 

@@ -2,8 +2,6 @@ import { Card } from "primereact/card";
 import { settlementChange, SettlementInterface, SettlementTierDetails } from "./SettlementInterface/SettlementInterface";
 import PopulationIconTT from "../tooltips/PopulationIconTT";
 import DisplayGoods from "../components/goodsDislay";
-import { InputText } from "primereact/inputtext";
-import { Slider } from "primereact/slider";
 import { Button } from "primereact/button";
 import { Panel } from "primereact/panel";
 import { goodsdist, roundGoods } from "../Goods/GoodsDist";
