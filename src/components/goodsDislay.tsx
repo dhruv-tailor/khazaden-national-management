@@ -1,6 +1,6 @@
 import { goodsdist } from "../Goods/GoodsDist";
 import ArmsIconTT from "../tooltips/goods/ArmsIconTT";
-import ArtisinalIconTT from "../tooltips/goods/ArtisinalIconTT";
+import ArtisanalIconTT from "../tooltips/goods/ArtisanalIconTT";
 import BeerIconTT from "../tooltips/goods/BeerIconTT";
 import BooksIconTT from "../tooltips/goods/BooksIconTT";
 import CharcoalIconTT from "../tooltips/goods/CharcoalIconTT";
@@ -26,98 +26,98 @@ export default function DisplayGoods({stock,change}: {stock: goodsdist,change: g
         <div className="flex flex-row flex-wrap gap-2">
             <div className="flex flex-row gap-1">
                 <MoneyIconTT/>
-                {stock.money}
-                <PlusMinus value={change.money}/>
+                {Math.round(stock.money)}
+                <PlusMinus value={Math.round(change.money)}/>
             </div>
             <div className="flex flex-row gap-1">
                 <FoodIconTT/>
-                {stock.food}
-                <PlusMinus value={change.food}/>
+                {Math.round(stock.food)}
+                <PlusMinus value={Math.round(change.food)}/>
             </div>
             <div className="flex flex-row gap-1">
                 <BeerIconTT/>
-                {stock.beer}
-                <PlusMinus value={change.beer}/>
+                {Math.round(stock.beer)}
+                <PlusMinus value={Math.round(change.beer)}/>
             </div>
             <div className="flex flex-row gap-1">
                 <LeatherIconTT/>
-                {stock.leather}
-                <PlusMinus value={change.leather}/>
+                {Math.round(stock.leather)}
+                <PlusMinus value={Math.round(change.leather)}/>
             </div>
             <div className="flex flex-row gap-1">
-                <ArtisinalIconTT/>
-                {stock.artisinal}
-                <PlusMinus value={change.artisinal}/>
+                <ArtisanalIconTT/>
+                {Math.round(stock.artisanal)}
+                <PlusMinus value={Math.round(change.artisanal)}/>
             </div>
             <div className="flex flex-row gap-1">
                 <OrnamentalIconTT/>
-                {stock.ornamental}
-                <PlusMinus value={change.ornamental}/>
+                {Math.round(stock.ornamental)}
+                <PlusMinus value={Math.round(change.ornamental)}/>
             </div>
             <div className="flex flex-row gap-1">
                 <LivestockIconTT/>
-                {stock.livestock}
-                <PlusMinus value={change.livestock}/>
+                {Math.round(stock.livestock)}
+                <PlusMinus value={Math.round(change.livestock)}/>
             </div>
             <div className="flex flex-row gap-1">
                 <EnchantedIconTT/>
-                {stock.enchanted}
-                <PlusMinus value={change.enchanted}/>
+                {Math.round(stock.enchanted)}
+                <PlusMinus value={Math.round(change.enchanted)}/>
             </div>
             <div className="flex flex-row gap-1">
                 <TimberIconTT/>
-                {stock.timber}
-                <PlusMinus value={change.timber}/>
+                {Math.round(stock.timber)}
+                <PlusMinus value={Math.round(change.timber)}/>
             </div>
             <div className="flex flex-row gap-1">
                 <ToolsIconTT/>
-                {stock.tools}
-                <PlusMinus value={change.tools}/>
+                {Math.round(stock.tools)}
+                <PlusMinus value={Math.round(change.tools)}/>
             </div>
             <div className="flex flex-row gap-1">
                 <CommonOresIconTT/>
-                {stock.common_ores}
-                <PlusMinus value={change.common_ores}/>
+                {Math.round(stock.common_ores)}
+                <PlusMinus value={Math.round(change.common_ores)}/>
             </div>
             <div className="flex flex-row gap-1">
                 <MedicalIconTT/>
-                {stock.medical}
-                <PlusMinus value={change.medical}/>
+                {Math.round(stock.medical)}
+                <PlusMinus value={Math.round(change.medical)}/>
             </div>
             <div className="flex flex-row gap-1">
                 <RareOresIconTT/>
-                {stock.rare_ores}
-                <PlusMinus value={change.rare_ores}/>
+                {Math.round(stock.rare_ores)}
+                <PlusMinus value={Math.round(change.rare_ores)}/>
             </div>
             <div className="flex flex-row gap-1">
                 <GemsIconTT/>
-                {stock.gems}
-                <PlusMinus value={change.gems}/>
+                {Math.round(stock.gems)}
+                <PlusMinus value={Math.round(change.gems)}/>
             </div>
             <div className="flex flex-row gap-1">
                 <RunesIconTT/>
-                {stock.runes}
-                <PlusMinus value={change.runes}/>
+                {Math.round(stock.runes)}
+                <PlusMinus value={Math.round(change.runes)}/>
             </div>
             <div className="flex flex-row gap-1">
                 <ArmsIconTT/>
-                {stock.arms}
-                <PlusMinus value={change.arms}/>
+                {Math.round(stock.arms)}
+                <PlusMinus value={Math.round(change.arms)}/>
             </div>
             <div className="flex flex-row gap-1">
                 <BooksIconTT/>
-                {stock.books}
-                <PlusMinus value={change.books}/>
+                {Math.round(stock.books)}
+                <PlusMinus value={Math.round(change.books)}/>
             </div>
             <div className="flex flex-row gap-1">
                 <EnchantedArmsIconTT/>
-                {stock.enchanted_arms}
-                <PlusMinus value={change.enchanted_arms}/>
+                {Math.round(stock.enchanted_arms)}
+                <PlusMinus value={Math.round(change.enchanted_arms)}/>
             </div>
             <div className="flex flex-row gap-1">
                 <CharcoalIconTT/>
-                {stock.charcoal}
-                <PlusMinus value={change.charcoal}/>
+                {Math.round(stock.charcoal)}
+                <PlusMinus value={Math.round(change.charcoal)}/>
             </div>
         </div>
     </>)

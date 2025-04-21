@@ -6,7 +6,7 @@ import { empty_goodsdist, goodsdist } from "../Goods/GoodsDist";
 import FoodIconTT from "../tooltips/goods/FoodIconTT";
 import BeerIconTT from "../tooltips/goods/BeerIconTT";
 import LeatherIconTT from "../tooltips/goods/LeatherIconTT";
-import ArtisinalIconTT from "../tooltips/goods/ArtisinalIconTT";
+import ArtisanalIconTT from "../tooltips/goods/ArtisanalIconTT";
 import LivestockIconTT from "../tooltips/goods/LivestockIconTT";
 import OrnamentalIconTT from "../tooltips/goods/OrnamentalIconTT";
 import EnchantedArmsIconTT from "../tooltips/goods/EnchantedArmsTT";
@@ -78,7 +78,7 @@ export default function ResourceDistribuition({goods_cap,updateFunc,existing_dis
             {/* Crafted Goods */}
             <div className="grid">
                 <div className="col-12 md:col-4">
-                    {renderResourceInput(ArtisinalIconTT, 'artisinal', 'Artisinal')}
+                    {renderResourceInput(ArtisanalIconTT, 'artisanal', 'Artisanal')}
                 </div>
                 <div className="col-12 md:col-4">
                     {renderResourceInput(LivestockIconTT, 'livestock', 'Livestock')}

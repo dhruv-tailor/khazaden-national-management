@@ -14,7 +14,7 @@ import MoneyIconTT from "./tooltips/goods/MoneyIconTT";
 import FoodIconTT from "./tooltips/goods/FoodIconTT";
 import BeerIconTT from "./tooltips/goods/BeerIconTT";
 import LeatherIconTT from "./tooltips/goods/LeatherIconTT";
-import ArtisinalIconTT from "./tooltips/goods/ArtisinalIconTT";
+import ArtisanalIconTT from "./tooltips/goods/ArtisanalIconTT";
 import ToolsIconTT from "./tooltips/goods/ToolsIconTT";
 import ArmsIconTT from "./tooltips/goods/ArmsIconTT";
 import MedicalIconTT from "./tooltips/goods/MedicalIconTT";
@@ -59,7 +59,7 @@ function NewGame() {
         food: 0,
         beer: 0,
         leather: 0,
-        artisinal: 0,
+        artisanal: 0,
         livestock: 0,
         ornamental: 0,
         enchanted: 0,
@@ -315,7 +315,7 @@ function getResourceIcon(resource: string) {
         case 'food': return <FoodIconTT />;
         case 'beer': return <BeerIconTT />;
         case 'leather': return <LeatherIconTT />;
-        case 'artisinal': return <ArtisinalIconTT />;
+        case 'artisanal': return <ArtisanalIconTT />;
         case 'tools': return <ToolsIconTT />;
         case 'arms': return <ArmsIconTT />;
         case 'medical': return <MedicalIconTT />;

@@ -34,9 +34,9 @@ export default function SellOrder(
             foreign_max = selectedBuyer?.available_supply.leather ?? 0
             local_max = supply.leather
         }
-        if (type === goodsId.artisinal) {
-            foreign_max = selectedBuyer?.available_supply.artisinal ?? 0
-            local_max = supply.artisinal
+        if (type === goodsId.artisanal) {
+            foreign_max = selectedBuyer?.available_supply.artisanal ?? 0
+            local_max = supply.artisanal
         }
         if (type === goodsId.ornamental) {
             foreign_max = selectedBuyer?.available_supply.ornamental ?? 0

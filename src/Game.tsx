@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router"
 import { SettlementInterface } from "./Settlement/SettlementInterface/SettlementInterface";
 import { load } from "@tauri-apps/plugin-store";
 import { saveLocation } from "./utilities/SaveData";
-import { addGoods, empty_goodsdist, goodsdist, subtractGoods } from "./Goods/GoodsDist";
+import { addGoods, empty_goodsdist, goodsdist, roundGoods, subtractGoods } from "./Goods/GoodsDist";
 import DisplayGoods from "./components/goodsDislay";
 import Settlement from "./Settlement/Settlement";
 import { Dialog } from "primereact/dialog";
@@ -18,6 +18,12 @@ import { LoanInterface } from "./Economics/loans/loanInterface";
 import { MonthInfo } from "./components/MonthInfo";
 import { Card } from "primereact/card";
 import { ArmyInterface } from "./Military/Army/Army";
+
+export interface FederalChangeProps {
+    settlements: SettlementInterface[],
+    loans: LoanInterface[],
+    armies: ArmyInterface[]
+}
 export default function Game() {
     const gameId = useParams().game
     let navigate = useNavigate();
@@ -53,21 +59,8 @@ export default function Game() {
         updateSettlements()
     }
     
-    const updateSettlements = () => setChangeGoods(FederalChange(settlements,loans,armies))
+    const updateSettlements = () => setChangeGoods({...FederalChange(settlements,loans,armies)})
 
-    const setSettlementTax = (name: string, val: number) => {
-        setSettlements(settlements.map(s => {
-            if (s.name !== name) {return s}
-            return {...s,settlement_tax: val}
-        }))
-    }
-
-    const setSettlementQuota = (name: string, val: number) => {
-        setSettlements(settlements.map(s => {
-            if (s.name !== name) {return s}
-            return {...s,production_quota: val}
-        }))
-    }
 
     const giveGoods = (name: string) => {
         setWhoToGive(name)
@@ -105,6 +98,7 @@ export default function Game() {
         s.name = `settlement${settlements.length + 1}`
         setSettlements([...settlements,s])
         setPrices({...calcPriceGoods(prices,reserveGoods,s.stock)})
+        updateSettlements()
     }
 
     const processNextTurn = async () => {
@@ -126,6 +120,22 @@ export default function Game() {
     const goToMilitary = async () => {
         await saveData()
         navigate(`military`)
+    }
+
+    const updateTaxation = (name: string, taxation: goodsdist) => {
+        setSettlements(settlements.map(s => {
+            if (s.name !== name) {return s}
+            return {...s, taxation: taxation}
+        }))
+        setChangeGoods({...FederalChange(settlements,loans,armies)})
+    }
+
+    const setMerchantTax = (name: string, merchant_tax: number) => {
+        setSettlements(settlements.map(s => {
+            if (s.name !== name) {return s}
+            return {...s, merchant_tax: merchant_tax}
+        }))
+        setChangeGoods({...FederalChange(settlements,loans,armies)})
     }
 
 
@@ -171,20 +181,20 @@ export default function Game() {
             </div>
 
             {/* Federal Reserve Section */}
-            <Card>
+            <Card className="sticky top-0 z-5 bg-black shadow-2">
                 <div className="flex flex-column gap-3">
                     <div className="flex flex-row justify-content-between align-items-center">
                         <h2 className="m-0">Federal Reserve</h2>
                         {settlements.length > 0 && (
                             <DisplayGoods 
-                                stock={reserveGoods} 
+                                stock={roundGoods(reserveGoods)} 
                                 change={{
                                     ...changeGoods,
-                                    money: settlements.map(
+                                    money: Math.round(settlements.map(
                                         s => s.clans.map(
-                                            c => Math.round(c.tax_rate * c.taxed_productivity * s.settlement_tax)
+                                            c => Math.round(c.tax_rate * c.taxed_productivity * s.taxation.money)
                                         ).reduce((sum,val) => sum + val)
-                                    ).reduce((sum,val) => sum + val)
+                                    ).reduce((sum,val) => sum + val))
                                 }}
                             />
                         )}
@@ -198,10 +208,16 @@ export default function Game() {
                     <div key={s.name} className="col-12 md:col-6 lg:col-4">
                         <Settlement 
                             settlement={s} 
-                            updateTax={setSettlementTax}
-                            updateQuota={setSettlementQuota}
                             stimulus={giveGoods}
+                            updateTaxation={updateTaxation}
+                            updateMerchantTax={setMerchantTax}
                             goTo={navigateSettlement}
+                            federal_reserve={reserveGoods}
+                            FederalProps={{
+                                settlements: settlements,
+                                loans: loans,
+                                armies: armies
+                            }}
                         />
                     </div>
                 ))}

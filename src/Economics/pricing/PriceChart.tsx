@@ -37,8 +37,8 @@ export const priceChartDataProp = (price_history: goodsdist[],current_price: goo
                 tension: tension
             },
             {
-                label: 'Artisinal Goods',
-                data: [...price_history.map(price => Math.round(price.artisinal)),current_price.artisinal],
+                label: 'Artisanal Goods',
+                data: [...price_history.map(price => Math.round(price.artisanal)),current_price.artisanal],
                 fill: false,
                 borderColor: documentStyle.getPropertyValue('--yellow-500'),
                 tension: tension

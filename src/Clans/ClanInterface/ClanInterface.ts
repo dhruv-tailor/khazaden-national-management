@@ -85,7 +85,7 @@ export const calcLoyalty = (clan: ClanInterface, settlement: SettlementInterface
     let loyalty = 0
     loyalty += 1 - ensureNumber(settlement.deficet.beer / settlement.consumption_rate.beer)
     loyalty += 1 - ensureNumber(settlement.deficet.leather / settlement.consumption_rate.leather)
-    loyalty += 1 - ensureNumber(settlement.deficet.artisinal / settlement.consumption_rate.artisinal)
+    loyalty += 1 - ensureNumber(settlement.deficet.artisanal / settlement.consumption_rate.artisanal)
     
     let val = deficetRatio(settlement.deficet.livestock,settlement.consumption_rate.livestock)
     loyalty += val[0]

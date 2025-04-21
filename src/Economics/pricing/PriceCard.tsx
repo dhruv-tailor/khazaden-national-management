@@ -4,7 +4,7 @@ import { goodsdist } from "../../Goods/GoodsDist";
 import FoodIconTT from "../../tooltips/goods/FoodIconTT";
 import BeerIconTT from "../../tooltips/goods/BeerIconTT";
 import LeatherIconTT from "../../tooltips/goods/LeatherIconTT";
-import ArtisinalIconTT from "../../tooltips/goods/ArtisinalIconTT";
+import ArtisanalIconTT from "../../tooltips/goods/ArtisanalIconTT";
 import LivestockIconTT from "../../tooltips/goods/LivestockIconTT";
 import OrnamentalIconTT from "../../tooltips/goods/OrnamentalIconTT";
 import EnchantedIconTT from "../../tooltips/goods/EnchantedIconTT";
@@ -32,7 +32,7 @@ interface TableView {
 }
 
 export default function PriceCard(
-    {name,id,goods,prices,merchantCapacity,maxCost,updateFunc}: 
+    {name,id,goods,prices,merchantCapacity,maxCost,updateFunc,myGoods,myChange}: 
     {
         name: string,
         id: string,
@@ -41,13 +41,15 @@ export default function PriceCard(
         merchantCapacity: number
         maxCost: number
         updateFunc: (id: string, capUsed: number, order: goodsdist) => void
+        myGoods: goodsdist
+        myChange: goodsdist
     }) {
 
     const table: TableView[] = [
         {name: <FoodIconTT/>, price: prices.food, available: goods.food},
         {name: <BeerIconTT/>, price: prices.beer, available: goods.beer},
         {name: <LeatherIconTT/>, price: prices.leather, available: goods.leather},
-        {name: <ArtisinalIconTT/>, price: prices.artisinal, available: goods.artisinal},
+        {name: <ArtisanalIconTT/>, price: prices.artisanal, available: goods.artisanal},
         {name: <LivestockIconTT/>, price: prices.livestock, available: goods.livestock},
         {name: <OrnamentalIconTT/>, price: prices.ornamental, available: goods.ornamental},
         {name: <EnchantedIconTT/>, price: prices.enchanted, available: goods.enchanted},
@@ -89,7 +91,7 @@ export default function PriceCard(
                 </DataTable>
                 <Button icon='pi pi-shopping-cart' severity="success" className="flex-grow-1" label="Buy" onClick={() => setShowBuy(true)}/>
                 <Dialog visible={showBuy} header={`Buy From ${name}`} onHide={() => setShowBuy(false)}>
-                    <PlaceOrder goods={goods} prices={prices} merchantCapacity={merchantCapacity} maxCost={maxCost} updateFunc={processOrder}/>
+                    <PlaceOrder goods={goods} prices={prices} merchantCapacity={merchantCapacity} maxCost={maxCost} updateFunc={processOrder} myGoods={myGoods} myChange={myChange}/>
                 </Dialog>
             </div>
         </Card>

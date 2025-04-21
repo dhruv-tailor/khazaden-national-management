@@ -2,7 +2,7 @@ import { FaBomb } from "react-icons/fa";
 import FoodIconTT from "../goods/FoodIconTT";
 import BeerIconTT from "../goods/BeerIconTT";
 import LeatherIconTT from "../goods/LeatherIconTT";
-import ArtisinalIconTT from "../goods/ArtisinalIconTT";
+import ArtisanalIconTT from "../goods/ArtisanalIconTT";
 import ToolsIconTT from "../goods/ToolsIconTT";
 import MedicalIconTT from "../goods/MedicalIconTT";
 import LivestockIconTT from "../goods/LivestockIconTT";
@@ -19,7 +19,7 @@ export default function BlastingChargesIconTT() {
                 <FoodIconTT/>
                 <BeerIconTT/>
                 <LeatherIconTT/>
-                <ArtisinalIconTT/>
+                <ArtisanalIconTT/>
                 <ToolsIconTT/>
                 <MedicalIconTT/>
                 <LivestockIconTT/>

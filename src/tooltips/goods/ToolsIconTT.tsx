@@ -11,7 +11,7 @@ export default function ToolsIconTT() {
     return <ToolTips 
         hover={<FaTools/>}
         body={<>
-            <b>Timber</b>
+            <b>Tools</b>
             <div className="flex flex-row gap-1">
                 Consumed by:
                 <MinersIconTT/>

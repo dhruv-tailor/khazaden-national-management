@@ -1,36 +1,24 @@
-Initial Version Features
-----------------------------
-Days Months and Years - O
-Goods Production - O
-Bureaucratic Focus - O
-Settlements - O
-Resource Caps - O
-Pop Growth - O
-Pop Conversion/ Encourage Growth - O
-Military - X
-Goods Consumption - O
-Trade - O
-Trade Potential - O
-Diplomacy - X
-Loans - O
-Development - O
+v0.1.1 plans
+-------------------
 
+Features
+---------------
+break down production quota into all components ✅
+pull out merchant capacity tax ✅
 
-In Progress
-------------------
-Military
+QOL/ UI
+------
+See good surplus/deficit in buy/sell screen ✅
+UI in Federal Economy screen matches the UI in the settlement economy screen ✅
+Removed the need to constantly scroll up and down in the settlement screen going 'wait how many tools do I need to produce?' ✅
 
-
-Future Features
---------------------
-Seasons
-Weather Reports
-Customized Start
-Market Caps
-Starting Scenarios
-Slavery?
-
-Known Bugs
------------------
-Population might be growing fast
-
+Bugs
+----------
+Finance not Finiance ✅
+Artisanal not Artisinal ✅
+Tools larping as Timber ✅
+Money not being rounded properly ✅
+foreign nations will no longer escalate a trade war that you de-escalted (even though you started it) ✅
+Farmers are illiterate as intended ✅
+Magic Runes are not required to guard wheat anymore ✅
+Prevented The Eid from refusing to buy crystal balls because it's cheaper by 0.0001 FP somewhere else ✅

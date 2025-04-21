@@ -5,7 +5,7 @@ export interface goodsdist {
     food: number;
     beer: number;
     leather: number;
-    artisinal: number;
+    artisanal: number;
     livestock: number;
     ornamental: number;
     enchanted: number;
@@ -27,7 +27,7 @@ export enum goodsId {
     food,
     beer,
     leather,
-    artisinal,
+    artisanal,
     livestock,
     ornamental,
     enchanted,
@@ -49,7 +49,7 @@ export const empty_goodsdist: goodsdist = {
     food: 0,
     beer: 0,
     leather: 0,
-    artisinal: 0,
+    artisanal: 0,
     livestock: 0,
     ornamental: 0,
     enchanted: 0,
@@ -72,7 +72,7 @@ export const addGoods = (a: goodsdist, b: goodsdist): goodsdist => {
         food: a.food + b.food,
         beer: a.beer + b.beer,
         leather: a.leather + b.leather,
-        artisinal: a.artisinal + b.artisinal,
+        artisanal: a.artisanal + b.artisanal,
         livestock: a.livestock + b.livestock,
         ornamental: a.ornamental + b.ornamental,
         enchanted: a.enchanted + b.enchanted,
@@ -96,7 +96,7 @@ export const subtractGoods = (a: goodsdist, b: goodsdist): goodsdist => {
         food: a.food - b.food,
         beer: a.beer - b.beer,
         leather: a.leather - b.leather,
-        artisinal: a.artisinal - b.artisinal,
+        artisanal: a.artisanal - b.artisanal,
         livestock: a.livestock - b.livestock,
         ornamental: a.ornamental - b.ornamental,
         enchanted: a.enchanted - b.enchanted,
@@ -120,7 +120,7 @@ export const multiplyGoods = (a: goodsdist, b: goodsdist): goodsdist => {
         food: a.food * b.food,
         beer: a.beer * b.beer,
         leather: a.leather * b.leather,
-        artisinal: a.artisinal * b.artisinal,
+        artisanal: a.artisanal * b.artisanal,
         livestock: a.livestock * b.livestock,
         ornamental: a.ornamental * b.ornamental,
         enchanted: a.enchanted * b.enchanted,
@@ -144,7 +144,7 @@ export const divideGoods = (a: goodsdist, b: goodsdist): goodsdist => {
         food: ensureNumber(a.food / b.food),
         beer: ensureNumber(a.beer / b.beer),
         leather: ensureNumber(a.leather / b.leather),
-        artisinal: ensureNumber(a.artisinal / b.artisinal),
+        artisanal: ensureNumber(a.artisanal / b.artisanal),
         livestock: ensureNumber(a.livestock / b.livestock),
         ornamental: ensureNumber(a.ornamental / b.ornamental),
         enchanted: ensureNumber(a.enchanted / b.enchanted),
@@ -168,7 +168,7 @@ export const scaleGoods = (a: goodsdist, modifier: number): goodsdist => {
         food: a.food * modifier,
         beer: a.beer * modifier,
         leather: a.leather * modifier,
-        artisinal: a.artisinal * modifier,
+        artisanal: a.artisanal * modifier,
         livestock: a.livestock * modifier,
         ornamental: a.ornamental * modifier,
         enchanted: a.enchanted * modifier,
@@ -192,7 +192,7 @@ export const scaleDownGoods = (a: goodsdist, modifier: number): goodsdist => {
         food: ensureNumber(a.food / modifier),
         beer: ensureNumber(a.beer / modifier),
         leather: ensureNumber(a.leather / modifier),
-        artisinal: ensureNumber(a.artisinal / modifier),
+        artisanal: ensureNumber(a.artisanal / modifier),
         livestock: ensureNumber(a.livestock / modifier),
         ornamental: ensureNumber(a.ornamental / modifier),
         enchanted: ensureNumber(a.enchanted / modifier),
@@ -216,7 +216,7 @@ export const roundGoods = (a: goodsdist): goodsdist => {
         food: Math.round(a.food),
         beer: Math.round(a.beer),
         leather: Math.round(a.leather),
-        artisinal: Math.round(a.artisinal),
+        artisanal: Math.round(a.artisanal),
         livestock: Math.round(a.livestock),
         ornamental: Math.round(a.ornamental),
         enchanted: Math.round(a.enchanted),
@@ -239,7 +239,7 @@ export const totalGoods = (a: goodsdist): number => {
     total += a.food
     total += a.beer
     total += a.leather
-    total += a.artisinal
+    total += a.artisanal
     total += a.livestock
     total += a.ornamental
     total += a.enchanted
@@ -263,7 +263,7 @@ export const floorGoods = (a: goodsdist): goodsdist => {
         food: Math.floor(a.food),
         beer: Math.floor(a.beer),
         leather: Math.floor(a.leather),
-        artisinal: Math.floor(a.artisinal),
+        artisanal: Math.floor(a.artisanal),
         livestock: Math.floor(a.livestock),
         ornamental: Math.floor(a.ornamental),
         enchanted: Math.floor(a.enchanted),
@@ -287,7 +287,7 @@ export const minPerGood = (a: goodsdist,b: number): goodsdist => {
         food: Math.max(a.food,b),
         beer: Math.max(a.beer,b),
         leather: Math.max(a.leather,b),
-        artisinal: Math.max(a.artisinal,b),
+        artisanal: Math.max(a.artisanal,b),
         livestock: Math.max(a.livestock,b),
         ornamental: Math.max(a.ornamental,b),
         enchanted: Math.max(a.enchanted,b),
@@ -302,5 +302,29 @@ export const minPerGood = (a: goodsdist,b: number): goodsdist => {
         books: Math.max(a.books,b),
         enchanted_arms: Math.max(a.enchanted_arms,b),
         charcoal: Math.max(a.charcoal,b)
+    }
+}
+
+export const inverseGoodPercentages = (a: goodsdist): goodsdist => {
+    return {
+        money: 1 - a.money,
+        food: 1 - a.food,
+        beer: 1 - a.beer,
+        leather: 1 - a.leather,
+        artisanal: 1 - a.artisanal,
+        livestock: 1 - a.livestock,
+        ornamental: 1 - a.ornamental,
+        enchanted: 1 - a.enchanted,
+        timber: 1 - a.timber,
+        tools: 1 - a.tools,
+        common_ores: 1 - a.common_ores,
+        medical: 1 - a.medical,
+        rare_ores: 1 - a.rare_ores,
+        gems: 1 - a.gems,
+        runes: 1 - a.runes,
+        arms: 1 - a.arms,
+        books: 1 - a.books,
+        enchanted_arms: 1 - a.enchanted_arms,
+        charcoal: 1 - a.charcoal
     }
 }

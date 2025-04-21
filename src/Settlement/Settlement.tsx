@@ -6,17 +6,24 @@ import { InputText } from "primereact/inputtext";
 import { Slider } from "primereact/slider";
 import { Button } from "primereact/button";
 import { Panel } from "primereact/panel";
-
+import { goodsdist, roundGoods } from "../Goods/GoodsDist";
+import SettlementTaxation from "../Economics/settlement/SettlementTaxation";
+import { useState } from "react";
+import { Dialog } from "primereact/dialog";
+import { FederalChangeProps } from "../Game";
 export default function Settlement(
-    {settlement,updateTax,updateQuota, stimulus,goTo}: 
+    {settlement, stimulus,goTo,updateTaxation,updateMerchantTax,federal_reserve,FederalProps}: 
     {
         settlement: SettlementInterface,
-        updateTax: (name: string, val: number) => void,
-        updateQuota: (name: string, val: number) => void,
         stimulus: (name: string) => void,
-        goTo: (name: string) => void
+        goTo: (name: string) => void,
+        updateTaxation: (name: string, taxation: goodsdist) => void,
+        updateMerchantTax: (name: string, merchant_tax: number) => void,
+        federal_reserve: goodsdist,
+        FederalProps: FederalChangeProps
     }
 ) {
+    const [showTaxation, setShowTaxation] = useState(false);
     const footer = (
         <div className="flex justify-content-end">
             <Button 
@@ -27,6 +34,9 @@ export default function Settlement(
             />
         </div>
     );
+
+    const setTaxation = (taxation: goodsdist) => updateTaxation(settlement.name,taxation);
+    const setMerchantTax = (merchant_tax: number) => updateMerchantTax(settlement.name,merchant_tax);
 
     return (
         <Card 
@@ -47,51 +57,19 @@ export default function Settlement(
                 {/* Goods Section */}
                 <Panel header="Goods" toggleable>
                     <DisplayGoods 
-                        stock={settlement.stock} 
-                        change={settlementChange(settlement)} 
+                        stock={roundGoods(settlement.stock)} 
+                        change={roundGoods(settlementChange(settlement))} 
                     />
                 </Panel>
 
                 {/* Economic Controls Section */}
                 <Panel header="Economic Controls" toggleable>
                     <div className="flex flex-column gap-3">
-                        {/* Tax Rate Control */}
-                        <div className="flex flex-column gap-2">
-                            <div className="flex justify-content-between align-items-center">
-                                <label htmlFor="tax-rate" className="font-semibold">Settlement Tax</label>
-                                <InputText 
-                                    id="tax-rate" 
-                                    value={`${Math.round(settlement.settlement_tax * 100)}%`}
-                                    className="w-4rem text-right"
-                                    disabled
-                                />
-                            </div>
-                            <Slider 
-                                value={settlement.settlement_tax * 100} 
-                                onChange={e => updateTax(settlement.name,(e.value as number)/100)} 
-                                step={1}
-                                className="w-full"
-                            />
-                        </div>
-
-                        {/* Production Quota Control */}
-                        <div className="flex flex-column gap-2">
-                            <div className="flex justify-content-between align-items-center">
-                                <label htmlFor="production-quota" className="font-semibold">Production Quota</label>
-                                <InputText 
-                                    id="production-quota" 
-                                    value={`${Math.round(settlement.production_quota * 100)}%`}
-                                    className="w-4rem text-right"
-                                    disabled
-                                />
-                            </div>
-                            <Slider 
-                                value={settlement.production_quota * 100} 
-                                onChange={e => updateQuota(settlement.name,(e.value as number)/100)} 
-                                step={1}
-                                className="w-full"
-                            />
-                        </div>
+                        <Button 
+                            label="Taxation" 
+                            icon="pi pi-money-bill" 
+                            onClick={()=>setShowTaxation(true)}
+                        />
 
                         {/* Stimulus Button */}
                         <Button 
@@ -103,6 +81,20 @@ export default function Settlement(
                     </div>
                 </Panel>
             </div>
+            <Dialog 
+                header="Taxation" 
+                visible={showTaxation} 
+                onHide={()=>setShowTaxation(false)}
+                className="w-8"
+            >
+                <SettlementTaxation 
+                    settlement={settlement} 
+                    updateTaxation={setTaxation} 
+                    setMerchantTax={setMerchantTax} 
+                    federal_reserve={federal_reserve}
+                    FederalProps={FederalProps}
+                />
+            </Dialog>
         </Card>
     );
 }

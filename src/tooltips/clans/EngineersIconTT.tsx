@@ -1,5 +1,5 @@
 import { MdEngineering } from "react-icons/md";
-import ArtisinalIconTT from "../goods/ArtisinalIconTT";
+import ArtisanalIconTT from "../goods/ArtisanalIconTT";
 import BeerIconTT from "../goods/BeerIconTT";
 import BooksIconTT from "../goods/BooksIconTT";
 import FoodIconTT from "../goods/FoodIconTT";
@@ -20,7 +20,7 @@ export default function EngineersIconTT() {
                 <FoodIconTT/>
                 <BeerIconTT/>
                 <LeatherIconTT/>
-                <ArtisinalIconTT/>
+                <ArtisanalIconTT/>
                 <OrnamentalIconTT/>
                 <LivestockIconTT/>
                 <RunesIconTT/>

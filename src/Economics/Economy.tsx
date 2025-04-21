@@ -18,6 +18,7 @@ import { LoanInterface, takeLoan } from "./loans/loanInterface";
 import ViewLoans from "./loans/ViewLoans";
 import { Card } from "primereact/card";
 import { ArmyInterface } from "../Military/Army/Army";
+
 export default function Economy() {
     const gameId = useParams().game;
     let navigate = useNavigate();
@@ -53,14 +54,14 @@ export default function Economy() {
     const updateSettlements = () => {
         const change_reserve = settlements.map(settlement => {
             return settlement.clans.map(
-                clan => roundGoods(scaleGoods(clan.production,settlement.production_quota))
+                clan => roundGoods(multiplyGoods(clan.production,settlement.taxation))
             ).reduce((sum,val) => addGoods(sum,val))
         }).reduce((sum,val) => addGoods(sum,val))
 
         change_reserve.money = Math.round(settlements.map(settlement => {
             return settlement.clans.map(
                 clan => clan.tax_rate * clan.taxed_productivity
-            ).reduce((sum,val) => sum + val) * settlement.settlement_tax
+            ).reduce((sum,val) => sum + val) * settlement.taxation.money
             }).reduce((sum,val) => sum + val))
 
         setChangeGoods(change_reserve)
@@ -132,7 +133,7 @@ export default function Economy() {
         if (type === goodsId.food) {money_gained = units * prices.food}
         if (type === goodsId.beer) {money_gained = units * prices.beer}
         if (type === goodsId.leather) {money_gained = units * prices.leather}
-        if (type === goodsId.artisinal) {money_gained = units * prices.artisinal}
+        if (type === goodsId.artisanal) {money_gained = units * prices.artisanal}
         if (type === goodsId.livestock) {money_gained = units * prices.livestock}
         if (type === goodsId.ornamental) {money_gained = units * prices.ornamental}
         if (type === goodsId.enchanted) {money_gained = units * prices.enchanted}
@@ -152,7 +153,7 @@ export default function Economy() {
             food: type === goodsId.food ? reserveGoods.food - units : reserveGoods.food,
             beer: type === goodsId.beer ? reserveGoods.beer - units : reserveGoods.beer,
             leather: type === goodsId.leather ? reserveGoods.leather - units : reserveGoods.leather,
-            artisinal: type === goodsId.artisinal ? reserveGoods.artisinal - units : reserveGoods.artisinal,
+            artisanal: type === goodsId.artisanal ? reserveGoods.artisanal - units : reserveGoods.artisanal,
             livestock: type === goodsId.livestock ? reserveGoods.livestock - units : reserveGoods.livestock,
             ornamental: type === goodsId.ornamental ? reserveGoods.ornamental - units : reserveGoods.ornamental,
             enchanted: type === goodsId.enchanted ? reserveGoods.enchanted - units : reserveGoods.enchanted,
@@ -177,7 +178,7 @@ export default function Economy() {
                 food: power.available_supply.food - (type === goodsId.food ? units : 0),
                 beer: power.available_supply.beer - (type === goodsId.beer ? units : 0),
                 leather: power.available_supply.leather - (type === goodsId.leather ? units : 0),
-                artisinal: power.available_supply.artisinal - (type === goodsId.artisinal ? units : 0),
+                artisanal: power.available_supply.artisanal - (type === goodsId.artisanal ? units : 0),
                 livestock: power.available_supply.livestock - (type === goodsId.livestock ? units : 0),
                 ornamental: power.available_supply.ornamental - (type === goodsId.ornamental ? units : 0),
                 enchanted: power.available_supply.enchanted - (type === goodsId.enchanted ? units : 0),
@@ -214,16 +215,18 @@ export default function Economy() {
     }
 
     return (
-        <div className="flex flex-column gap-3 p-3">
+        <div className="flex flex-column gap-3">
             {/* Header Section */}
-            <div className="flex flex-row align-items-center justify-content-between">
+            <div className="flex flex-row justify-content-between align-items-center">
                 <Button 
+                    size="small" 
                     label="Go Back" 
                     icon='pi pi-angle-double-left' 
                     onClick={() => navigateTo(`/game/${gameId}`)}
-                    severity="secondary"
+                    className="p-button-text"
                 />
                 <Button 
+                    size="small" 
                     label="View Loans" 
                     icon='pi pi-money-bill' 
                     onClick={() => setShowLoans(true)}
@@ -231,26 +234,11 @@ export default function Economy() {
                 />
             </div>
 
-            {/* Loans Dialog */}
-            <Dialog 
-                header="Loans" 
-                visible={showLoans} 
-                onHide={() => setShowLoans(false)}
-            >
-                <ViewLoans 
-                    loans={loans} 
-                    settlements={settlements} 
-                    updateFunc={loanTaken} 
-                    declareBankruptcy={declareBankruptcy}
-                />
-            </Dialog>
-
             {/* Federal Reserve Section */}
-            <Card>
+            <Card title="Federal Reserve" className="sticky top-0 z-5 bg-black shadow-2">
                 <div className="flex flex-column gap-3">
-                    <div className="flex flex-row justify-content-between align-items-center">
-                        <h2 className="m-0">Federal Reserve</h2>
-                        <div className="flex flex-row align-items-center gap-2">
+                    <div className="flex flex-row align-items-center gap-3">
+                        <div className="flex flex-column gap-1">
                             <MonthsStoredTT/>
                             <InputNumber 
                                 showButtons 
@@ -260,8 +248,6 @@ export default function Economy() {
                                 onChange={e => setFederalMonthsStored(e.value as number)}
                             />
                         </div>
-                    </div>
-                    <div className="flex flex-row gap-3">
                         {settlements.length > 0 && (
                             <DisplayGoods 
                                 stock={reserveGoods} 
@@ -269,56 +255,37 @@ export default function Economy() {
                                     ...changeGoods,
                                     money: settlements.map(
                                         s => s.clans.map(
-                                            c => Math.round(c.tax_rate * c.taxed_productivity * s.settlement_tax)
+                                            c => Math.round(c.tax_rate * c.taxed_productivity * s.taxation.money)
                                         ).reduce((sum,val) => sum + val)
                                     ).reduce((sum,val) => sum + val)
                                 }}
                             />
                         )}
                         <Button 
-                            icon="pi pi-wallet" 
                             label="Sell Goods" 
+                            icon="pi pi-wallet" 
                             severity="success" 
                             onClick={() => setShowSell(true)}
+                            className="ml-auto"
                         />
                     </div>
                 </div>
             </Card>
 
-            {/* Sell Goods Dialog */}
-            <Dialog 
-                header="Sell Goods" 
-                visible={showSell} 
-                onHide={() => setShowSell(false)}
-                className="w-30rem"
-            >
-                <SellGoods
-                    merchantCapacity={merchantCapacity}
-                    supply={reserveGoods}
-                    foreignPowers={foreignPowers.filter(p => p.isEmbargoed === false)} 
-                    prices={prices} 
-                    competingPrices={settlements.map(s => s.prices)}
-                    updateFunc={processSell}
-                />
-            </Dialog>
-
             {/* Price Chart Section */}
-            <Card>
-                <div className="flex flex-column gap-3">
-                    <h2 className="m-0">Federal Prices</h2>
-                    <PriceChart 
-                        data={priceChartDataProp(priceHistory,prices)} 
-                        options={priceChartOptionsProp()}
-                    />
-                </div>
+            <Card title="Federal Prices">
+                <PriceChart 
+                    data={priceChartDataProp(priceHistory,prices)} 
+                    options={priceChartOptionsProp()}
+                />
             </Card>
 
             {/* Local Goods Section */}
-            <Card>
+            <Card title='Local Goods'>
                 <div className="flex flex-column gap-3">
-                    <div className="flex flex-row justify-content-between align-items-center">
-                        <h2 className="m-0">Local Goods</h2>
-                        <span className="font-bold">Merchant Capacity: {merchantCapacity}</span>
+                    <div className="font-bold">
+                        Merchant Capacity: {merchantCapacity} | 
+                        Available Money: {reserveGoods.money}
                     </div>
                     <div className="grid">
                         {settlements.map(s => (
@@ -331,6 +298,8 @@ export default function Economy() {
                                     merchantCapacity={merchantCapacity}
                                     maxCost={reserveGoods.money}
                                     updateFunc={processSettlementOrder}
+                                    myGoods={roundGoods(reserveGoods)}
+                                    myChange={roundGoods(changeGoods)}
                                 />
                             </div>
                         ))}
@@ -339,11 +308,11 @@ export default function Economy() {
             </Card>
 
             {/* Global Goods Section */}
-            <Card>
+            <Card title='Global Goods'>
                 <div className="flex flex-column gap-3">
-                    <div className="flex flex-row justify-content-between align-items-center">
-                        <h2 className="m-0">Global Goods</h2>
-                        <span className="font-bold">Merchant Capacity: {merchantCapacity}</span>
+                    <div className="font-bold">
+                        Merchant Capacity: {merchantCapacity} | 
+                        Available Money: {reserveGoods.money}
                     </div>
                     <div className="grid">
                         {foreignPowers.filter(power => !power.isEmbargoed).map(power => (
@@ -356,12 +325,44 @@ export default function Economy() {
                                     merchantCapacity={merchantCapacity}
                                     maxCost={reserveGoods.money}
                                     updateFunc={processForeignOrder}
+                                    myGoods={roundGoods(reserveGoods)}
+                                    myChange={roundGoods(changeGoods)}
                                 />
                             </div>
                         ))}
                     </div>
                 </div>
             </Card>
+
+            {/* Dialogs */}
+            <Dialog 
+                header="Sell Goods" 
+                visible={showSell} 
+                onHide={() => setShowSell(false)}
+            >
+                <SellGoods
+                    merchantCapacity={merchantCapacity}
+                    supply={reserveGoods}
+                    foreignPowers={foreignPowers.filter(p => p.isEmbargoed === false)} 
+                    prices={prices} 
+                    competingPrices={settlements.map(s => s.prices)}
+                    currentChange={roundGoods(changeGoods)}
+                    updateFunc={processSell}
+                />
+            </Dialog>
+
+            <Dialog 
+                header="Loans" 
+                visible={showLoans} 
+                onHide={() => setShowLoans(false)}
+            >
+                <ViewLoans 
+                    loans={loans} 
+                    settlements={settlements} 
+                    updateFunc={loanTaken} 
+                    declareBankruptcy={declareBankruptcy}
+                />
+            </Dialog>
         </div>
     )
 }

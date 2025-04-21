@@ -1,4 +1,4 @@
-import ArtisinalIconTT from "../goods/ArtisinalIconTT";
+import ArtisanalIconTT from "../goods/ArtisanalIconTT";
 import BeerIconTT from "../goods/BeerIconTT";
 import FoodIconTT from "../goods/FoodIconTT";
 import LeatherIconTT from "../goods/LeatherIconTT";
@@ -22,7 +22,7 @@ export default function CraftsmenIconTT() {
                 <FoodIconTT/>
                 <BeerIconTT/>
                 <LeatherIconTT/>
-                <ArtisinalIconTT/>
+                <ArtisanalIconTT/>
                 <OrnamentalIconTT/>
                 <TimberIconTT/>
                 <CommonOresIconTT/>
@@ -30,7 +30,7 @@ export default function CraftsmenIconTT() {
             </div>
             <div className="flex flex-row gap-1">
                 Produces:
-                <ArtisinalIconTT/>
+                <ArtisanalIconTT/>
                 <OrnamentalIconTT/>
                 <ToolsIconTT/>
                 <ArmsIconTT/>
