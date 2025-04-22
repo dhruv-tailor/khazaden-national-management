@@ -8,6 +8,7 @@ export interface TradeDealInterface {
     outgoing: goodsdist;
     incoming: goodsdist;
     duration: number;
+    active: 'sent' | 'checking' | 'active'
 }
 
 export const empty_trade_deal: TradeDealInterface = {
@@ -16,5 +17,6 @@ export const empty_trade_deal: TradeDealInterface = {
     type: 'foreign',
     outgoing: {...empty_goodsdist},
     incoming: {...empty_goodsdist},
-    duration: 0
+    duration: 0,
+    active: 'active'
 }

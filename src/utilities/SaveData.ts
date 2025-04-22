@@ -97,7 +97,6 @@ export const createNewSave = async (saveName: string)  => {
     store.set('Federal Prices',{...initial_prices}) // Prices for the goods in the federal reserve
     store.set('Price History',[]) // Tracks the history of prices in the nation
     store.set('Merchant Capacity',0) // Merchant Capacity for the nation
-    store.set('Months Stored',1) // Months worth of goods that are stored in the nation
     store.set('Loans',[]) // History of loans
     store.set('Current Year',728) // Current Year
     store.set('Current Month',0) // Current Month
@@ -135,7 +134,6 @@ export const createCustomSave = async (saveName: string,custom_resources: goodsd
     store.set('Federal Prices',{...initial_prices}) // Prices for the goods in the federal reserve
     store.set('Price History',[]) // Tracks the history of prices in the nation
     store.set('Merchant Capacity',0) // Merchant Capacity for the nation
-    store.set('Months Stored',1) // Months worth of goods that are stored in the nation
     store.set('Loans',[]) // History of loans
     store.set('Current Year',728) // Current Year
     store.set('Current Month',0) // Current Month
@@ -217,7 +215,6 @@ export const createJan728Save = async (saveName: string) => {
     store.set('Federal Prices',{...initial_prices}) // Prices for the goods in the federal reserve
     store.set('Price History',[]) // Tracks the history of prices in the nation
     store.set('Merchant Capacity',0) // Merchant Capacity for the nation
-    store.set('Months Stored',1) // Months worth of goods that are stored in the nation
     store.set('Loans',[]) // History of loans
     store.set('Current Year',728) // Current Year
     store.set('Current Month',1) // Current Month
@@ -303,7 +300,6 @@ export const createJul728Save = async (saveName: string) => {
     store.set('Federal Prices',{...initial_prices}) // Prices for the goods in the federal reserve
     store.set('Price History',[]) // Tracks the history of prices in the nation
     store.set('Merchant Capacity',0) // Merchant Capacity for the nation
-    store.set('Months Stored',1) // Months worth of goods that are stored in the nation
     store.set('Loans',[]) // History of loans
     store.set('Current Year',728) // Current Year
     store.set('Current Month',7) // Current Month
@@ -392,7 +388,6 @@ export const createJan729Save = async (saveName: string) => {
     store.set('Federal Prices',{...initial_prices}) // Prices for the goods in the federal reserve
     store.set('Price History',[]) // Tracks the history of prices in the nation
     store.set('Merchant Capacity',0) // Merchant Capacity for the nation
-    store.set('Months Stored',1) // Months worth of goods that are stored in the nation
     store.set('Loans',[]) // History of loans
     store.set('Current Year',728) // Current Year
     store.set('Current Month',7) // Current Month

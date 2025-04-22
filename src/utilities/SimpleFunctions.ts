@@ -1,6 +1,6 @@
 import { LoanInterface } from "../Economics/loans/loanInterface"
-import { roundGoods, scaleGoods, addGoods, goodsdist, empty_goodsdist, subtractGoods, multiplyGoods } from "../Goods/GoodsDist"
-import { MonthsStoreGetChange, SettlementInterface } from "../Settlement/SettlementInterface/SettlementInterface"
+import { roundGoods, addGoods, goodsdist, empty_goodsdist, subtractGoods, multiplyGoods } from "../Goods/GoodsDist"
+import { SettlementInterface } from "../Settlement/SettlementInterface/SettlementInterface"
 import { ArmyInterface } from "../Military/Army/Army"
 // Makes sure the number is not NaN or None
 export const ensureNumber = (value: number): number => isNaN(value) ? 0 : value
@@ -29,9 +29,4 @@ export const FederalChange = (settlements: SettlementInterface[],loans: LoanInte
      )
 
      return(change_reserve)
-}
-
-export const GetFederalGoodsStored = (settlements: SettlementInterface[],months: number,loans: LoanInterface[],armies: ArmyInterface[]): goodsdist => {
-    const store_per_turn = FederalChange(settlements,loans,armies)
-    return scaleGoods(MonthsStoreGetChange(store_per_turn),months)
 }

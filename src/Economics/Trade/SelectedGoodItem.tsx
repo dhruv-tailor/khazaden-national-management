@@ -23,6 +23,8 @@ import CharcoalIconTT from '../../tooltips/goods/CharcoalIconTT';
 interface SelectedGoodItemProps {
     goodName: keyof goodsdist;
     amount: number;
+    isOutgoing: boolean;
+    price: number;
     onRemove: (goodName: keyof goodsdist) => void;
 }
 
@@ -48,12 +50,21 @@ const goodTooltipMap: Record<keyof goodsdist, React.ReactElement> = {
     charcoal: <CharcoalIconTT />
 };
 
-export default function SelectedGoodItem({ goodName, amount, onRemove }: SelectedGoodItemProps) {
+export default function SelectedGoodItem({ goodName, amount, isOutgoing, price, onRemove }: SelectedGoodItemProps) {
     return (
         <div className="flex align-items-center justify-content-between surface-ground p-2 border-1 border-round">
             <div className="flex align-items-center gap-2">
+                <i className={`pi ${!isOutgoing ? 'pi-angle-double-left text-green-500' : ''}`} />
                 {goodTooltipMap[goodName]}
-                <span className="text-sm font-medium">{amount} per month</span>
+                <div className="flex flex-column">
+                    <span className="text-sm font-medium">{amount} per month</span>
+                    <div className="flex align-items-center gap-1">
+                        <span className="text-sm text-500">Valuation of </span>
+                        <MoneyIconTT />
+                        <span className="text-sm text-500">{price * amount} </span>
+                    </div>
+                </div>
+                <i className={`pi ${isOutgoing ? 'pi-angle-double-right text-red-500' : ''}`} />
             </div>
             <Button
                 icon="pi pi-times"

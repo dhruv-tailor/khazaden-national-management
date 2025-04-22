@@ -1,4 +1,5 @@
 import { initial_prices } from "../../Economics/pricing/prices";
+import { TradeDealInterface } from "../../Economics/Trade/interface/TradeDealInterface";
 import { EconomyTypeData, EconomyTypes } from "../../Goods/EconomyTypes";
 import { goodsdist, scaleGoods } from "../../Goods/GoodsDist";
 
@@ -61,7 +62,8 @@ export interface ForeignPowerInterface {
     available_supply: goodsdist;
     available_demand: goodsdist;
     retlaitory_tariffs: number;
-    price_history: goodsdist[]
+    price_history: goodsdist[];
+    trade_deals: TradeDealInterface[];
 }
 
 export const newForeignPower = (name: string, dwarfPopulation: number,economy: EconomyTypes,start_factor: number): ForeignPowerInterface => {
@@ -86,7 +88,8 @@ export const newForeignPower = (name: string, dwarfPopulation: number,economy: E
         available_supply: scaleGoods({ money: 1, ...EconomyTypeData[economy].demand }, pop_scaling_factor * availability_factor),
         available_demand: scaleGoods({ money: 1, ...EconomyTypeData[economy].demand }, pop_scaling_factor * availability_factor),
         retlaitory_tariffs: 0,
-        price_history: []
+        price_history: [],
+        trade_deals: [],
     })
 }
 

@@ -54,7 +54,6 @@ export interface SettlementInterface {
     price_history: goodsdist[]
     merchant_capacity: number;
 
-    months_stored: number;
     interest_rate: number;
     available_loan: number;
     loans: LoanInterface[];
@@ -85,7 +84,6 @@ export const empty_settlement: SettlementInterface = {
     prices: {...initial_prices},
     price_history: [],
     merchant_capacity: 0,
-    months_stored: 1,
     interest_rate: 0.05,
     loans: [],
     available_loan: 0,
@@ -285,12 +283,6 @@ export const settlementChange = (settlement: SettlementInterface): goodsdist => 
     // Cost of Military
     change = subtractGoods(change,settlement.garrison.reduce((sum,val) => addGoods(sum,val.consumption_rate),{...empty_goodsdist}))
     return change
-}
-
-export const monthsStored = (s: SettlementInterface): goodsdist => {
-    const change_per_turn = settlementChange(s)
-
-    return scaleGoods(MonthsStoreGetChange(change_per_turn),s.months_stored)
 }
 
 export const MonthsStoreGetChange = (g: goodsdist): goodsdist => {

@@ -24,13 +24,13 @@ import EnchantedArmsIconTT from '../../tooltips/goods/EnchantedArmsTT';
 import CharcoalIconTT from '../../tooltips/goods/CharcoalIconTT';
 import PlusMinus from '../../components/PlusMinus';
 
-interface TradeGoodSelectorProps {
+export interface PartnerGoodSelectorProps {
     goodName: keyof goodsdist;
     currentStock: number;
     currentChange: number;
     price: number;
-    maxTradeAmount?: number; // Optional limit for foreign nation demand
-    remainingCapacity: number; // Available merchant capacity
+    remainingCapacity: number;
+    partnerMerchantCapacity?: number; // Optional merchant capacity for settlements
     onAddToTrade: (amount: number) => void;
 }
 
@@ -56,49 +56,53 @@ const goodTooltipMap: Record<keyof goodsdist, React.ReactElement> = {
     charcoal: <CharcoalIconTT />
 };
 
-export default function TradeGoodSelector({ 
-    goodName, 
-    currentStock, 
+export const PartnerGoodSelector: React.FC<PartnerGoodSelectorProps> = ({
+    goodName,
+    currentStock,
     currentChange,
     price,
-    maxTradeAmount,
     remainingCapacity,
-    onAddToTrade 
-}: TradeGoodSelectorProps) {
+    partnerMerchantCapacity,
+    onAddToTrade
+}) => {
     const [tradeAmount, setTradeAmount] = useState<number>(0);
 
-    const handleAddToTrade = () => {
-        if (tradeAmount > 0) {
-            onAddToTrade(tradeAmount);
-            setTradeAmount(0); // Reset after adding
-        }
-    };
-
-    // Calculate the effective max amount considering stock, trade limit, and merchant capacity
     const effectiveMaxAmount = Math.min(
         currentStock,
         goodName === 'money' ? Infinity : remainingCapacity,
-        maxTradeAmount !== undefined ? maxTradeAmount : Infinity
+        partnerMerchantCapacity ?? Infinity
     );
 
     return (
         <div className="flex align-items-center justify-content-between surface-ground p-2 border-1 border-round mb-1">
-            <div className="flex flex-column gap-2">
-                <div className="flex align-items-center gap-1">
-                    {goodTooltipMap[goodName]}
-                    <span className="text-sm font-medium" data-pr-tooltip="Current stock">
-                        {currentStock}
-                    </span>
-                    <PlusMinus value={currentChange} />
-                </div>
-                <div className="flex align-items-center gap-1" data-pr-tooltip="Current price">
-                    <MoneyIconTT />
-                    <span className="text-sm font-medium">{price}</span>
+            <div className='flex flex-row'>
+                <Button 
+                    icon="pi pi-angle-double-left"
+                    className="p-button-text p-button-secondary w-2rem h-2rem p-0"
+                    onClick={() => {
+                        if (tradeAmount > 0) {
+                            onAddToTrade(tradeAmount);
+                            setTradeAmount(0);
+                        }
+                    }}
+                    disabled={tradeAmount <= 0 || tradeAmount > effectiveMaxAmount}
+                />
+                <div className="flex flex-column gap-2">
+                    <div className="flex align-items-center gap-1">
+                        {goodTooltipMap[goodName]}
+                        <span className="text-sm font-medium" data-pr-tooltip="Current stock">
+                            {currentStock}
+                        </span>
+                        <PlusMinus value={currentChange} />
+                    </div>
+                    <div className="flex align-items-center gap-1" data-pr-tooltip="Current price">
+                        <MoneyIconTT />
+                        <span className="text-sm font-medium">{price}</span>
+                    </div>
                 </div>
             </div>
 
-            <div className="flex align-items-center gap-2">
-                <InputNumber 
+            <InputNumber 
                     value={tradeAmount} 
                     onValueChange={(e) => setTradeAmount(e.value || 0)}
                     min={0}
@@ -111,15 +115,8 @@ export default function TradeGoodSelector({
                     tooltip={`Max: ${effectiveMaxAmount}`}
                     tooltipOptions={{ position: 'top' }}
                 />
-                <Button 
-                    icon="pi pi-angle-double-right"
-                    className="p-button-text p-button-danger w-2rem h-2rem p-0"
-                    onClick={handleAddToTrade}
-                    disabled={tradeAmount <= 0 || tradeAmount > effectiveMaxAmount}
-                />
-            </div>
 
             <Tooltip target="[data-pr-tooltip]" />
         </div>
     );
-} 
+}; 
