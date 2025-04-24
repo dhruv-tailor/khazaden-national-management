@@ -45,7 +45,6 @@ export default function SettlementDetailed() {
         })
         store.set('settlements',updatedSettlements)
         store.save()
-        console.log('saved')
     }
 
     useEffect(()=>{getSettlement()},[])

@@ -18,11 +18,13 @@ import { LoanInterface } from "./Economics/loans/loanInterface";
 import { MonthInfo } from "./components/MonthInfo";
 import { Card } from "primereact/card";
 import { ArmyInterface } from "./Military/Army/Army";
+import { TradeDealInterface } from "./Economics/Trade/interface/TradeDealInterface";
 
 export interface FederalChangeProps {
     settlements: SettlementInterface[],
     loans: LoanInterface[],
-    armies: ArmyInterface[]
+    armies: ArmyInterface[],
+    tradeDeals: TradeDealInterface[]
 }
 export default function Game() {
     const gameId = useParams().game
@@ -36,6 +38,7 @@ export default function Game() {
     const [prices,setPrices] = useState<goodsdist>({...empty_goodsdist})
     const [loans,setLoans] = useState<LoanInterface[]>([])
     const [armies,setArmies] = useState<ArmyInterface[]>([])
+    const [tradeDeals,setTradeDeals] = useState<TradeDealInterface[]>([])
 
     // Stimulus
     const [whoToGive,setWhoToGive] = useState<string>('');
@@ -49,17 +52,20 @@ export default function Game() {
     
     const getSettlements = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
-        store.get<goodsdist>('Federal Reserve').then(value => {if (value) {setReserveGoods(value);}});
-        store.get<goodsdist>('Federal Prices').then(value => {if (value) {setPrices(value)}})
-        store.get<SettlementInterface[]>('settlements').then(value => {if (value) {setSettlements(value)}});
-        store.get<LoanInterface[]>('loans').then(value => {if (value) {setLoans(value)}});
-        store.get<number>('Current Month').then(value => {if (value) {setCurrentMonth(value)}});
-        store.get<number>('Current Year').then(value => {if (value) {setCurrentYear(value)}});
-        store.get<ArmyInterface[]>('Armies').then(value => {if (value) {setArmies(value)}});
+        await Promise.all([
+            store.get<goodsdist>('Federal Reserve').then(value => {if (value) {setReserveGoods(value);}}),
+            store.get<goodsdist>('Federal Prices').then(value => {if (value) {setPrices(value)}}),
+            store.get<SettlementInterface[]>('settlements').then(value => {if (value) {setSettlements(value)}}),
+            store.get<LoanInterface[]>('loans').then(value => {if (value) {setLoans(value)}}),
+            store.get<number>('Current Month').then(value => {if (value) {setCurrentMonth(value)}}),
+            store.get<number>('Current Year').then(value => {if (value) {setCurrentYear(value)}}),
+            store.get<ArmyInterface[]>('Armies').then(value => {if (value) {setArmies(value)}}),
+            store.get<TradeDealInterface[]>('Trade Deals').then(value => {if (value) {setTradeDeals(value)}})
+        ])
         updateSettlements()
     }
     
-    const updateSettlements = () => setChangeGoods({...FederalChange(settlements,loans,armies)})
+    const updateSettlements = () => setChangeGoods({...FederalChange(settlements,loans,armies,tradeDeals)})
 
 
     const giveGoods = (name: string) => {
@@ -89,6 +95,7 @@ export default function Game() {
         store.set('Federal Reserve',reserveGoods)
         store.set('Federal Prices',prices)
         store.set('loans',loans)
+        store.set('Trade Deals',tradeDeals)
         store.set('Armies',armies)
         store.save()
     }
@@ -127,7 +134,7 @@ export default function Game() {
             if (s.name !== name) {return s}
             return {...s, taxation: taxation}
         }))
-        setChangeGoods({...FederalChange(settlements,loans,armies)})
+        setChangeGoods({...FederalChange(settlements,loans,armies,tradeDeals)})
     }
 
     const setMerchantTax = (name: string, merchant_tax: number) => {
@@ -135,7 +142,7 @@ export default function Game() {
             if (s.name !== name) {return s}
             return {...s, merchant_tax: merchant_tax}
         }))
-        setChangeGoods({...FederalChange(settlements,loans,armies)})
+        setChangeGoods({...FederalChange(settlements,loans,armies,tradeDeals)})
     }
 
 
@@ -216,7 +223,8 @@ export default function Game() {
                             FederalProps={{
                                 settlements: settlements,
                                 loans: loans,
-                                armies: armies
+                                armies: armies,
+                                tradeDeals: tradeDeals
                             }}
                         />
                     </div>

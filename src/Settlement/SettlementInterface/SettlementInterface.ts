@@ -282,6 +282,14 @@ export const settlementChange = (settlement: SettlementInterface): goodsdist => 
     }
     // Cost of Military
     change = subtractGoods(change,settlement.garrison.reduce((sum,val) => addGoods(sum,val.consumption_rate),{...empty_goodsdist}))
+
+    // Cost of Trade Deals
+    settlement.trade_deals.forEach(deal => {
+        if(deal.active === 'active') {
+            change = subtractGoods(change,deal.outgoing)
+            change = addGoods(change,deal.incoming)
+        }
+    })
     return change
 }
 

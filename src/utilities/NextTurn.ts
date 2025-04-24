@@ -9,6 +9,7 @@ import { TerrainData } from "../Settlement/SettlementInterface/TerrainInterface"
 import { LoanInterface, takeLoan } from "../Economics/loans/loanInterface";
 import { ensureNumber } from "./SimpleFunctions";
 import { ArmyInterface } from "../Military/Army/Army";
+import { TradeDealInterface } from "../Economics/Trade/interface/TradeDealInterface";
 
 export const NextTurn = async (game: string) => {
     const store = await load(await saveLocation(game), {autoSave: false});
@@ -27,6 +28,7 @@ export const NextTurn = async (game: string) => {
     const price_history = await store.get<goodsdist[]>('Price History') ?? []
     let loans = await store.get<LoanInterface[]>('Loans') ?? []
     let armies = await store.get<ArmyInterface[]>('Armies') ?? []
+    let trade_deals = await store.get<TradeDealInterface[]>('Trade Deals') ?? []
 
     const current_year = await store.get<number>('Current Year') ?? 0
     const current_month = await store.get<number>('Current Month') ?? 0
@@ -35,6 +37,7 @@ export const NextTurn = async (game: string) => {
     let merchant_capacity: number = 0
 
     settlements?.forEach(settlement => {
+        const market_health = randMarketHealth()
         // First update Taxation
         let base_tax = 0
         let produced: goodsdist = {...empty_goodsdist}
@@ -55,12 +58,20 @@ export const NextTurn = async (game: string) => {
         // Garrison Consumption
         settlement.stock = subtractGoods(settlement.stock,settlement.garrison.reduce((sum,val) => addGoods(sum,val.consumption_rate),{...empty_goodsdist}))
         settlement.stock = roundGoods(settlement.stock)
+        // Trade Deals
+        settlement.trade_deals.forEach(deal => {
+            if(deal.active === 'active') {
+                settlement.stock = subtractGoods(settlement.stock,deal.outgoing)
+                settlement.stock = addGoods(settlement.stock,deal.incoming)
+                deal.duration -= 1
+            }
+        })
         updateSettlmentStock(settlement)
         settlement.prices = calcPriceGoods(settlement.prices,old_stock,settlement.stock)
+        settlement.prices = scaleGoods(settlement.prices,market_health * randMarketHealth() * market_modifier)
         
         // Calculate popGrowth
         settlement.projected_pop = popGrowth(settlement,foreign_nations??[])
-        console.log(settlement.projected_pop,settlement.name)
 
         const p0 = settlement.clans.map(clan => clan.population).reduce((sum,val) => sum + val)
         if(Math.floor(settlement.projected_pop) !== p0) {
@@ -93,11 +104,24 @@ export const NextTurn = async (game: string) => {
             clan.production = floorGoods(scaleGoods(scaleDownGoods(clan.production,clan_produced),clan.goods_produced))
         })
 
+        // Filter out expired trade deals
+        settlement.trade_deals = settlement.trade_deals.filter(deal => deal.duration > 0)
+
         // Merchant Capacity
         const merchants = settlement.clans.filter(clan => clan.id === clanTypes.merchants)[0]
         const merchant_cap = merchants.taxed_productivity
         settlement.merchant_capacity = Math.round(merchant_cap * (1 - settlement.merchant_tax))
         merchant_capacity += Math.round(merchant_cap * settlement.merchant_tax)
+
+        // Remove merchant capacity used by trade deals
+        settlement.trade_deals.forEach(deal => {
+            if(deal.active === 'active') {
+                settlement.merchant_capacity -= totalGoods(deal.outgoing) - totalGoods(deal.incoming)
+            }
+        })
+
+        // Ensure merchant capacity is not negative
+        settlement.merchant_capacity = Math.max(settlement.merchant_capacity,0)
 
         //Reset available natural resource
         settlement.production_cap = {
@@ -125,7 +149,6 @@ export const NextTurn = async (game: string) => {
         // Update available loan
         settlement.available_loan += Math.abs(Math.round(merchants.total_productivity - merchants.taxed_productivity))
         settlement.available_loan = Math.max(settlement.available_loan,0)
-        console.log(settlement.available_loan,settlement.name)
 
         // Take Interest on Loans
         settlement.loans.forEach(loan => {
@@ -199,11 +222,33 @@ export const NextTurn = async (game: string) => {
         }
 
         nation.available_demand = roundGoods(scaleGoods(nation.demand,Math.max(0.05 * (1 - nation.retlaitory_tariffs),0)))
+
+        // Take into account trade deals
+        nation.trade_deals.forEach(deal => {
+            if(deal.active === 'active') {
+                nation.available_demand = subtractGoods(nation.available_demand,deal.incoming)
+                nation.available_supply = addGoods(nation.available_supply,deal.outgoing)
+                deal.duration -= 1
+            }
+        })
     })
 
     // Calculate federal military expenses
     const military_expenses = armies.reduce((sum,army) => addGoods(sum,army.units.reduce((ssum,unit) => addGoods(ssum,unit.consumption_rate),{...empty_goodsdist})),{...empty_goodsdist})
     next_goodsdist = subtractGoods(next_goodsdist,military_expenses)
+
+    // Take into account trade deals
+    trade_deals.forEach(deal => {
+        if(deal.active === 'active') {
+            next_goodsdist = subtractGoods(next_goodsdist,deal.outgoing)
+            next_goodsdist = addGoods(next_goodsdist,deal.incoming)
+            deal.duration -= 1
+        }
+        merchant_capacity = Math.max(merchant_capacity - totalGoods(deal.outgoing) - totalGoods(deal.incoming),0)
+    })
+
+    // Filter out expired trade deals
+    trade_deals = trade_deals.filter(deal => deal.duration > 0)
 
     if(osc_months_passed > osc_months) {
         store.set('Osc Period',Math.floor(Math.random() * 28) + 48)
@@ -215,7 +260,7 @@ export const NextTurn = async (game: string) => {
     store.set('Foreign Powers',foreign_nations)
     store.set('Price History',[...price_history,federal_prices])
     federal_prices = calcPriceGoods(federal_prices,current_goodsdist,addGoods(current_goodsdist,next_goodsdist))
-    store.set('Federal Prices', federal_prices)
+    store.set('Federal Prices', scaleGoods(federal_prices,randMarketHealth() * randMarketHealth() * market_modifier))
     next_goodsdist = addGoods(current_goodsdist,next_goodsdist)
 
     // Take Interest on Loans
@@ -261,6 +306,29 @@ export const NextTurn = async (game: string) => {
 
     next_goodsdist = roundGoods(next_goodsdist)
 
+    // Make sure next_goodsdist is not negative
+    next_goodsdist = {
+        money: next_goodsdist.money,
+        food: Math.max(next_goodsdist.food,0),
+        beer: Math.max(next_goodsdist.beer,0),
+        leather: Math.max(next_goodsdist.leather,0),
+        artisanal: Math.max(next_goodsdist.artisanal,0),
+        livestock: Math.max(next_goodsdist.livestock,0),
+        ornamental: Math.max(next_goodsdist.ornamental,0),
+        enchanted: Math.max(next_goodsdist.enchanted,0),
+        timber: Math.max(next_goodsdist.timber,0),
+        tools: Math.max(next_goodsdist.tools,0),
+        common_ores: Math.max(next_goodsdist.common_ores,0),
+        medical: Math.max(next_goodsdist.medical,0),
+        rare_ores: Math.max(next_goodsdist.rare_ores,0),
+        gems: Math.max(next_goodsdist.gems,0),
+        runes: Math.max(next_goodsdist.runes,0),
+        arms: Math.max(next_goodsdist.arms,0),
+        books: Math.max(next_goodsdist.books,0),
+        enchanted_arms: Math.max(next_goodsdist.enchanted_arms,0),
+        charcoal: Math.max(next_goodsdist.charcoal,0)
+    }
+
     // Bankruptcy
     if (next_goodsdist.money < 0) {
         next_goodsdist = {...empty_goodsdist}
@@ -274,6 +342,7 @@ export const NextTurn = async (game: string) => {
     store.set('Current Month',(current_month + 1) % 12)
     store.set('Current Year',current_year + Math.floor((current_month + 1) / 12))
     store.set('Armies',armies)
+    store.set('Trade Deals',trade_deals)
     store.save()
 }
 

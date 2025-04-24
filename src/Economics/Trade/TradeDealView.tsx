@@ -13,9 +13,10 @@ import TradeGoodSelector from "./TradeGoodSelector";
 import SelectedGoodItem from './SelectedGoodItem';
 import { PartnerGoodSelector } from './PartnerGoodSelector';
 import MoneyIconTT from '../../tooltips/goods/MoneyIconTT';
+import TradeInfo from "./TradeInfo";
 
 export default function TradeDealView(
-    {tradedeals,foreignPowers,settlements,currentStock,merchantCapacity,prices,currentChange,updateFunc,isFederal,federalReserve,federalChange,federalPrices,federalMerchantCap}: 
+    {tradedeals,foreignPowers,settlements,currentStock,merchantCapacity,prices,currentChange,updateFunc,isFederal,federalReserve,federalChange,federalPrices,federalMerchantCap,handleAcceptDeal,handleDeclineDeal}: 
     {
         tradedeals: TradeDealInterface[],
         foreignPowers: ForeignPowerInterface[],
@@ -34,7 +35,9 @@ export default function TradeDealView(
         federalReserve: goodsdist,
         federalChange: goodsdist,
         federalPrices: goodsdist,
-        federalMerchantCap: number
+        federalMerchantCap: number,
+        handleAcceptDeal: (trade_id: string) => void,
+        handleDeclineDeal: (trade_id: string) => void
     }) {
     const [showCreateTradeDeal, setShowCreateTradeDeal] = useState(false);
     const [selectedPartnerType, setSelectedPartnerType] = useState<'settlement' | 'foreign' | 'federal'>('settlement');
@@ -148,11 +151,84 @@ export default function TradeDealView(
     );
 
     const renderTradeDetails = () => (
-        <div className="flex flex-column gap-3">
+        <div className="flex flex-column gap-3" style={{ height: 'calc(80vh - 100px)' }}>
             <div className="grid">
+                <div className="col-4">
+                    {/* Merchant Capacity */}
+                    <div className="flex flex-column gap-2">
+                        <label className="font-semibold">Merchant Capacity</label>
+                        <div className="flex flex-column gap-1">
+                            <ProgressBar 
+                                value={(usedCapacity / merchantCapacity) * 100} 
+                                showValue={false}
+                                className="h-1rem"
+                            />
+                            <div className="flex justify-content-between">
+                                <span className="text-sm text-500">
+                                    {usedCapacity} / {merchantCapacity}
+                                </span>
+                                <span className="text-sm text-500">
+                                    {Math.round((usedCapacity / merchantCapacity) * 100)}%
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="col-4">
+                    {/* Duration Selection */}
+                    <div className="flex flex-column gap-2">
+                        <label htmlFor="duration" className="font-semibold">Deal Duration</label>
+                        <div className="p-inputgroup">
+                            <InputNumber 
+                                id="duration"
+                                value={duration}
+                                onChange={(e) => setDuration(e.value || 1)}
+                                min={1}
+                                className="text-center"
+                                showButtons={true}
+                                inputClassName="border-none text-center"
+                            />
+                            <span className="p-inputgroup-addon">months</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Partner Merchant Capacity (for settlements and federal) */}
+                {(selectedPartnerType === 'settlement' || selectedPartnerType === 'federal') && (
+                    <div className="col-4">
+                        <div className="flex flex-column gap-2">
+                            <label className="font-semibold">Partner Merchant Capacity</label>
+                            <div className="flex flex-column gap-1">
+                                <ProgressBar 
+                                    value={(usedCapacity / (selectedPartnerType === 'settlement' 
+                                        ? settlements.find(s => s.name === selectedPartner)?.merchant_capacity ?? 0
+                                        : federalMerchantCap)) * 100} 
+                                    showValue={false}
+                                    className="h-1rem"
+                                />
+                                <div className="flex justify-content-between">
+                                    <span className="text-sm text-500">
+                                        {usedCapacity} / {selectedPartnerType === 'settlement' 
+                                            ? settlements.find(s => s.name === selectedPartner)?.merchant_capacity ?? 0
+                                            : federalMerchantCap}
+                                    </span>
+                                    <span className="text-sm text-500">
+                                        {Math.round((usedCapacity / (selectedPartnerType === 'settlement' 
+                                            ? settlements.find(s => s.name === selectedPartner)?.merchant_capacity ?? 0
+                                            : federalMerchantCap)) * 100)}%
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            <div className="grid flex-grow-1">
                 {/* Left Section - Current Stock */}
                 <div className="col-4">
-                    <Card title="Current Stock" className="h-full overflow-auto" style={{ maxHeight: '500px' }}>
+                    <Card title="Current Stock" className="h-full overflow-auto" style={{ maxHeight: 'calc(85vh - 320px)' }}>
                         <div className="flex flex-column gap-2">
                             {(Object.entries(currentStock) as [keyof goodsdist, number][])
                                 .filter(([goodName, stock]) => 
@@ -190,73 +266,8 @@ export default function TradeDealView(
 
                 {/* Middle Section - Trade Details */}
                 <div className="col-4">
-                    <Card title="Trade Details" className="h-full overflow-auto" style={{ maxHeight: '500px' }}>
+                    <Card title="Trade Details" className="h-full overflow-auto" style={{ maxHeight: 'calc(85vh - 320px)' }}>
                         <div className="flex flex-column gap-3">
-                            {/* Merchant Capacity */}
-                            <div className="flex flex-column gap-2">
-                                <label className="font-semibold">Merchant Capacity</label>
-                                <div className="flex flex-column gap-1">
-                                    <ProgressBar 
-                                        value={(usedCapacity / merchantCapacity) * 100} 
-                                        showValue={false}
-                                        className="h-1rem"
-                                    />
-                                    <div className="flex justify-content-between">
-                                        <span className="text-sm text-500">
-                                            {usedCapacity} / {merchantCapacity}
-                                        </span>
-                                        <span className="text-sm text-500">
-                                            {Math.round((usedCapacity / merchantCapacity) * 100)}%
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Partner Merchant Capacity (for settlements and federal) */}
-                            {(selectedPartnerType === 'settlement' || selectedPartnerType === 'federal') && (
-                                <div className="flex flex-column gap-2">
-                                    <label className="font-semibold">Partner Merchant Capacity</label>
-                                    <div className="flex flex-column gap-1">
-                                        <ProgressBar 
-                                            value={(usedCapacity / (selectedPartnerType === 'settlement' 
-                                                ? settlements.find(s => s.name === selectedPartner)?.merchant_capacity ?? 0
-                                                : federalMerchantCap)) * 100} 
-                                            showValue={false}
-                                            className="h-1rem"
-                                        />
-                                        <div className="flex justify-content-between">
-                                            <span className="text-sm text-500">
-                                                {usedCapacity} / {selectedPartnerType === 'settlement' 
-                                                    ? settlements.find(s => s.name === selectedPartner)?.merchant_capacity ?? 0
-                                                    : federalMerchantCap}
-                                            </span>
-                                            <span className="text-sm text-500">
-                                                {Math.round((usedCapacity / (selectedPartnerType === 'settlement' 
-                                                    ? settlements.find(s => s.name === selectedPartner)?.merchant_capacity ?? 0
-                                                    : federalMerchantCap)) * 100)}%
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Duration Selection */}
-                            <div className="flex flex-column gap-2">
-                                <label htmlFor="duration" className="font-semibold">Deal Duration</label>
-                                <div className="p-inputgroup">
-                                <InputNumber 
-                                        id="duration"
-                                        value={duration}
-                                        onChange={(e) => setDuration(e.value || 1)}
-                                        min={1}
-                                        className="text-center"
-                                        showButtons={true}
-                                        inputClassName="border-none text-center"
-                                    />
-                                    <span className="p-inputgroup-addon">months</span>
-                                </div>
-                            </div>
-                            
                             {/* Selected Goods */}
                             <div className="flex flex-column gap-2">
                                 <label className="font-semibold">Selected Goods</label>
@@ -284,7 +295,7 @@ export default function TradeDealView(
                 {/* Right Section - Partner Information and Goods */}
                 <div className="col-4">
                     <div className="flex flex-column gap-3">          
-                        <Card title={selectedPartnerType === 'federal' ? 'Federal Reserve' : selectedPartner} className="h-full overflow-auto" style={{ maxHeight: '500px' }}>
+                        <Card title={selectedPartnerType === 'federal' ? 'Federal Reserve' : selectedPartner} className="h-full overflow-auto" style={{ maxHeight: 'calc(85vh - 320px)' }}>
                             <div className="flex flex-column gap-2">
                                 {(Object.entries(prices) as [keyof goodsdist, number][])
                                     .filter(([goodName]) => !selectedGoods.some(g => g.goodName === goodName))
@@ -347,9 +358,9 @@ export default function TradeDealView(
                             <span className="font-semibold">Incoming:</span>
                             <div className="flex align-items-center gap-1">
                                 <MoneyIconTT />
-                                <span>{selectedGoods
+                                <span>{Math.round(selectedGoods
                                     .filter(good => !good.isOutgoing)
-                                    .reduce((sum, good) => sum + (good.amount * good.price), 0)
+                                    .reduce((sum, good) => sum + (good.amount * good.price), 0))
                                 }</span>
                             </div>
                         </div>
@@ -363,12 +374,19 @@ export default function TradeDealView(
                     />
                     <Button 
                         label="Create Deal"
-                        disabled={selectedGoods
+                        disabled={(Math.round(selectedGoods
                             .filter(good => good.isOutgoing)
-                            .reduce((sum, good) => sum + (good.amount * good.price), 0) < selectedGoods
+                            .reduce((sum, good) => sum + (good.amount * good.price), 0)) < Math.round(selectedGoods
                             .filter(good => !good.isOutgoing)
-                            .reduce((sum, good) => sum + (good.amount * good.price), 0)}
-                        onClick={() => updateFunc(selectedPartnerType,selectedPartner,duration,selectedGoods)}
+                            .reduce((sum, good) => sum + (good.amount * good.price), 0))) || selectedGoods.length === 0}
+                        onClick={() => {
+                            updateFunc(selectedPartnerType,selectedPartner,duration,selectedGoods)
+                            setShowCreateTradeDeal(false);
+                            setCurrentStep('select');
+                            setSelectedPartner('');
+                            setDuration(6);
+                            setSelectedGoods([]);
+                        }}
                     />
                 </div>
             </div>
@@ -376,11 +394,35 @@ export default function TradeDealView(
     );
 
     return (
-        <div className="flex flex-column gap-2">
-            <Button label="Create Trade Deal" onClick={() => {
-                setShowCreateTradeDeal(true);
-                setSelectedGoods([]);
-            }}/>
+        <div className="flex flex-column gap-3">
+            <div className="flex justify-content-between align-items-center">
+                <h1 className="text-2xl font-bold m-0">Trade Deals</h1>
+                <Button 
+                    label="Create Trade Deal" 
+                    icon="pi pi-plus"
+                    onClick={() => {
+                        setShowCreateTradeDeal(true);
+                        setSelectedGoods([]);
+                    }}
+                />
+            </div>
+
+            {tradedeals.length === 0 ? (
+                <div className="surface-ground border-round p-4 text-center">
+                    <i className="pi pi-inbox text-4xl text-500 mb-3"></i>
+                    <div className="text-500">No active trade deals</div>
+                    <div className="text-sm text-400">Click "Create Trade Deal" to start trading with other settlements or nations.</div>
+                </div>
+            ) : (
+                <div className="grid">
+                    {tradedeals.map(trade_deal => (
+                        <div key={trade_deal.name} className="col-12 md:col-6 xl:col-4">
+                            <TradeInfo trade_deal={trade_deal} handleAcceptDeal={handleAcceptDeal} handleDeclineDeal={handleDeclineDeal} />
+                        </div>
+                    ))}
+                </div>
+            )}
+
             <Dialog 
                 header="Create Trade Deal" 
                 visible={showCreateTradeDeal} 
@@ -391,6 +433,9 @@ export default function TradeDealView(
                     setDuration(6);
                     setSelectedGoods([]);
                 }}
+                style={currentStep === 'select' ? {} : { width: '75vw', height: '85vh' }}
+                className="trade-deal-dialog"
+                contentStyle={{ height: '100%' }}
             >
                 {currentStep === 'select' ? renderSelectPartner() : renderTradeDetails()}
             </Dialog>

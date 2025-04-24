@@ -1,17 +1,14 @@
 v0.2.0 plans
 -------------------
-Automated Trade deals
+Automated Trade deals - ✅
+world map - In Progress
+rework new settlement feature
 Random Events
 Ability to Conduct Diplomacy
 
 wip
 ----------
-add trade screen for federal
-ability to propose trade to federal government
-process trade on next turn
-take into account trade for change
-ability to accept trade deals
-add random market movement to goods
+
 
 completed
 ---------
@@ -19,3 +16,9 @@ add trade screen for settlements
 delete sell and buy components
 remove buy and sell options from federal economy tab
 remove months stored
+retaliatory not retailitory
+ability to accept trade deals
+add trade screen for federal
+take into account trade for change
+process trade on next turn
+add random market movement to goods

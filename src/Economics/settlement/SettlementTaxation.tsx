@@ -34,7 +34,7 @@ export default function SettlementTaxation(
         <div className="flex flex-column gap-2">
             <div className="flex flex-row justify-content-between align-items-center sticky top-0 z-5 bg-black shadow-2">
                 <Card header="Federal Reserve">
-                    <DisplayGoods stock={federal_reserve} change={FederalChange(FederalProps.settlements,FederalProps.loans,FederalProps.armies)}/>
+                    <DisplayGoods stock={federal_reserve} change={FederalChange(FederalProps.settlements,FederalProps.loans,FederalProps.armies,FederalProps.tradeDeals)}/>
                 </Card>
                 <Card header="Settlement">
                     <DisplayGoods stock={settlement.stock} change={settlementChange(settlement)}/>
