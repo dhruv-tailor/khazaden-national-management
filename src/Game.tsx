@@ -19,7 +19,11 @@ import { MonthInfo } from "./components/MonthInfo";
 import { Card } from "primereact/card";
 import { ArmyInterface } from "./Military/Army/Army";
 import { TradeDealInterface } from "./Economics/Trade/interface/TradeDealInterface";
-
+import { FederalInterface } from "./utilities/FederalInterface";
+import { empty_federal_interface } from "./utilities/FederalInterface";
+import WorldMap from "./Map/WorldMap";
+import { empty_map_info } from "./Map/MapInfoInterface";
+import { MapInfoInterface } from "./Map/MapInfoInterface";
 export interface FederalChangeProps {
     settlements: SettlementInterface[],
     loans: LoanInterface[],
@@ -30,15 +34,9 @@ export default function Game() {
     const gameId = useParams().game
     let navigate = useNavigate();
 
-    const [settlements,setSettlements] = useState<SettlementInterface[]>([])
-
     // Federal Goods
-    const [reserveGoods,setReserveGoods] = useState<goodsdist>({...empty_goodsdist});
     const [changeGoods,setChangeGoods] = useState<goodsdist>({...empty_goodsdist});
-    const [prices,setPrices] = useState<goodsdist>({...empty_goodsdist})
-    const [loans,setLoans] = useState<LoanInterface[]>([])
-    const [armies,setArmies] = useState<ArmyInterface[]>([])
-    const [tradeDeals,setTradeDeals] = useState<TradeDealInterface[]>([])
+    const [federal,setFederal] = useState<FederalInterface>({...empty_federal_interface})
 
     // Stimulus
     const [whoToGive,setWhoToGive] = useState<string>('');
@@ -49,23 +47,21 @@ export default function Game() {
 
     const [currentMonth,setCurrentMonth] = useState<number>(0)
     const [currentYear,setCurrentYear] = useState<number>(0)
+
+    const [map_info,setMapInfo] = useState<MapInfoInterface>({...empty_map_info})
     
     const getSettlements = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
         await Promise.all([
-            store.get<goodsdist>('Federal Reserve').then(value => {if (value) {setReserveGoods(value);}}),
-            store.get<goodsdist>('Federal Prices').then(value => {if (value) {setPrices(value)}}),
-            store.get<SettlementInterface[]>('settlements').then(value => {if (value) {setSettlements(value)}}),
-            store.get<LoanInterface[]>('loans').then(value => {if (value) {setLoans(value)}}),
+            store.get<FederalInterface>('Federal').then(value => {if (value) {setFederal(value)}}),
             store.get<number>('Current Month').then(value => {if (value) {setCurrentMonth(value)}}),
             store.get<number>('Current Year').then(value => {if (value) {setCurrentYear(value)}}),
-            store.get<ArmyInterface[]>('Armies').then(value => {if (value) {setArmies(value)}}),
-            store.get<TradeDealInterface[]>('Trade Deals').then(value => {if (value) {setTradeDeals(value)}})
+            store.get<MapInfoInterface>('Map Info').then(value => {if (value) {setMapInfo(value)}}),
         ])
         updateSettlements()
     }
-    
-    const updateSettlements = () => setChangeGoods({...FederalChange(settlements,loans,armies,tradeDeals)})
+
+    const updateSettlements = () => setChangeGoods({...FederalChange(federal)})
 
 
     const giveGoods = (name: string) => {
@@ -75,11 +71,11 @@ export default function Game() {
 
     const stimulus = (dist: goodsdist) => {
         // Take from Frederal Reserve and give to settlment
-        setReserveGoods(subtractGoods(reserveGoods,dist))
-        setSettlements(settlements.map(s => {
+        setFederal({...federal,reserve: subtractGoods(federal.reserve,dist)})
+        setFederal({...federal,settlements: federal.settlements.map(s => {
             if (s.name !== whoToGive) {return s}
             return {...s, stock: addGoods(s.stock,dist)}
-        }))
+        })})
         setGiveGoodsVisable(false)
         setWhoToGive('')
     }
@@ -91,20 +87,16 @@ export default function Game() {
 
     const saveData = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
-        store.set('settlements',settlements)
-        store.set('Federal Reserve',reserveGoods)
-        store.set('Federal Prices',prices)
-        store.set('loans',loans)
-        store.set('Trade Deals',tradeDeals)
-        store.set('Armies',armies)
+        store.set('Map Info',map_info)
+        store.set('Federal',federal)
         store.save()
     }
 
     const createSettlement = (s: SettlementInterface) => {
         setNewSettlementVisable(false)
-        s.name = `settlement${settlements.length + 1}`
-        setSettlements([...settlements,s])
-        setPrices({...calcPriceGoods(prices,reserveGoods,s.stock)})
+        s.name = `settlement${federal.settlements.length + 1}`
+        setFederal({...federal,settlements: [...federal.settlements,s]})
+        setFederal({...federal,prices: calcPriceGoods(federal.prices,federal.reserve,s.stock)})
         updateSettlements()
     }
 
@@ -130,23 +122,27 @@ export default function Game() {
     }
 
     const updateTaxation = (name: string, taxation: goodsdist) => {
-        setSettlements(settlements.map(s => {
+        setFederal({...federal,settlements: federal.settlements.map(s => {
             if (s.name !== name) {return s}
             return {...s, taxation: taxation}
-        }))
-        setChangeGoods({...FederalChange(settlements,loans,armies,tradeDeals)})
+        })})
+        setChangeGoods({...FederalChange(federal)})
     }
 
     const setMerchantTax = (name: string, merchant_tax: number) => {
-        setSettlements(settlements.map(s => {
+        setFederal({...federal,settlements: federal.settlements.map(s => {
             if (s.name !== name) {return s}
             return {...s, merchant_tax: merchant_tax}
-        }))
-        setChangeGoods({...FederalChange(settlements,loans,armies,tradeDeals)})
+        })})
+        setChangeGoods({...FederalChange(federal)})
     }
 
 
     useEffect(() => {getSettlements()},[])
+
+    const updateNodePositions = (new_nodes:{id: string, position: {x: number, y: number}}[]) => {
+        setMapInfo({...map_info, nodes: new_nodes})
+    }
     
     return (
         <div className="flex flex-column gap-3 p-3">
@@ -192,12 +188,12 @@ export default function Game() {
                 <div className="flex flex-column gap-3">
                     <div className="flex flex-row justify-content-between align-items-center">
                         <h2 className="m-0">Federal Reserve</h2>
-                        {settlements.length > 0 && (
+                        {federal.settlements.length > 0 && (
                             <DisplayGoods 
-                                stock={roundGoods(reserveGoods)} 
+                                stock={roundGoods(federal.reserve)} 
                                 change={{
                                     ...changeGoods,
-                                    money: Math.round(settlements.map(
+                                    money: Math.round(federal.settlements.map(
                                         s => s.clans.map(
                                             c => Math.round(c.tax_rate * c.taxed_productivity * s.taxation.money)
                                         ).reduce((sum,val) => sum + val)
@@ -210,8 +206,8 @@ export default function Game() {
             </Card>
 
             {/* Settlements Section */}
-            <div className="grid">
-                {settlements.map(s => (
+            {/* <div className="grid">
+                {federal.settlements.map(s => (
                     <div key={s.name} className="col-12 md:col-6 lg:col-4">
                         <Settlement 
                             settlement={s} 
@@ -219,27 +215,50 @@ export default function Game() {
                             updateTaxation={updateTaxation}
                             updateMerchantTax={setMerchantTax}
                             goTo={navigateSettlement}
-                            federal_reserve={reserveGoods}
-                            FederalProps={{
-                                settlements: settlements,
-                                loans: loans,
-                                armies: armies,
-                                tradeDeals: tradeDeals
-                            }}
+                            federal_reserve={federal.reserve}
+                            FederalProps={federal}
                         />
                     </div>
                 ))}
-            </div>
+            </div> */}
+            {map_info.nodes.length > 0 && (
+                <WorldMap nodes={map_info.nodes.map(node => {
+                    if(node.id.startsWith('s')){
+                    return {
+                        id: node.id,
+                        type: 'settlement',
+                        data: {settlement: federal.settlements.find(s => s.global_id === node.id)},
+                        position: {x: node.position.x, y: node.position.y},
+                        draggable: true
+                    }
+                    }
+                    else if(node.id.startsWith('f')){
+                        return {
+                            id: node.id,
+                            type: 'foreign',
+                            data: {foreign: federal.foreign_powers.find(f => f.global_id === node.id)},
+                            position: {x: node.position.x, y: node.position.y},
+                            draggable: true
+                        }
+                    }
+                    return {id: 'error', data: {label: 'Error'}, position: {x: 0, y: 0}}
+                })} edges={map_info.edges}
+                updateNodePositions={updateNodePositions}
+                 />
+            )}
 
             {/* New Settlement Button */}
-            {reserveGoods.money >= ((settlements.length ** 2) * 4500) && (
+            {federal.reserve.money >= ((federal.settlements.length ** 2) * 4500) && (
                 <Card>
                     <Button 
                         icon="pi pi-plus" 
                         onClick={() => {
-                            setReserveGoods({
-                                ...reserveGoods,
-                                money: reserveGoods.money - ((settlements.length ** 2) * 4500)
+                            setFederal({
+                                ...federal,
+                                reserve: {
+                                    ...federal.reserve,
+                                    money: federal.reserve.money - ((federal.settlements.length ** 2) * 4500)
+                                }
                             })
                             setNewSettlementVisable(true)
                         }}
@@ -249,7 +268,7 @@ export default function Game() {
                         <div className="flex flex-row align-items-center justify-content-center gap-2">
                             New Settlement
                             <MoneyIconTT/>
-                            <span className="font-bold">{(settlements.length ** 2) * 4500}</span>
+                            <span className="font-bold">{(federal.settlements.length ** 2) * 4500}</span>
                         </div>
                     </Button>
                 </Card>
@@ -266,7 +285,7 @@ export default function Game() {
                 className="w-30rem"
             >
                 <ResourceDistribuition 
-                    goods_cap={reserveGoods} 
+                    goods_cap={federal.reserve} 
                     updateFunc={stimulus}
                 />
             </Dialog>
@@ -280,7 +299,7 @@ export default function Game() {
                 className="w-30rem"
             >
                 <NewSettlement 
-                    max_resources={reserveGoods} 
+                    max_resources={federal.reserve} 
                     updateFunc={createSettlement}
                 />
             </Dialog>

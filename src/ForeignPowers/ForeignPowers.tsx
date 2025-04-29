@@ -5,6 +5,8 @@ import { saveLocation } from "../utilities/SaveData"
 import { load } from "@tauri-apps/plugin-store"
 import { Button } from "primereact/button"
 import ForeignPower from "./ForeignPower"
+import { FederalInterface } from "../utilities/FederalInterface"
+import { empty_federal_interface } from "../utilities/FederalInterface" 
 
 export default function ForeignPowers() {
     const gameId = useParams().game
@@ -13,27 +15,20 @@ export default function ForeignPowers() {
 
     const loadForeignPowers = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
-        const foreign_powers = await store.get<ForeignPowerInterface[]>('Foreign Powers') ?? []
-        setForeignPowers([...foreign_powers])
+        const federal = await store.get<FederalInterface>('Federal') ?? {...empty_federal_interface};
+        setForeignPowers([...federal.foreign_powers])
     }
 
     const saveData = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
-        await store.set('Foreign Powers', foreignPowers);
+        const federal = await store.get<FederalInterface>('Federal') ?? {...empty_federal_interface};
+        await store.set('Federal', {...federal,foreign_powers: foreignPowers});
         store.save()
     }
 
     const goBack = async () => {
         await saveData()
         navigate(`/game/${gameId}`)
-    }
-
-    const updateTariff = (name: string, amount: number): void => {
-        const updatedPowers = foreignPowers.map(power => {
-            if (power.name === name) {return { ...power, tarriffs: amount };}
-            return {...power};
-        });
-        setForeignPowers([...updatedPowers]);
     }
 
     useEffect(() => {loadForeignPowers()}, [])
@@ -55,10 +50,7 @@ export default function ForeignPowers() {
             <div className="grid">
                 {foreignPowers.map(power => (
                     <div key={power.name} className="col-12 md:col-6 lg:col-4">
-                        <ForeignPower 
-                            power={power} 
-                            updateTariff={updateTariff}
-                        />
+                        <ForeignPower power={power} />
                     </div>
                 ))}
             </div>

@@ -8,29 +8,24 @@ import { Card } from "primereact/card";
 import DisplayGoods from "../../components/goodsDislay";
 import PriceChart, { priceChartDataProp, priceChartOptionsProp } from "../pricing/PriceChart";
 import { empty_goodsdist, goodsdist, roundGoods, subtractGoods, totalGoods } from "../../Goods/GoodsDist";
-import { ForeignPowerInterface } from "../../ForeignPowers/Interface/ForeignPowerInterface";
 import { Dialog } from "primereact/dialog";
-import { LoanInterface, takeLoan } from "../loans/loanInterface";
+import { takeLoan } from "../loans/loanInterface";
 import ViewLoans from "../loans/ViewLoans";
-import { ArmyInterface } from "../../Military/Army/Army";
 import TradeDealView from "../Trade/TradeDealView";
 import { empty_trade_deal, TradeDealInterface } from "../Trade/interface/TradeDealInterface";
 import { FederalChange } from "../../utilities/SimpleFunctions";
+import { FederalInterface } from "../../utilities/FederalInterface";
+import { empty_federal_interface } from "../../utilities/FederalInterface";
+
 export default function SettlmentEconomy() {
     const gameId = useParams().game;
     const settlementId = useParams().settlement;
     let navigate = useNavigate();
 
-    const [settlement, setSettlement] = useState<SettlementInterface>({...empty_settlement});
-    const [settlements, setSettlements] = useState<SettlementInterface[]>([]);
-    const [reserveGoods,setReserveGoods] = useState<goodsdist>({...empty_goodsdist});
-    const [federalPrices,setFederalPrices] = useState<goodsdist>({...empty_goodsdist});
-    const [foreignPowers,setForeignPowers] = useState<ForeignPowerInterface[]>([]);
-    const [FederalLoans,setFederalLoans] = useState<LoanInterface[]>([]);
+    const [federal,setFederal] = useState<FederalInterface>({...empty_federal_interface})
+    const [settlement,setSettlement] = useState<SettlementInterface>({...empty_settlement})
     const [showLoans,setShowLoans] = useState<boolean>(false);
-    const [armies,setArmies] = useState<ArmyInterface[]>([]);
-    const [federalMerchantCap,setFederalMerchantCap] = useState<number>(0)
-    const [federalDeals,setFederalDeals] = useState<TradeDealInterface[]>([])
+
 
     const navigateTo = async (location: string) => {
         await saveData()
@@ -39,56 +34,38 @@ export default function SettlmentEconomy() {
 
     const getInfo = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
-        const settlements = await store.get<SettlementInterface[]>('settlements') ?? [];
-        
-        if(settlements) {
-            setSettlements(settlements);
-            const current_settlement = settlements.find(settlement => settlement.name === settlementId);
+        const federal = await store.get<FederalInterface>('Federal') ?? {...empty_federal_interface};
+        if(federal.settlements) {
+            setFederal({...federal});
+            const current_settlement = federal.settlements.find(settlement => settlement.name === settlementId);
             if(current_settlement) {
                 setSettlement(current_settlement);
             }
         }
         
-        // Load other data in parallel but wait for all to complete
-        await Promise.all([
-            store.get<goodsdist>('Federal Reserve').then(value => {if (value) {setReserveGoods(value);}}),
-            store.get<goodsdist>('Federal Prices').then(value => {if (value) {setFederalPrices(value)}}),
-            store.get<ForeignPowerInterface[]>('Foreign Powers').then(value => {if (value) {setForeignPowers(value)}}),
-            store.get<LoanInterface[]>('Loans').then(value => {if (value) {setFederalLoans(value)}}),
-            store.get<ArmyInterface[]>('Armies').then(value => {if (value) {setArmies(value)}}),
-            store.get<number>('Merchant Capacity').then(value => {if (value) {setFederalMerchantCap(value)}}),
-            store.get<TradeDealInterface[]>('Trade Deals').then(value => {if (value) {setFederalDeals(value)}}),
-        ]);
     }
 
     useEffect(()=>{getInfo()},[])
     
     const saveData = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
-        const updatedSettlements = settlements.map(s => {
+        const updatedSettlements = federal.settlements.map(s => {
             if (s.name === settlement.name) {return({...settlement})}
             return {...s}
         })
-        store.set('Federal Reserve',reserveGoods)
-        store.set('Federal Prices',federalPrices)
-        store.set('settlements',updatedSettlements)
-        store.set('Loans',FederalLoans)
-        store.set('Armies',armies)
-        store.set('Merchant Capacity',federalMerchantCap)
-        store.set('Trade Deals',federalDeals)
-        store.set('Foreign Powers',foreignPowers)
+        store.set('Federal',{...federal,settlements: updatedSettlements})
         store.save()
     }
 
     const loanTaken = (giver: string, amount: number) => {
         setShowLoans(false)
-        const s = settlements.map(s => {
+        const s = federal.settlements.map(s => {
             if (giver !== s.name) {return s}
             const newLoans = [...settlement.loans, takeLoan(amount, s.visible_name, s.name)]
             setSettlement({...settlement, loans: newLoans})
             return {...s, available_loan: s.available_loan - amount}
         })
-        setSettlements([...s])
+        setFederal({...federal,settlements: s})
     }
 
     const declareBankruptcy = () => {
@@ -112,7 +89,7 @@ export default function SettlmentEconomy() {
         const new_deal : TradeDealInterface = {...empty_trade_deal}
         new_deal.trade_id = uniqueId
         if (partnerType === 'settlement') { 
-            new_deal.name = settlements.find(s => s.name === partnerId)?.visible_name ?? ''
+            new_deal.name = federal.settlements.find(s => s.name === partnerId)?.visible_name ?? ''
             new_deal.active = 'sent'
         }
         else if (partnerType === 'foreign') {
@@ -139,7 +116,7 @@ export default function SettlmentEconomy() {
         if (partnerType === 'foreign') {
             // The other details doesn't really matter it can stay the same
             const mirror_deal: TradeDealInterface = {...new_deal,outgoing: {...new_deal.incoming},incoming:{...new_deal.outgoing}}
-            const fps = foreignPowers.map(fp => {
+            const fps = federal.foreign_powers.map(fp => {
                 if (fp.name !== partnerId) {return {...fp}}
                 return {
                     ...fp,
@@ -148,7 +125,7 @@ export default function SettlmentEconomy() {
                     available_supply: subtractGoods(fp.available_supply,new_deal.incoming)
                 }
             })
-            setForeignPowers({...fps})
+            setFederal({...federal,foreign_powers: fps})
         }
         else if (partnerType === 'settlement') {
             const mirror_deal: TradeDealInterface = {
@@ -159,14 +136,14 @@ export default function SettlmentEconomy() {
                 name: settlement.visible_name,
                 active: 'checking'
             }
-            setSettlements([...settlements.map(s => {
+            setFederal({...federal,settlements: federal.settlements.map(s => {
                 if (s.name !== partnerId) {return {...s}}
                 return {
                     ...s,
                     trade_deals: [...s.trade_deals,{...mirror_deal}],
                     merchant_capacity: s.merchant_capacity - merchant_cap_used
                 }
-            })])
+            })})
         }
         else if (partnerType === 'federal') {
             const mirror_deal: TradeDealInterface = {
@@ -177,7 +154,7 @@ export default function SettlmentEconomy() {
                 name: settlement.visible_name,
                 active: 'checking'
             }
-            setFederalDeals([...federalDeals,{...mirror_deal}])
+            setFederal({...federal,trade_deals: [...federal.trade_deals,{...mirror_deal}]})
         }
     }
 
@@ -195,19 +172,19 @@ export default function SettlmentEconomy() {
             trade_deals: settlement.trade_deals.map(td => td.trade_id === trade_id ? {...td, active: 'active'} : td)
         })
         if (type === 'settlement') {
-            setSettlements([...settlements.map(s => {
+            setFederal({...federal,settlements: federal.settlements.map(s => {
                 if (s.name !== partner) {return {...s}}
                 return {
                     ...s,
                     trade_deals: s.trade_deals.map(td => td.trade_id === trade_id ? {...td, active: 'active' as const} : td),
                 }
-            })])
+            })})
         }
         else if (type === 'foreign') {
-            setForeignPowers([...foreignPowers.map(fp => fp.name === partner ? {...fp, trade_deals: fp.trade_deals.map(td => td.trade_id === trade_id ? {...td, active: 'active' as const} : td)} : fp)])
+            setFederal({...federal,foreign_powers: federal.foreign_powers.map(fp => fp.name === partner ? {...fp, trade_deals: fp.trade_deals.map(td => td.trade_id === trade_id ? {...td, active: 'active' as const} : td)} : fp)})
         }
         else if (type === 'federal') {
-            setFederalDeals([...federalDeals.map(td => td.trade_id === trade_id ? {...td, active: 'active' as const} : td)])
+            setFederal({...federal,trade_deals: federal.trade_deals.map(td => td.trade_id === trade_id ? {...td, active: 'active' as const} : td)})
         }
     }
 
@@ -227,17 +204,16 @@ export default function SettlmentEconomy() {
             trade_deals: settlement.trade_deals.filter(td => td.trade_id !== trade_id)
         })
         if (type === 'settlement') {
-            setSettlements([...settlements.map(s => {
+            setFederal({...federal,settlements: federal.settlements.map(s => {
                 if (s.name !== partner) {return {...s}}
                 return {...s, trade_deals: s.trade_deals.filter(td => td.trade_id !== trade_id), merchant_capacity: s.merchant_capacity + merchant_cap_used}
-            })])
+            })})
         }
         else if (type === 'foreign') {
-            setForeignPowers([...foreignPowers.map(fp => fp.name === partner ? {...fp, trade_deals: fp.trade_deals.filter(td => td.trade_id !== trade_id)} : fp)])
+            setFederal({...federal,foreign_powers: federal.foreign_powers.map(fp => fp.name === partner ? {...fp, trade_deals: fp.trade_deals.filter(td => td.trade_id !== trade_id)} : fp)})
         }
         else if (type === 'federal') {
-            setFederalDeals([...federalDeals.filter(td => td.trade_id !== trade_id)])
-            setFederalMerchantCap(federalMerchantCap + merchant_cap_used)
+            setFederal({...federal,trade_deals: federal.trade_deals.filter(td => td.trade_id !== trade_id)})
         }
     }
 
@@ -286,18 +262,18 @@ export default function SettlmentEconomy() {
             <Card title='Trade'>
                 <TradeDealView 
                     tradedeals={settlement.trade_deals} 
-                    foreignPowers={Object.values(foreignPowers)} 
-                    settlements={settlements.filter(s => s.name !== settlement.name)} 
+                    foreignPowers={Object.values(federal.foreign_powers)} 
+                    settlements={federal.settlements.filter(s => s.name !== settlement.name)} 
                     currentStock={settlement.stock} 
                     merchantCapacity={settlement.merchant_capacity} 
                     prices={settlement.prices} 
                     currentChange={roundGoods(settlementChange(settlement))}
                     updateFunc={createTradeDeal}
                     isFederal={false}
-                    federalReserve={reserveGoods}
-                    federalChange={FederalChange(settlements,FederalLoans,armies,federalDeals)}
-                    federalPrices={federalPrices}
-                    federalMerchantCap={federalMerchantCap}
+                    federalReserve={federal.reserve}
+                    federalChange={FederalChange(federal)}
+                    federalPrices={federal.prices}
+                    federalMerchantCap={federal.merchant_capacity}
                     handleAcceptDeal={handleAcceptDeal}
                     handleDeclineDeal={handleDeclineDeal}
                 />
@@ -312,7 +288,7 @@ export default function SettlmentEconomy() {
             >
                 <ViewLoans 
                     loans={settlement.loans} 
-                    settlements={settlements} 
+                    settlements={federal.settlements} 
                     updateFunc={loanTaken} 
                     declareBankruptcy={declareBankruptcy}
                 />

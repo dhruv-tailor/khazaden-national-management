@@ -1,22 +1,22 @@
 import { load } from "@tauri-apps/plugin-store";
 import { saveLocation } from "./SaveData";
-import { popGrowth, SettlementInterface, tierModifier, updateGoodsProduction, updateSettlmentStock } from "../Settlement/SettlementInterface/SettlementInterface";
-import { ForeignPowerInterface } from "../ForeignPowers/Interface/ForeignPowerInterface";
+import { popGrowth, tierModifier, updateGoodsProduction, updateSettlmentStock } from "../Settlement/SettlementInterface/SettlementInterface";
 import { goodsdist, empty_goodsdist, addGoods, subtractGoods, scaleGoods, roundGoods, totalGoods, scaleDownGoods, floorGoods, multiplyGoods, inverseGoodPercentages } from "../Goods/GoodsDist";
 import { calcPriceGoods } from "../Economics/pricing/prices";
 import { clanTypes } from "../Clans/ClanInterface/ClanInterface";
 import { TerrainData } from "../Settlement/SettlementInterface/TerrainInterface";
 import { LoanInterface, takeLoan } from "../Economics/loans/loanInterface";
 import { ensureNumber } from "./SimpleFunctions";
-import { ArmyInterface } from "../Military/Army/Army";
-import { TradeDealInterface } from "../Economics/Trade/interface/TradeDealInterface";
+import { FederalInterface } from "./FederalInterface";
+import { empty_federal_interface } from "./FederalInterface";
 
 export const NextTurn = async (game: string) => {
     const store = await load(await saveLocation(game), {autoSave: false});
-    const settlements = await store.get<SettlementInterface[]>('settlements') ?? [];
-    const current_goodsdist = await store.get<goodsdist>('Federal Reserve') ?? {...empty_goodsdist};
+    const federal_interface = await store.get<FederalInterface>('Federal') ?? {...empty_federal_interface};
+    const settlements = federal_interface.settlements;
+    const current_goodsdist = federal_interface.reserve;
     let next_goodsdist = {...empty_goodsdist};
-    const foreign_nations = await store.get<ForeignPowerInterface[]>('Foreign Powers');
+    const foreign_nations = federal_interface.foreign_powers;
     // Market Data
     const osc_months = await store.get<number>('Osc Period') ?? 0
     const osc_months_passed = await store.get<number>('Osc Months Passed')?? 0
@@ -24,11 +24,11 @@ export const NextTurn = async (game: string) => {
     const global_market_trend = await store.get<boolean>('Positive Global Market Trend')?? true
     const market_modifier = (Math.random() * ((2 * market_trajectory) + market_trajectory) - market_trajectory * (global_market_trend ? 1 : -1)) + 1
     const turns_passed = await store.get<number>('Turns Passed') ?? 0;
-    let federal_prices = await store.get<goodsdist>('Federal Prices') ?? {...empty_goodsdist}
-    const price_history = await store.get<goodsdist[]>('Price History') ?? []
-    let loans = await store.get<LoanInterface[]>('Loans') ?? []
-    let armies = await store.get<ArmyInterface[]>('Armies') ?? []
-    let trade_deals = await store.get<TradeDealInterface[]>('Trade Deals') ?? []
+    let federal_prices = federal_interface.prices
+    const price_history = federal_interface.price_history
+    let loans = federal_interface.loans
+    let armies = federal_interface.armies
+    let trade_deals = federal_interface.trade_deals
 
     const current_year = await store.get<number>('Current Year') ?? 0
     const current_month = await store.get<number>('Current Month') ?? 0
@@ -207,21 +207,7 @@ export const NextTurn = async (game: string) => {
         nation.price_history = [...nation.price_history,nation.prices]
         nation.prices = calcPriceGoods(nation.prices,old_supply,nation.supply)
         nation.available_supply = roundGoods(scaleGoods(nation.supply,0.05))
-
-        // Adjust tariffs
-        // If Player is taxing more, then match the new tarriff rate
-        if (nation.tarriffs > nation.retlaitory_tariffs) {
-            nation.relations -= 1
-            nation.retlaitory_tariffs = nation.tarriffs
-            if (nation.relations < 0) {
-                nation.retlaitory_tariffs *= 1 + ensureNumber((Math.abs(nation.relations) / 10) )
-            }
-        }
-        else if (nation.retlaitory_tariffs > nation.tarriffs) {
-            nation.retlaitory_tariffs -= ensureNumber((nation.retlaitory_tariffs - nation.tarriffs) / 100)
-        }
-
-        nation.available_demand = roundGoods(scaleGoods(nation.demand,Math.max(0.05 * (1 - nation.retlaitory_tariffs),0)))
+        nation.available_demand = roundGoods(scaleGoods(nation.demand,0.05))
 
         // Take into account trade deals
         nation.trade_deals.forEach(deal => {
@@ -256,11 +242,11 @@ export const NextTurn = async (game: string) => {
         store.set('Market Trajectory',Math.random() * 0.005)
         store.set('Positive Global Market Trend',!global_market_trend)
     } else { store.set('Osc Months Passed',osc_months_passed + 1) }
-    store.set('settlements',settlements)
-    store.set('Foreign Powers',foreign_nations)
-    store.set('Price History',[...price_history,federal_prices])
+    federal_interface.settlements = settlements
+    federal_interface.foreign_powers = foreign_nations
+    federal_interface.price_history = [...price_history,federal_prices]
     federal_prices = calcPriceGoods(federal_prices,current_goodsdist,addGoods(current_goodsdist,next_goodsdist))
-    store.set('Federal Prices', scaleGoods(federal_prices,randMarketHealth() * randMarketHealth() * market_modifier))
+    federal_interface.prices = scaleGoods(federal_prices,randMarketHealth() * randMarketHealth() * market_modifier)
     next_goodsdist = addGoods(current_goodsdist,next_goodsdist)
 
     // Take Interest on Loans
@@ -335,14 +321,17 @@ export const NextTurn = async (game: string) => {
         loans = []
         armies = []
     }
-    store.set('Federal Reserve', next_goodsdist)
-    store.set('Loans',loans)
+    store.set('Federal',{
+        ...federal_interface,
+        reserve: next_goodsdist,
+        loans: loans,
+        armies: armies,
+        trade_deals: trade_deals
+    })
     store.set('Turns Passed',turns_passed + 1)
     store.set('Merchant Capacity',Math.round(merchant_capacity))
     store.set('Current Month',(current_month + 1) % 12)
     store.set('Current Year',current_year + Math.floor((current_month + 1) / 12))
-    store.set('Armies',armies)
-    store.set('Trade Deals',trade_deals)
     store.save()
 }
 

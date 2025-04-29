@@ -8,7 +8,7 @@ import { goodsdist, roundGoods } from "../Goods/GoodsDist";
 import SettlementTaxation from "../Economics/settlement/SettlementTaxation";
 import { useState } from "react";
 import { Dialog } from "primereact/dialog";
-import { FederalChangeProps } from "../Game";
+import { FederalInterface } from "../utilities/FederalInterface";
 export default function Settlement(
     {settlement, stimulus,goTo,updateTaxation,updateMerchantTax,federal_reserve,FederalProps}: 
     {
@@ -18,7 +18,7 @@ export default function Settlement(
         updateTaxation: (name: string, taxation: goodsdist) => void,
         updateMerchantTax: (name: string, merchant_tax: number) => void,
         federal_reserve: goodsdist,
-        FederalProps: FederalChangeProps
+        FederalProps: FederalInterface
     }
 ) {
     const [showTaxation, setShowTaxation] = useState(false);

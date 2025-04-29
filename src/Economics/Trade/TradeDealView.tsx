@@ -4,7 +4,7 @@ import { Dialog } from "primereact/dialog";
 import { useState } from "react";
 import { ForeignPowerInterface } from "../../ForeignPowers/Interface/ForeignPowerInterface";
 import { settlementChange, SettlementInterface } from "../../Settlement/SettlementInterface/SettlementInterface";
-import { goodsdist, scaleGoods } from "../../Goods/GoodsDist";
+import { goodsdist, roundGoods } from "../../Goods/GoodsDist";
 import { Dropdown } from "primereact/dropdown";
 import { Card } from "primereact/card";
 import { InputNumber } from "primereact/inputnumber";
@@ -69,7 +69,7 @@ export default function TradeDealView(
             ? settlements.find(s => s.name === selectedPartner)?.prices ?? prices
             : selectedPartnerType === 'federal'
                 ? federalPrices
-                : scaleGoods(foreignPowers.find(fp => fp.name === selectedPartner)?.prices ?? prices, 1 + (foreignPowers.find(fp => fp.name === selectedPartner)?.tarriffs ?? 0));
+                : foreignPowers.find(fp => fp.name === selectedPartner)?.prices ?? prices;
 
         setSelectedGoods(prev => [...prev, { 
             goodName, 
@@ -240,7 +240,7 @@ export default function TradeDealView(
                                         ? settlements.find(s => s.name === selectedPartner)?.prices ?? prices
                                         : selectedPartnerType === 'federal'
                                             ? federalPrices
-                                            : scaleGoods(foreignPowers.find(fp => fp.name === selectedPartner)?.prices ?? prices, 1 + (foreignPowers.find(fp => fp.name === selectedPartner)?.tarriffs ?? 0));
+                                            : roundGoods(foreignPowers.find(fp => fp.name === selectedPartner)?.prices ?? prices);
 
                                     return (
                                         <TradeGoodSelector
@@ -304,7 +304,7 @@ export default function TradeDealView(
                                             ? settlements.find(s => s.name === selectedPartner)?.prices ?? prices
                                             : selectedPartnerType === 'federal'
                                                 ? federalPrices
-                                                : scaleGoods(foreignPowers.find(fp => fp.name === selectedPartner)?.prices ?? prices, 1 + (foreignPowers.find(fp => fp.name === selectedPartner)?.tarriffs ?? 0));
+                                                : roundGoods(foreignPowers.find(fp => fp.name === selectedPartner)?.prices ?? prices);
 
                                         return (
                                             <PartnerGoodSelector

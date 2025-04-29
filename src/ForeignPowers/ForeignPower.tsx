@@ -8,13 +8,10 @@ import { AllianceStatusBadge } from "./badges/AllianceStatusBadge";
 import { CombatantStatusBadge } from "./badges/CombatantStatusBadge";
 import { MilitaryAccessBadge } from "./badges/MilitaryAccessBadge";
 import { VassalStatusBadge } from "./badges/VassalStatusBadge";
-import { InputNumber } from "primereact/inputnumber";
 import { ProgressBar } from "primereact/progressbar";
-import TariffRateTT from "../tooltips/economy/tariffRateTT";
-import RetalitoryTariffRateTT from "../tooltips/economy/retalitoryTariffRateTT";
 import { Divider } from "primereact/divider";
 
-export default function ForeignPower({power,updateTariff}: {power: ForeignPowerInterface,updateTariff: (name: string, amount: number) => void}) {
+export default function ForeignPower({power}: {power: ForeignPowerInterface}) {
     const knobColor = (value: number) => {
         if (value < 0) {return 'var(--red-500)'} 
         else if (value > 0) {return 'var(--green-500)';} 
@@ -64,26 +61,7 @@ export default function ForeignPower({power,updateTariff}: {power: ForeignPowerI
                 {/* Trade and Immigration */}
                 <div className="flex flex-column gap-3">
                     {!power.isEmbargoed ? (
-                        <div className="flex flex-column gap-2">
-                            <div className="flex flex-column gap-1">
-                                <div className="flex flex-row align-items-center gap-2">
-                                    <TariffRateTT/>
-                                    <InputNumber 
-                                        size={5}
-                                        min={0}
-                                        showButtons
-                                        suffix="%" 
-                                        value={Math.round(power.tarriffs * 100)} 
-                                        onChange={e => updateTariff(power.name,(e.value ?? 0)/100)}
-                                        className="w-6rem"
-                                    />
-                                </div>
-                                <div className="flex flex-row align-items-center gap-2">
-                                    <RetalitoryTariffRateTT/>
-                                    <span className="text-lg">{Math.round(power.retlaitory_tariffs * 100)}%</span>
-                                </div>
-                            </div>
-                        </div>
+                        <></>
                     ) : (
                         <div className="flex align-items-center justify-content-center p-2 border-round" style={{backgroundColor: 'var(--red-500)'}}>
                             <span className="text-white font-bold">EMBARGOED</span>

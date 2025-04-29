@@ -24,17 +24,17 @@ import TaxSlider from "./TaxSlider";
 import { Card } from "primereact/card";
 import DisplayGoods from "../../components/goodsDislay";
 import { settlementChange } from "../../Settlement/SettlementInterface/SettlementInterface";
-import { FederalChangeProps } from "../../Game";
 import { FederalChange } from "../../utilities/SimpleFunctions";
+import { FederalInterface } from "../../utilities/FederalInterface";
 export default function SettlementTaxation(
     {settlement, updateTaxation,setMerchantTax,federal_reserve,FederalProps}: 
-    {settlement: SettlementInterface, updateTaxation: (taxation: goodsdist) => void, setMerchantTax: (merchant_tax: number) => void, federal_reserve: goodsdist, FederalProps: FederalChangeProps }
+    {settlement: SettlementInterface, updateTaxation: (taxation: goodsdist) => void, setMerchantTax: (merchant_tax: number) => void, federal_reserve: goodsdist, FederalProps: FederalInterface }
 ) {
     return (
         <div className="flex flex-column gap-2">
             <div className="flex flex-row justify-content-between align-items-center sticky top-0 z-5 bg-black shadow-2">
                 <Card header="Federal Reserve">
-                    <DisplayGoods stock={federal_reserve} change={FederalChange(FederalProps.settlements,FederalProps.loans,FederalProps.armies,FederalProps.tradeDeals)}/>
+                    <DisplayGoods stock={federal_reserve} change={FederalChange(FederalProps)}/>
                 </Card>
                 <Card header="Settlement">
                     <DisplayGoods stock={settlement.stock} change={settlementChange(settlement)}/>

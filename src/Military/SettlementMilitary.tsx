@@ -13,6 +13,8 @@ import { Dialog } from "primereact/dialog";
 import RecruitRegiment from "./RecruitRegiment";
 import { RegimentInterface } from "./units/RegimentInterface";
 import { ClanInterface, clanTypes } from "../Clans/ClanInterface/ClanInterface";
+import { FederalInterface } from "../utilities/FederalInterface";
+import { empty_federal_interface } from "../utilities/FederalInterface";
 
 export default function SettlementMilitary() {
     const gameId = useParams().game
@@ -24,8 +26,8 @@ export default function SettlementMilitary() {
 
     const getSettlement = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
-        const settlements = await store.get<SettlementInterface[]>('settlements');
-        const current_settlement = settlements?.find(settlement => settlement.name === settlementId)
+        const federal = await store.get<FederalInterface>('Federal') ?? {...empty_federal_interface};
+        const current_settlement = federal.settlements?.find(settlement => settlement.name === settlementId)
         if(current_settlement) {setSettlement(current_settlement)}
     }
     useEffect(() => {
@@ -68,12 +70,12 @@ export default function SettlementMilitary() {
 
     const saveData = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
-        const settlements = await store.get<SettlementInterface[]>('settlements');
-        const updatedSettlements = settlements?.map(s => {
+        const federal = await store.get<FederalInterface>('Federal') ?? {...empty_federal_interface};
+        const updatedSettlements = federal.settlements?.map(s => {
             if(s.name === settlement.name) {return {...settlement}}
             return s
         })
-        store.set('settlements', updatedSettlements)
+        store.set('Federal',{...federal,settlements: updatedSettlements})
         store.save()
     }
 

@@ -59,7 +59,10 @@ export interface SettlementInterface {
     loans: LoanInterface[];
 
     garrison: RegimentInterface[]
-    trade_deals: TradeDealInterface[]
+    trade_deals: TradeDealInterface[];
+
+    global_id: string;
+    connections: [boolean,boolean,boolean,boolean]
 }
 
 
@@ -89,7 +92,9 @@ export const empty_settlement: SettlementInterface = {
     available_loan: 0,
     garrison: [],
     merchant_tax: 0,
-    trade_deals: []
+    trade_deals: [],
+    global_id: '',
+    connections: [true,true,true,true]
 }
 
 export const newSettlement = (name: string, terrain_type: TerrainType, visable_name?: string) => {

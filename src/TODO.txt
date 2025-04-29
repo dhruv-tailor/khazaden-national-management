@@ -8,6 +8,8 @@ Ability to Conduct Diplomacy
 
 wip
 ----------
+remove tariffs
+refactor federal stuff into one objects
 
 
 completed

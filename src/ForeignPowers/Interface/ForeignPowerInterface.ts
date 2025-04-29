@@ -48,7 +48,6 @@ export interface ForeignPowerInterface {
     relations: number;
     recognition: ForeignRecognition;
     isEmbargoed: boolean;
-    tarriffs: number;
     dwarfPopulation: number;
     immigrationRate: number;
     combatantStatus: CombatantStatus;
@@ -61,9 +60,10 @@ export interface ForeignPowerInterface {
     prices: goodsdist;
     available_supply: goodsdist;
     available_demand: goodsdist;
-    retlaitory_tariffs: number;
     price_history: goodsdist[];
     trade_deals: TradeDealInterface[];
+    global_id: string;
+    connections: [boolean,boolean,boolean,boolean];
 }
 
 export const newForeignPower = (name: string, dwarfPopulation: number,economy: EconomyTypes,start_factor: number): ForeignPowerInterface => {
@@ -74,7 +74,6 @@ export const newForeignPower = (name: string, dwarfPopulation: number,economy: E
         relations: 0,
         recognition: ForeignRecognition.None,
         isEmbargoed: true,
-        tarriffs: 0,
         dwarfPopulation: dwarfPopulation,
         immigrationRate: 0,
         combatantStatus: CombatantStatus.Neutral,
@@ -87,9 +86,10 @@ export const newForeignPower = (name: string, dwarfPopulation: number,economy: E
         prices: {...initial_prices},
         available_supply: scaleGoods({ money: 1, ...EconomyTypeData[economy].demand }, pop_scaling_factor * availability_factor),
         available_demand: scaleGoods({ money: 1, ...EconomyTypeData[economy].demand }, pop_scaling_factor * availability_factor),
-        retlaitory_tariffs: 0,
         price_history: [],
         trade_deals: [],
+        global_id: '',
+        connections: [true,true,true,true]
     })
 }
 
