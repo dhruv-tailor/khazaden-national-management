@@ -7,6 +7,7 @@ import { Card } from "primereact/card";
 import { Panel } from "primereact/panel";
 import { RadioButton } from "primereact/radiobutton";
 import { InputNumber } from "primereact/inputnumber";
+import { Slider } from "primereact/slider";
 import { clanTypes } from "./Clans/ClanInterface/ClanInterface";
 import { empty_goodsdist, goodsdist } from "./Goods/GoodsDist";
 import { releventClanTT } from "./tooltips/clans/ReleventClanTT";
@@ -34,6 +35,7 @@ function NewGame() {
 
     const [saveName, setSaveName] = useState('');
     const [gameType, setGameType] = useState<'standard' | 'custom' | 'Jan_728' | 'Jul_728' | 'Jan_729'>('standard');
+    const [spawnRate, setSpawnRate] = useState(48); // Default spawn rate of 50%
     
     // Clan distribution state
     const [clanDistribution, setClanDistribution] = useState<{[key in clanTypes]: number}>({
@@ -77,11 +79,20 @@ function NewGame() {
     });
 
     const startGame = async () => {
-        if(gameType === 'standard') {await createNewSave(saveName);} 
-        else if(gameType === 'custom'){await createCustomSave(saveName,startingResources,clanDistribution);}
-        else if(gameType === 'Jan_728'){await createJan728Save(saveName);}
-        else if(gameType === 'Jul_728'){await createJul728Save(saveName);}
-        else if(gameType === 'Jan_729'){await createJan729Save(saveName);}
+        if (saveName === '') {
+            return;
+        }
+        if (gameType === 'standard') {
+            await createNewSave(saveName, spawnRate / 100);
+        } else if (gameType === 'custom') {
+            await createCustomSave(saveName, startingResources, clanDistribution, spawnRate / 100);
+        } else if (gameType === 'Jan_728') {
+            await createJan728Save(saveName, spawnRate / 100);
+        } else if (gameType === 'Jul_728') {
+            await createJul728Save(saveName, spawnRate / 100);
+        } else if (gameType === 'Jan_729') {
+            await createJan729Save(saveName, spawnRate / 100);
+        }
         navigate(`/game/${saveName}`);
     };
 
@@ -205,6 +216,24 @@ function NewGame() {
                             </div>
                         </div>
                     </Panel>
+
+                    {/* Spawn Rate Slider */}
+                    <div className="flex flex-column gap-2">
+                        <div className="flex align-items-center justify-content-between">
+                            <label htmlFor="spawnrate" className="font-bold">Foreign Power Spawn Rate</label>
+                            <span className="text-sm">{spawnRate}%</span>
+                        </div>
+                        <Slider
+                            id="spawnrate"
+                            value={spawnRate}
+                            onChange={(e) => setSpawnRate(e.value as number)}
+                            min={0}
+                            max={100}
+                            step={1}
+                            className="w-full"
+                        />
+                        <small className="text-500">Adjust the rate at which foreign powers spawn when exploring.</small>
+                    </div>
 
                     {/* Start Game Button */}
                     <Button 

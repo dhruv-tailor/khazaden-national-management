@@ -64,6 +64,7 @@ export interface ForeignPowerInterface {
     trade_deals: TradeDealInterface[];
     global_id: string;
     connections: [boolean,boolean,boolean,boolean];
+    isSource: [boolean,boolean,boolean,boolean];
 }
 
 export const newForeignPower = (name: string, dwarfPopulation: number,economy: EconomyTypes,start_factor: number): ForeignPowerInterface => {
@@ -89,7 +90,8 @@ export const newForeignPower = (name: string, dwarfPopulation: number,economy: E
         price_history: [],
         trade_deals: [],
         global_id: '',
-        connections: [true,true,true,true]
+        connections: [true,true,true,true],
+        isSource: [false,false,false,false]
     })
 }
 

@@ -5,7 +5,6 @@ import { load } from "@tauri-apps/plugin-store";
 import { saveLocation } from "./utilities/SaveData";
 import { addGoods, empty_goodsdist, goodsdist, roundGoods, subtractGoods } from "./Goods/GoodsDist";
 import DisplayGoods from "./components/goodsDislay";
-import Settlement from "./Settlement/Settlement";
 import { Dialog } from "primereact/dialog";
 import ResourceDistribuition from "./components/ResourceDistribution";
 import { Button } from "primereact/button";
@@ -22,8 +21,9 @@ import { TradeDealInterface } from "./Economics/Trade/interface/TradeDealInterfa
 import { FederalInterface } from "./utilities/FederalInterface";
 import { empty_federal_interface } from "./utilities/FederalInterface";
 import WorldMap from "./Map/WorldMap";
-import { empty_map_info } from "./Map/MapInfoInterface";
+import { empty_map_info, UncolonziedInterface } from "./Map/MapInfoInterface";
 import { MapInfoInterface } from "./Map/MapInfoInterface";
+import { TerrainType } from "./Settlement/SettlementInterface/TerrainInterface";
 export interface FederalChangeProps {
     settlements: SettlementInterface[],
     loans: LoanInterface[],
@@ -34,6 +34,8 @@ export default function Game() {
     const gameId = useParams().game
     let navigate = useNavigate();
 
+    const [global_id,setGlobalID] = useState<number>(0)
+
     // Federal Goods
     const [changeGoods,setChangeGoods] = useState<goodsdist>({...empty_goodsdist});
     const [federal,setFederal] = useState<FederalInterface>({...empty_federal_interface})
@@ -41,6 +43,11 @@ export default function Game() {
     // Stimulus
     const [whoToGive,setWhoToGive] = useState<string>('');
     const [giveGoodsVisable,setGiveGoodsVisable] = useState<boolean>(false)
+
+    // Uncolonized
+    const [fromNode,setFromNode] = useState<{nodeid: string, handleid: string} | null>(null);
+    const [toEmptyNode,setToEmptyNode] = useState<{x: number, y: number} | null>(null);
+    const [confirmDiscoveryVisable,setConfirmDiscoveryVisable] = useState<boolean>(false)
 
     // New Settlement Screen
     const [newSettlementVisable,setNewSettlementVisable] = useState<boolean>(false);
@@ -57,6 +64,7 @@ export default function Game() {
             store.get<number>('Current Month').then(value => {if (value) {setCurrentMonth(value)}}),
             store.get<number>('Current Year').then(value => {if (value) {setCurrentYear(value)}}),
             store.get<MapInfoInterface>('Map Info').then(value => {if (value) {setMapInfo(value)}}),
+            store.get<number>('Global ID').then(value => {if (value) {setGlobalID(value)}}),
         ])
         updateSettlements()
     }
@@ -89,6 +97,7 @@ export default function Game() {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
         store.set('Map Info',map_info)
         store.set('Federal',federal)
+        store.set('Global ID',global_id)
         store.save()
     }
 
@@ -104,11 +113,6 @@ export default function Game() {
         await saveData()
         await NextTurn(gameId ?? '')
         await getSettlements()
-    }
-
-    const goToForeignPowers = async () => {
-        await saveData()
-        navigate(`foreignpowers`)
     }
 
     const goToEconomy = async () => {
@@ -143,11 +147,83 @@ export default function Game() {
     const updateNodePositions = (new_nodes:{id: string, position: {x: number, y: number}}[]) => {
         setMapInfo({...map_info, nodes: new_nodes})
     }
+
+    const confirmDiscovery = (from: {nodeid: string, handleid: string}, to: {x: number, y: number}) => {
+        setFromNode({...from})
+        setToEmptyNode({...to})
+        setConfirmDiscoveryVisable(true)
+    }
+
+    // Create a new Uncolonized Node
+    const createUncolonizedNode = ( from: {nodeid: string, handleid: string}, to: {x: number, y: number}) => {
+        // Can't create a node if a connection from that handle already exists
+        const existing_edge = map_info.edges.find(edge => {
+            return edge.source === from.nodeid && edge.sourceHandle === from.handleid
+        })
+        if(existing_edge){ return }
+        // Get Terrain from the existing node
+        let terrain = TerrainType.Mountain
+        if(from.nodeid.startsWith('s')){
+            terrain = federal.settlements.find(s => s.global_id === from.nodeid)?.terrain_type ?? TerrainType.Mountain
+        }
+        else if(from.nodeid.startsWith('u')){
+            terrain = map_info.uncolonzied.find(u => u.id === from.nodeid)?.terrain ?? TerrainType.Mountain
+        }
+        // 50% chance that terrain is changed to a different terrain
+        if(Math.random() < 0.5){
+            const terrain_count = Object.values(TerrainType).filter(value => typeof value === 'number') as number[]
+            const randVal = () => terrain_count[Math.floor(Math.random() * terrain_count.length)]
+            terrain = randVal() as TerrainType
+        }
+
+        // Generate a new uncolonized node
+        const new_uncolonized: UncolonziedInterface = {
+            id: `u${global_id}`,
+            terrain: terrain,
+            connections: [
+                from.handleid === 'bottom' ? true : Math.random() < 0.5 ? true : false,
+                from.handleid === 'top' ? true : Math.random() < 0.5 ? true : false,
+                from.handleid === 'right' ? true : Math.random() < 0.5 ? true : false,
+                from.handleid === 'left' ? true : Math.random() < 0.5 ? true : false
+            ],
+            isSource: [
+                from.handleid === 'bottom' ? false : true,
+                from.handleid === 'top' ? false : true,
+                from.handleid === 'right' ? false : true,
+                from.handleid === 'left' ? false : true
+            ]
+        }
+        let targetHandle = 'bottom'
+        if(from.handleid === 'bottom'){
+            targetHandle = 'top'
+        }
+        else if(from.handleid === 'right'){
+            targetHandle = 'left'
+        }
+        else if(from.handleid === 'left'){
+            targetHandle = 'right'
+        }
+
+        setMapInfo({...map_info,
+            nodes: [...map_info.nodes,{id: new_uncolonized.id, position: {x: to.x, y: to.y}}],
+            edges: [...map_info.edges, {
+                id: `${from.nodeid}-${new_uncolonized.id}`,
+                source: from.nodeid,
+                target: new_uncolonized.id,
+                sourceHandle: from.handleid,
+                targetHandle: targetHandle,
+            }],
+            uncolonzied: [...map_info.uncolonzied, new_uncolonized]
+        })
+        setGlobalID(global_id + 1)
+        
+
+    }
     
     return (
-        <div className="flex flex-column gap-3 p-3">
+        <div className="flex flex-column gap-1">
             {/* Header Section */}
-            <div className="flex flex-column gap-2">
+            <div className="flex flex-column gap-1">
                 <div className="flex flex-row align-items-center justify-content-between">
                     <h1 className="m-0">Game Management</h1>
                     <Button 
@@ -159,13 +235,6 @@ export default function Game() {
                     />
                 </div>
                 <div className="flex flex-row gap-2">
-                    <Button 
-                        className='flex-grow-1' 
-                        severity="secondary" 
-                        label='Foreign Powers' 
-                        icon='pi pi-flag-fill' 
-                        onClick={goToForeignPowers}
-                    />
                     <Button 
                         className='flex-grow-1' 
                         severity="warning" 
@@ -184,8 +253,8 @@ export default function Game() {
             </div>
 
             {/* Federal Reserve Section */}
-            <Card className="sticky top-0 z-5 bg-black shadow-2">
-                <div className="flex flex-column gap-3">
+            <Card className="sticky top-0  z-5 bg-black shadow-2">
+                <div className="flex flex-column">
                     <div className="flex flex-row justify-content-between align-items-center">
                         <h2 className="m-0">Federal Reserve</h2>
                         {federal.settlements.length > 0 && (
@@ -205,29 +274,20 @@ export default function Game() {
                 </div>
             </Card>
 
-            {/* Settlements Section */}
-            {/* <div className="grid">
-                {federal.settlements.map(s => (
-                    <div key={s.name} className="col-12 md:col-6 lg:col-4">
-                        <Settlement 
-                            settlement={s} 
-                            stimulus={giveGoods}
-                            updateTaxation={updateTaxation}
-                            updateMerchantTax={setMerchantTax}
-                            goTo={navigateSettlement}
-                            federal_reserve={federal.reserve}
-                            FederalProps={federal}
-                        />
-                    </div>
-                ))}
-            </div> */}
             {map_info.nodes.length > 0 && (
                 <WorldMap nodes={map_info.nodes.map(node => {
                     if(node.id.startsWith('s')){
                     return {
                         id: node.id,
                         type: 'settlement',
-                        data: {settlement: federal.settlements.find(s => s.global_id === node.id)},
+                        data: {
+                            settlement: federal.settlements.find(s => s.global_id === node.id),
+                            goTo: navigateSettlement,
+                            updateTaxation: updateTaxation,
+                            setMerchantTax: setMerchantTax,
+                            federal: federal,
+                            stimulus: giveGoods
+                        },
                         position: {x: node.position.x, y: node.position.y},
                         draggable: true
                     }
@@ -241,9 +301,19 @@ export default function Game() {
                             draggable: true
                         }
                     }
+                    else if(node.id.startsWith('u')){
+                        return {
+                            id: node.id,
+                            type: 'uncolonized',
+                            data: {uncolonized: map_info.uncolonzied.find(u => u.id === node.id)},
+                            position: {x: node.position.x, y: node.position.y},
+                            draggable: true
+                        }
+                    }
                     return {id: 'error', data: {label: 'Error'}, position: {x: 0, y: 0}}
                 })} edges={map_info.edges}
                 updateNodePositions={updateNodePositions}
+                createUncolonizedNode={confirmDiscovery}
                  />
             )}
 
@@ -302,6 +372,52 @@ export default function Game() {
                     max_resources={federal.reserve} 
                     updateFunc={createSettlement}
                 />
+            </Dialog>
+
+            <Dialog
+                header="Confirm Exploration"
+                visible={confirmDiscoveryVisable}
+                onHide={() => setConfirmDiscoveryVisable(false)}
+                className="w-30rem"
+            >
+                <div className="flex flex-column gap-3">
+                    <div className="flex align-items-center gap-2">
+                        <i className="pi pi-map text-xl"></i>
+                        <span>Explore this territory?</span>
+                    </div>
+                    
+                    <div className="flex align-items-center gap-2">
+                        <MoneyIconTT/>
+                        <span>1,000</span>
+                    </div>
+
+                    <div className="flex justify-content-end gap-2 mt-3">
+                        <Button 
+                            label="Cancel" 
+                            icon="pi pi-times" 
+                            onClick={() => {
+                                setConfirmDiscoveryVisable(false)
+                                setFromNode(null)
+                                setToEmptyNode(null)
+                            }}
+                            className="p-button-text"
+                        />
+                        <Button 
+                            label="Explore" 
+                            icon="pi pi-check" 
+                            onClick={() => {
+                                // TODO: Handle exploration
+                                setConfirmDiscoveryVisable(false);
+                                if (fromNode && toEmptyNode) {
+                                    createUncolonizedNode(fromNode, toEmptyNode);
+                                }
+                                setFromNode(null);
+                                setToEmptyNode(null);
+                            }}
+                            severity="success"
+                        />
+                    </div>
+                </div>
             </Dialog>
         </div>
     )

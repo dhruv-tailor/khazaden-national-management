@@ -47,7 +47,7 @@ export const deleteSavegame = async (saveName: string) => {
     await remove(saveFile, {baseDir: BaseDirectory.Document});
 }
 
-export const createNewSave = async (saveName: string)  => {
+export const createNewSave = async (saveName: string, spawnRate: number = 0.48)  => {
     const savegame_folder = await savegameFolder();
     const saveFile = `${savegame_folder}${fileSeperator()}${saveName}.json`;
     new LazyStore(saveFile,{autoSave: false}); 
@@ -55,6 +55,7 @@ export const createNewSave = async (saveName: string)  => {
     let global_id = 0;
     let initial_settlement = newSettlement('Skarduhn', TerrainType.Mountain);
     initial_settlement.global_id = `s${global_id.toString()}`;
+    
     global_id++;
     // Initial Stock
     initial_settlement.stock = {
@@ -112,10 +113,11 @@ export const createNewSave = async (saveName: string)  => {
     store.set('Turns Passed',0) // Turns since game start
     store.set('Current Year',728) // Current Year
     store.set('Current Month',0) // Current Month
+    store.set('Foreign Spawn Rate', spawnRate) // The Chance that a foreign power will spawn when exploring
     store.set('Map Info',{...empty_map_info,
         nodes: [
-            { id: `s${0}`, position: {x: 550, y: 170} },
-            { id: `f${1}`, position: {x: 820, y: 170} }
+            { id: `s${0}`, position: {x: 370, y: 80} },
+            { id: `f${1}`, position: {x: 790, y: 40} }
         ],
         edges: [
             { id: '0l-1r', source: 's0', target: 'f1', sourceHandle: 'right', targetHandle: 'left' }
@@ -125,7 +127,7 @@ export const createNewSave = async (saveName: string)  => {
     store.close();
 }
 
-export const createCustomSave = async (saveName: string,custom_resources: goodsdist,custom_clans: {[key in clanTypes]: number}) => {
+export const createCustomSave = async (saveName: string, custom_resources: goodsdist, custom_clans: {[key in clanTypes]: number}, spawnRate: number = 0.48) => {
     const savegame_folder = await savegameFolder();
     const saveFile = `${savegame_folder}${fileSeperator()}${saveName}.json`;
     new LazyStore(saveFile,{autoSave: false}); 
@@ -165,10 +167,11 @@ export const createCustomSave = async (saveName: string,custom_resources: goodsd
     store.set('Turns Passed',0) // Turns since game start
     store.set('Current Year',728) // Current Year
     store.set('Current Month',0) // Current Month
+    store.set('Foreign Spawn Rate', spawnRate) // The Chance that a foreign power will spawn when exploring
     store.set('Map Info',{...empty_map_info,
         nodes: [
-            { id: `s${0}`, position: {x: 550, y: 170} },
-            { id: `f${1}`, position: {x: 820, y: 170} }
+            { id: `s${0}`, position: {x: 370, y: 80} },
+            { id: `f${1}`, position: {x: 790, y: 40} }
         ],
         edges: [
             { id: '0l-1r', source: 's0', target: 'f1', sourceHandle: 'right', targetHandle: 'left' }
@@ -177,7 +180,7 @@ export const createCustomSave = async (saveName: string,custom_resources: goodsd
     await store.save();
     store.close();
 }
-export const createJan728Save = async (saveName: string) => {
+export const createJan728Save = async (saveName: string, spawnRate: number = 0.48) => {
     const savegame_folder = await savegameFolder();
     const saveFile = `${savegame_folder}${fileSeperator()}${saveName}.json`;
     new LazyStore(saveFile,{autoSave: false}); 
@@ -262,10 +265,11 @@ export const createJan728Save = async (saveName: string) => {
     store.set('Turns Passed',0) // Turns since game start
     store.set('Current Year',728) // Current Year
     store.set('Current Month',1) // Current Month
+    store.set('Foreign Spawn Rate', spawnRate) // The Chance that a foreign power will spawn when exploring
     store.set('Map Info',{...empty_map_info,
         nodes: [
-            { id: `s${0}`, position: {x: 550, y: 170} },
-            { id: `f${1}`, position: {x: 820, y: 170} }
+            { id: `s${0}`, position: {x: 370, y: 80} },
+            { id: `f${1}`, position: {x: 790, y: 40} }
         ],
         edges: [
             { id: '0l-1r', source: 's0', target: 'f1', sourceHandle: 'right', targetHandle: 'left' }
@@ -275,7 +279,7 @@ export const createJan728Save = async (saveName: string) => {
     store.close();
 }
 
-export const createJul728Save = async (saveName: string) => {
+export const createJul728Save = async (saveName: string, spawnRate: number = 0.48) => {
     const savegame_folder = await savegameFolder();
     const saveFile = `${savegame_folder}${fileSeperator()}${saveName}.json`;
     new LazyStore(saveFile,{autoSave: false}); 
@@ -363,10 +367,11 @@ export const createJul728Save = async (saveName: string) => {
     store.set('Turns Passed',0) // Turns since game start
     store.set('Current Year',728) // Current Year
     store.set('Current Month',7) // Current Month
+    store.set('Foreign Spawn Rate', spawnRate) // The Chance that a foreign power will spawn when exploring
     store.set('Map Info',{...empty_map_info,
         nodes: [
-            { id: `s${0}`, position: {x: 550, y: 170} },
-            { id: `f${1}`, position: {x: 820, y: 170} }
+            { id: `s${0}`, position: {x: 370, y: 80} },
+            { id: `f${1}`, position: {x: 790, y: 40} }
         ],
         edges: [
             { id: '0l-1r', source: 's0', target: 'f1', sourceHandle: 'right', targetHandle: 'left' }
@@ -376,7 +381,7 @@ export const createJul728Save = async (saveName: string) => {
     store.close();
 }
 
-export const createJan729Save = async (saveName: string) => {
+export const createJan729Save = async (saveName: string, spawnRate: number = 0.48) => {
     const savegame_folder = await savegameFolder();
     const saveFile = `${savegame_folder}${fileSeperator()}${saveName}.json`;
     new LazyStore(saveFile,{autoSave: false}); 
@@ -466,11 +471,12 @@ export const createJan729Save = async (saveName: string) => {
     store.set('Market Trajectory', 0.0002) // The Veleocity of the market
     store.set('Turns Passed',0) // Turns since game start
     store.set('Current Year',728) // Current Year
-    store.set('Current Month',7) // Current Month
+    store.set('Current Month',1) // Current Month
+    store.set('Foreign Spawn Rate', spawnRate) // The Chance that a foreign power will spawn when exploring
     store.set('Map Info',{...empty_map_info,
         nodes: [
-            { id: `s${0}`, position: {x: 550, y: 170} },
-            { id: `f${1}`, position: {x: 820, y: 170} }
+            { id: `s${0}`, position: {x: 370, y: 80} },
+            { id: `f${1}`, position: {x: 790, y: 40} }
         ],
         edges: [
             { id: '0l-1r', source: 's0', target: 'f1', sourceHandle: 'right', targetHandle: 'left' }
