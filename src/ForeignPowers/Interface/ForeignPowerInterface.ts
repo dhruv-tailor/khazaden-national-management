@@ -116,3 +116,30 @@ export const Eidgenossenkhazaden: ForeignPowerInterface = {
     allianceStatus: AllianceStatus.Neutral,
     militaryAccess: MilitaryAccess.Limited
 };
+
+export const getForeignPower = (name: string): ForeignPowerInterface => {
+    switch(name){
+        case "Baetanuesa":
+            return newForeignPower("Baetanuesa", 0.11,EconomyTypes.Colonial,2.5)
+        case "Beznesti":
+            return newForeignPower("Beznesti", 0,EconomyTypes.Colonial,2)
+        case "Dragonsbane":
+            return newForeignPower("Dragonsbane", 0.08,EconomyTypes.Balanced,5)
+        case "Garozemle":
+            return newForeignPower("Garozemle", 0.05,EconomyTypes.Aristocratic,6)
+        case "Kayasahr":
+            return newForeignPower("Kayasahr", 0.05,EconomyTypes.SilkRoad,2)
+        case "Pactusallamanni":
+            return newForeignPower("Pactusallamanni", 0.2,EconomyTypes.Balanced,2)
+        case "Polabtheli":
+            return newForeignPower("Polabtheli", 0,EconomyTypes.Elven,2)
+        case "Saemark":
+            return newForeignPower("Saemark", 0.2,EconomyTypes.Seaborne,7)
+        case "Sledzianska":
+            return newForeignPower("Sledzianska", 0.04,EconomyTypes.Agricultural,3)
+        case "TerraKontor":
+            return newForeignPower("Terra Kontor", 0.03,EconomyTypes.Martial,2.5)
+        default:
+            return newForeignPower("Unknown", 0,EconomyTypes.Colonial,2)
+    }
+}

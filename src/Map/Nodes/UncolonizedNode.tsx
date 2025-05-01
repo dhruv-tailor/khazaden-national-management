@@ -2,17 +2,51 @@ import { Handle, Position } from "@xyflow/react";
 import { Card } from 'primereact/card';
 import { Tag } from 'primereact/tag';
 import { Button } from 'primereact/button';
-import { TerrainData } from "../../Settlement/SettlementInterface/TerrainInterface";
+import { TerrainData, TerrainType } from "../../Settlement/SettlementInterface/TerrainInterface";
 import { UncolonziedInterface } from "../MapInfoInterface";
+import { GiMountainCave, GiPineTree, GiMagicSwirl, GiWheat } from 'react-icons/gi';
+import { FaMapMarkedAlt } from 'react-icons/fa';
 
 type UncolonizedNodeData = {
     uncolonized: UncolonziedInterface;
+};
+
+const getTerrainIcon = (terrain: TerrainType) => {
+    switch (terrain) {
+        case TerrainType.Mountain:
+            return <GiMountainCave className="text-xl" />;
+        case TerrainType.Forest:
+            return <GiPineTree className="text-xl" />;
+        case TerrainType.Enchanted_Forest:
+            return <GiMagicSwirl className="text-xl" />;
+        case TerrainType.Farmland:
+            return <GiWheat className="text-xl" />;
+        default:
+            return <FaMapMarkedAlt className="text-xl" />;
+    }
+};
+
+const getTerrainSeverity = (terrain: TerrainType): 'success' | 'warning' | 'info' | 'danger' | 'secondary' | 'contrast' => {
+    switch (terrain) {
+        case TerrainType.Mountain:
+            return 'warning';
+        case TerrainType.Forest:
+            return 'info';
+        case TerrainType.Enchanted_Forest:
+            return 'secondary';
+        case TerrainType.Farmland:
+            return 'success';
+        default:
+            return 'info';
+    }
 };
 
 export default function UncolonizedNode({data}: {data: UncolonizedNodeData}) {
     if (!data?.uncolonized) return null;
     
     const { uncolonized } = data;
+    const terrainIcon = getTerrainIcon(uncolonized.terrain);
+    const terrainSeverity = getTerrainSeverity(uncolonized.terrain);
 
     return (
         <div>
@@ -21,31 +55,19 @@ export default function UncolonizedNode({data}: {data: UncolonizedNodeData}) {
             {uncolonized.connections[2] && <Handle type={uncolonized.isSource[2] ? "source" : "target"} position={Position.Left} id='left' />}
             {uncolonized.connections[3] && <Handle type={uncolonized.isSource[3] ? "source" : "target"} position={Position.Right} id='right' />}
             
-            <Card 
-                className="shadow-2"
-                title={
-                    <div className="flex gap-2 align-items-center justify-content-between">
-                        <span className="text-xl font-bold">Uncolonized Territory</span>
-                    </div>
-                }
-            >
+            <Card >
                 <div className="flex flex-column gap-3">
-                    <div className="flex gap-2">
-                        <Tag 
-                            value={TerrainData[uncolonized.terrain].name} 
-                            severity="info"
-                            className="text-sm"
-                        />
-                    </div>
-                    <div className="flex justify-content-end">
-                        <Button 
-                            icon="pi pi-map" 
-                            label="Explore" 
-                            size="small"
-                            severity="success"
-                            className="p-button-sm"
-                        />
-                    </div>
+                    <Tag severity={terrainSeverity}>
+                        <span className="mr-2">{terrainIcon}</span>
+                        {TerrainData[uncolonized.terrain].name}
+                    </Tag>
+                    <Button 
+                        icon="pi pi-map" 
+                        label="Settle Location" 
+                        size="small"
+                        severity="success"
+                        className="p-button-sm"
+                    />
                 </div>
             </Card>
         </div>

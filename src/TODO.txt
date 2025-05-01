@@ -4,16 +4,13 @@ Automated Trade deals - ✅
 world map - In Progress
 rework new settlement feature
 Random Events
-Ability to Conduct Diplomacy
+Ability to Conduct Simple Diplomacy
 
 wip
 ----------
-Settlement Node
-Federal Node
-Empty land Node
 Settle on Empty Land
-Discover New Foreign Nation
 create road between existing nodes
+Market Access Variable for Foreign Nations
 
 potential bugs
 -----------------
@@ -34,3 +31,13 @@ process trade on next turn
 add random market movement to goods
 remove tariffs
 refactor federal stuff into one objects
+Settlement Node
+Federal Node
+Empty land Node
+increase cost of exploration
+Discover New Foreign Nation
+
+
+Future Features
+---------------------
+Random Empire generation

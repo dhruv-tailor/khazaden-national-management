@@ -16,10 +16,7 @@ export default function WorldMap(
         nodes: Node[],
         edges: Edge[],
         updateNodePositions: (nodes:{id: string, position: {x: number, y: number}}[]) => void,
-        createUncolonizedNode: (from: {
-            nodeid: string;
-            handleid: string;
-        }, to: { x: number; y: number;}) => void
+        createUncolonizedNode: (from: { nodeid: string; handleid: string; }) => void
     }
         
     ) {
@@ -56,10 +53,7 @@ export default function WorldMap(
         // Make sure that it's not connected to anything
         console.log(params)
         if (params.toNode === null) {
-            createUncolonizedNode(
-                { nodeid: params.fromNode.id, handleid: params.fromHandle.id},
-                params.to
-            )
+            createUncolonizedNode({ nodeid: params.fromNode.id, handleid: params.fromHandle.id})
         }
     }, []);
 

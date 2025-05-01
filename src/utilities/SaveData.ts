@@ -104,6 +104,7 @@ export const createNewSave = async (saveName: string, spawnRate: number = 0.48) 
         trade_deals: [],
     }
     global_id++;
+    store.set('Undiscovered Foreign Powers',['Baetanuesa','Beznesti','Dragonsbane','Garozemle','Kayasahr','Pactusallamanni','Polabtheli','Saemark','Sledzianska','TerraKontor'])
     store.set('Global ID',global_id)
     store.set('Federal',federal_interface)
     store.set('Positive Global Market Trend',true) //True means going up false means going down
@@ -158,6 +159,7 @@ export const createCustomSave = async (saveName: string, custom_resources: goods
         trade_deals: [],
     }
     global_id++;
+    store.set('Undiscovered Foreign Powers',['Baetanuesa','Beznesti','Dragonsbane','Garozemle','Kayasahr','Pactusallamanni','Polabtheli','Saemark','Sledzianska','TerraKontor'])
     store.set('Global ID',global_id)
     store.set('Federal',federal_interface)
     store.set('Positive Global Market Trend',true) //True means going up false means going down
@@ -256,6 +258,7 @@ export const createJan728Save = async (saveName: string, spawnRate: number = 0.4
         trade_deals: [],
     }
     global_id++;
+    store.set('Undiscovered Foreign Powers',['Baetanuesa','Beznesti','Dragonsbane','Garozemle','Kayasahr','Pactusallamanni','Polabtheli','Saemark','Sledzianska','TerraKontor'])
     store.set('Global ID',global_id)
     store.set('Federal',federal_interface)
     store.set('Positive Global Market Trend',true) //True means going up false means going down
@@ -358,6 +361,7 @@ export const createJul728Save = async (saveName: string, spawnRate: number = 0.4
         trade_deals: [],
     }
     global_id++;
+    store.set('Undiscovered Foreign Powers',['Baetanuesa','Beznesti','Dragonsbane','Garozemle','Kayasahr','Pactusallamanni','Polabtheli','Saemark','Sledzianska','TerraKontor'])
     store.set('Global ID',global_id)
     store.set('Federal',federal_interface)
     store.set('Positive Global Market Trend',true) //True means going up false means going down
@@ -463,6 +467,7 @@ export const createJan729Save = async (saveName: string, spawnRate: number = 0.4
         trade_deals: [],
     }
     global_id++;
+    store.set('Undiscovered Foreign Powers',['Baetanuesa','Beznesti','Dragonsbane','Garozemle','Kayasahr','Pactusallamanni','Polabtheli','Saemark','Sledzianska','TerraKontor'])
     store.set('Global ID',global_id)
     store.set('Federal',federal_interface)
     store.set('Positive Global Market Trend',true) //True means going up false means going down

@@ -38,7 +38,7 @@ export default function ForeignNode({data}: {data: ForeignNodeData}) {
                     <div className="flex flex-column align-items-center gap-1">
                         <h3 className="m-0 text-lg font-semibold text-center">{foreign.name}</h3>
                         <Badge 
-                            value={EconomyTypeData[foreign.economyType].name}
+                            value={EconomyTypeData[foreign.economyType as keyof typeof EconomyTypeData].name}
                             className="text-sm"
                             severity="info"
                         />

@@ -24,6 +24,7 @@ import WorldMap from "./Map/WorldMap";
 import { empty_map_info, UncolonziedInterface } from "./Map/MapInfoInterface";
 import { MapInfoInterface } from "./Map/MapInfoInterface";
 import { TerrainType } from "./Settlement/SettlementInterface/TerrainInterface";
+import { AllianceStatus, ForeignPowerInterface, ForeignRecognition, getForeignPower } from "./ForeignPowers/Interface/ForeignPowerInterface";
 export interface FederalChangeProps {
     settlements: SettlementInterface[],
     loans: LoanInterface[],
@@ -45,8 +46,7 @@ export default function Game() {
     const [giveGoodsVisable,setGiveGoodsVisable] = useState<boolean>(false)
 
     // Uncolonized
-    const [fromNode,setFromNode] = useState<{nodeid: string, handleid: string} | null>(null);
-    const [toEmptyNode,setToEmptyNode] = useState<{x: number, y: number} | null>(null);
+    const [fromNode,setFromNode] = useState<{nodeid: string, handleid: string} | null>(null)
     const [confirmDiscoveryVisable,setConfirmDiscoveryVisable] = useState<boolean>(false)
 
     // New Settlement Screen
@@ -56,7 +56,9 @@ export default function Game() {
     const [currentYear,setCurrentYear] = useState<number>(0)
 
     const [map_info,setMapInfo] = useState<MapInfoInterface>({...empty_map_info})
-    
+    const [undiscovered_foreign_powers,setUndiscoveredForeignPowers] = useState<string[]>([])
+    const [foreign_spawn_rate,setForeignSpawnRate] = useState<number>(0.48)
+
     const getSettlements = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
         await Promise.all([
@@ -65,6 +67,8 @@ export default function Game() {
             store.get<number>('Current Year').then(value => {if (value) {setCurrentYear(value)}}),
             store.get<MapInfoInterface>('Map Info').then(value => {if (value) {setMapInfo(value)}}),
             store.get<number>('Global ID').then(value => {if (value) {setGlobalID(value)}}),
+            store.get<string[]>('Undiscovered Foreign Powers').then(value => {if (value) {setUndiscoveredForeignPowers(value)}}),
+            store.get<number>('Foreign Spawn Rate').then(value => {if (value) {setForeignSpawnRate(value)}}),
         ])
         updateSettlements()
     }
@@ -98,6 +102,8 @@ export default function Game() {
         store.set('Map Info',map_info)
         store.set('Federal',federal)
         store.set('Global ID',global_id)
+        store.set('Undiscovered Foreign Powers',undiscovered_foreign_powers)
+        store.set('Foreign Spawn Rate',foreign_spawn_rate)
         store.save()
     }
 
@@ -148,14 +154,81 @@ export default function Game() {
         setMapInfo({...map_info, nodes: new_nodes})
     }
 
-    const confirmDiscovery = (from: {nodeid: string, handleid: string}, to: {x: number, y: number}) => {
+    const confirmDiscovery = (from: {nodeid: string, handleid: string}) => {
         setFromNode({...from})
-        setToEmptyNode({...to})
         setConfirmDiscoveryVisable(true)
     }
 
+    // When exploring a new node, there's a chance that a foreign power will spawn instead
+    const spawnForeignPower = (from: {nodeid: string, handleid: string}) => {
+        if (undiscovered_foreign_powers.length === 0) {
+            createUncolonizedNode(from)
+            return
+        }
+        const foreign_power = undiscovered_foreign_powers[Math.floor(Math.random() * undiscovered_foreign_powers.length)]
+        setUndiscoveredForeignPowers(undiscovered_foreign_powers.filter(power => power !== foreign_power))
+        const new_foreign_power: ForeignPowerInterface = {
+            ...getForeignPower(foreign_power),
+            recognition: ForeignRecognition.Limited,
+            immigrationRate: 0.10,
+            allianceStatus: AllianceStatus.Neutral,
+            isEmbargoed: false,
+            global_id: `f${global_id}`,
+            connections: [
+                from.handleid === 'bottom' ? true : Math.random() < 0.5 ? true : false,
+                from.handleid === 'top' ? true : Math.random() < 0.5 ? true : false,
+                from.handleid === 'right' ? true : Math.random() < 0.5 ? true : false,
+                from.handleid === 'left' ? true : Math.random() < 0.5 ? true : false
+            ] as [boolean, boolean, boolean, boolean],
+            isSource: [false, false, false, false] as [boolean, boolean, boolean, boolean]
+        }
+
+        let targetHandle = 'bottom'
+        let targetPosition = {
+            x: map_info.nodes.find(n => n.id === from.nodeid)?.position.x ?? 0, 
+            y: (map_info.nodes.find(n => n.id === from.nodeid)?.position.y ?? 0) - 300
+        }
+        if(from.handleid === 'bottom'){
+            targetHandle = 'top'
+            targetPosition = {
+                x: map_info.nodes.find(n => n.id === from.nodeid)?.position.x ?? 0, 
+                y: (map_info.nodes.find(n => n.id === from.nodeid)?.position.y ?? 0) + 300
+            }
+        }
+        else if(from.handleid === 'right'){
+            targetHandle = 'left'
+            targetPosition = {
+                x: (map_info.nodes.find(n => n.id === from.nodeid)?.position.x ?? 0) + 300, 
+                y: map_info.nodes.find(n => n.id === from.nodeid)?.position.y ?? 0
+            }
+        }
+        else if(from.handleid === 'left'){
+            targetHandle = 'right'
+            targetPosition = {
+                x: (map_info.nodes.find(n => n.id === from.nodeid)?.position.x ?? 0) - 300, 
+                y: map_info.nodes.find(n => n.id === from.nodeid)?.position.y ?? 0
+            }
+        }
+
+        setFederal({
+            ...federal,
+            foreign_powers: [...federal.foreign_powers,{...new_foreign_power}]
+        })
+        setGlobalID(global_id + 1)
+        setMapInfo({...map_info,
+            nodes: [...map_info.nodes,{id: new_foreign_power.global_id, position: targetPosition}],
+            edges: [...map_info.edges, {
+                id: `${from.nodeid}-${new_foreign_power.global_id}`,
+                source: from.nodeid,
+                target: new_foreign_power.global_id,
+                sourceHandle: from.handleid,
+                targetHandle: targetHandle,
+            }],
+        })
+    }
+
     // Create a new Uncolonized Node
-    const createUncolonizedNode = ( from: {nodeid: string, handleid: string}, to: {x: number, y: number}) => {
+    const createUncolonizedNode = ( from: {nodeid: string, handleid: string}) => {
         // Can't create a node if a connection from that handle already exists
         const existing_edge = map_info.edges.find(edge => {
             return edge.source === from.nodeid && edge.sourceHandle === from.handleid
@@ -194,18 +267,34 @@ export default function Game() {
             ]
         }
         let targetHandle = 'bottom'
+        let targetPosition = {
+            x: map_info.nodes.find(n => n.id === from.nodeid)?.position.x ?? 0, 
+            y: (map_info.nodes.find(n => n.id === from.nodeid)?.position.y ?? 0) - 300
+        }
         if(from.handleid === 'bottom'){
             targetHandle = 'top'
+            targetPosition = {
+                x: map_info.nodes.find(n => n.id === from.nodeid)?.position.x ?? 0, 
+                y: (map_info.nodes.find(n => n.id === from.nodeid)?.position.y ?? 0) + 300
+            }
         }
         else if(from.handleid === 'right'){
             targetHandle = 'left'
+            targetPosition = {
+                x: (map_info.nodes.find(n => n.id === from.nodeid)?.position.x ?? 0) + 300, 
+                y: map_info.nodes.find(n => n.id === from.nodeid)?.position.y ?? 0
+            }
         }
         else if(from.handleid === 'left'){
             targetHandle = 'right'
+            targetPosition = {
+                x: (map_info.nodes.find(n => n.id === from.nodeid)?.position.x ?? 0) - 300, 
+                y: map_info.nodes.find(n => n.id === from.nodeid)?.position.y ?? 0
+            }
         }
 
         setMapInfo({...map_info,
-            nodes: [...map_info.nodes,{id: new_uncolonized.id, position: {x: to.x, y: to.y}}],
+            nodes: [...map_info.nodes,{id: new_uncolonized.id, position: targetPosition}],
             edges: [...map_info.edges, {
                 id: `${from.nodeid}-${new_uncolonized.id}`,
                 source: from.nodeid,
@@ -388,7 +477,7 @@ export default function Game() {
                     
                     <div className="flex align-items-center gap-2">
                         <MoneyIconTT/>
-                        <span>1,000</span>
+                        <span>{(1 + ((map_info.nodes.length - 2)/10)) * 1000}</span>
                     </div>
 
                     <div className="flex justify-content-end gap-2 mt-3">
@@ -398,21 +487,27 @@ export default function Game() {
                             onClick={() => {
                                 setConfirmDiscoveryVisable(false)
                                 setFromNode(null)
-                                setToEmptyNode(null)
                             }}
                             className="p-button-text"
                         />
                         <Button 
+                            //disabled={federal.reserve.money < ((1 + ((map_info.nodes.length - 2)/10)) * 1000)}
                             label="Explore" 
                             icon="pi pi-check" 
                             onClick={() => {
-                                // TODO: Handle exploration
+                                setFederal({
+                                    ...federal,
+                                    reserve: {
+                                        ...federal.reserve, 
+                                        money: federal.reserve.money - ((1 + ((map_info.nodes.length - 2)/10)) * 1000)
+                                    }
+                                })
                                 setConfirmDiscoveryVisable(false);
-                                if (fromNode && toEmptyNode) {
-                                    createUncolonizedNode(fromNode, toEmptyNode);
+                                if (fromNode) {
+                                    if(Math.random() > foreign_spawn_rate){ createUncolonizedNode(fromNode);}
+                                    else{spawnForeignPower(fromNode);}
                                 }
                                 setFromNode(null);
-                                setToEmptyNode(null);
                             }}
                             severity="success"
                         />

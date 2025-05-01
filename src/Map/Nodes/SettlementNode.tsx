@@ -2,7 +2,7 @@ import { settlementChange, SettlementInterface, SettlementTierDetails } from "..
 import { Handle, Position } from "@xyflow/react";
 import { Card } from 'primereact/card';
 import { Tag } from 'primereact/tag';
-import { TerrainData } from "../../Settlement/SettlementInterface/TerrainInterface";
+import { TerrainData, TerrainType } from "../../Settlement/SettlementInterface/TerrainInterface";
 import { OverlayPanel } from 'primereact/overlaypanel';
 import { Button } from 'primereact/button';
 import { useRef, useState } from 'react';
@@ -11,6 +11,8 @@ import DisplayGoods from "../../components/goodsDislay";
 import { Dialog } from "primereact/dialog";
 import SettlementTaxation from "../../Economics/settlement/SettlementTaxation";
 import { FederalInterface } from "../../utilities/FederalInterface";
+import { FaMapMarkedAlt } from "react-icons/fa";
+import { GiMountainCave, GiPineTree, GiMagicSwirl, GiWheat } from "react-icons/gi";
 
 type SettlementNodeData = {
     settlement: SettlementInterface;
@@ -19,6 +21,36 @@ type SettlementNodeData = {
     setMerchantTax: (name: string, merchant_tax: number) => void;
     federal: FederalInterface;
     stimulus: (name: string) => void
+};
+
+const getTerrainIcon = (terrain: TerrainType) => {
+    switch (terrain) {
+        case TerrainType.Mountain:
+            return <GiMountainCave className="text-xl" />;
+        case TerrainType.Forest:
+            return <GiPineTree className="text-xl" />;
+        case TerrainType.Enchanted_Forest:
+            return <GiMagicSwirl className="text-xl" />;
+        case TerrainType.Farmland:
+            return <GiWheat className="text-xl" />;
+        default:
+            return <FaMapMarkedAlt className="text-xl" />;
+    }
+};
+
+const getTerrainSeverity = (terrain: TerrainType): 'success' | 'warning' | 'info' | 'danger' | 'secondary' | 'contrast' => {
+    switch (terrain) {
+        case TerrainType.Mountain:
+            return 'warning';
+        case TerrainType.Forest:
+            return 'info';
+        case TerrainType.Enchanted_Forest:
+            return 'secondary';
+        case TerrainType.Farmland:
+            return 'success';
+        default:
+            return 'info';
+    }
 };
 
 export default function SettlementNode({data}: {data: SettlementNodeData}) {
@@ -61,11 +93,10 @@ export default function SettlementNode({data}: {data: SettlementNodeData}) {
                     </div>
 
                     <div className="flex gap-2">
-                        <Tag 
-                            value={TerrainData[settlement.terrain_type].name} 
-                            severity="info"
-                            className="text-sm"
-                        />
+                    <Tag severity={getTerrainSeverity(settlement.terrain_type)}>
+                        <span className="mr-2">{getTerrainIcon(settlement.terrain_type)}</span>
+                            {TerrainData[settlement.terrain_type].name}
+                        </Tag>
                         <Tag 
                             value={SettlementTierDetails[settlement.tier].name} 
                             severity={settlement.tier >= 4 ? "success" : settlement.tier >= 2 ? "info" : "warning"}
