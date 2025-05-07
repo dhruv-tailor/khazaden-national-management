@@ -3,12 +3,13 @@ import { Card } from 'primereact/card';
 import { Tag } from 'primereact/tag';
 import { Button } from 'primereact/button';
 import { TerrainData, TerrainType } from "../../Settlement/SettlementInterface/TerrainInterface";
-import { UncolonziedInterface } from "../MapInfoInterface";
+import { colonizedInterface } from "../MapInfoInterface";
 import { GiMountainCave, GiPineTree, GiMagicSwirl, GiWheat } from 'react-icons/gi';
 import { FaMapMarkedAlt } from 'react-icons/fa';
 
 type UncolonizedNodeData = {
-    uncolonized: UncolonziedInterface;
+    uncolonized: colonizedInterface;
+    colonizeNode: (id: string, terrain: TerrainType) => void;
 };
 
 const getTerrainIcon = (terrain: TerrainType) => {
@@ -67,6 +68,7 @@ export default function UncolonizedNode({data}: {data: UncolonizedNodeData}) {
                         size="small"
                         severity="success"
                         className="p-button-sm"
+                        onClick={() => data.colonizeNode(uncolonized.id, uncolonized.terrain)}
                     />
                 </div>
             </Card>

@@ -5,14 +5,17 @@ import { Tag } from 'primereact/tag';
 import { TerrainData, TerrainType } from "../../Settlement/SettlementInterface/TerrainInterface";
 import { OverlayPanel } from 'primereact/overlaypanel';
 import { Button } from 'primereact/button';
+import { Badge } from 'primereact/badge';
 import { useRef, useState } from 'react';
-import { goodsdist, roundGoods } from "../../Goods/GoodsDist";
+import { goodsdist, roundGoods, totalGoods } from "../../Goods/GoodsDist";
 import DisplayGoods from "../../components/goodsDislay";
 import { Dialog } from "primereact/dialog";
 import SettlementTaxation from "../../Economics/settlement/SettlementTaxation";
 import { FederalInterface } from "../../utilities/FederalInterface";
 import { FaMapMarkedAlt } from "react-icons/fa";
-import { GiMountainCave, GiPineTree, GiMagicSwirl, GiWheat } from "react-icons/gi";
+import { GiMountainCave, GiPineTree, GiMagicSwirl, GiWheat, GiFactory } from "react-icons/gi";
+import { Tooltip } from 'primereact/tooltip';
+import { clanTypes } from "../../Clans/ClanInterface/ClanInterface";
 
 type SettlementNodeData = {
     settlement: SettlementInterface;
@@ -66,6 +69,17 @@ export default function SettlementNode({data}: {data: SettlementNodeData}) {
     const setTaxation = (taxation: goodsdist) => data.updateTaxation(settlement.name,taxation);
     const setMerchantTax = (merchant_tax: number) => data.setMerchantTax(settlement.name,merchant_tax);
 
+    const unused_production : boolean = settlement.clans.filter(c => {
+        return(
+            (c.population > 0) && 
+            (c.goods_produced - totalGoods(c.production) > 0) && 
+            (c.id !== clanTypes.rulers) &&
+            (c.id !== clanTypes.engineers) &&
+            (c.id !== clanTypes.merchants) &&
+            (c.id !== clanTypes.warriors) &&
+            (c.id !== clanTypes.criminals)
+        )}).length > 0 
+
     return (
         <div>
             {settlement.connections[0] && <Handle  type={settlement.isSource[0] ? "source" : "target"} position={Position.Top} id='top' />}
@@ -77,6 +91,10 @@ export default function SettlementNode({data}: {data: SettlementNodeData}) {
                 title={
                     <div className="flex gap-2 align-items-center justify-content-between">
                         <span className="text-xl font-bold">{settlement.visible_name}</span>
+                        {unused_production && (
+                            <Tooltip target=".unused-production-badge" content="Unused Production" />
+                        )}
+                        {unused_production && <Badge severity="warning" value={<GiFactory />} className="unused-production-badge" />}
                     </div>
                 }
             >

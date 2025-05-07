@@ -2,8 +2,6 @@ import { Handle, Position } from "@xyflow/react";
 import { ForeignPowerInterface } from "../../ForeignPowers/Interface/ForeignPowerInterface";
 import { Card } from 'primereact/card';
 import { Knob } from 'primereact/knob';
-import { Badge } from 'primereact/badge';
-import { EconomyTypeData } from "../../Goods/EconomyTypes";
 import { RecognitionBadge } from "../../ForeignPowers/badges/RecognitionBadge";
 import { AllianceStatusBadge } from "../../ForeignPowers/badges/AllianceStatusBadge";
 import { CombatantStatusBadge } from "../../ForeignPowers/badges/CombatantStatusBadge";
@@ -37,11 +35,6 @@ export default function ForeignNode({data}: {data: ForeignNodeData}) {
                     {/* Header with Name and Economy */}
                     <div className="flex flex-column align-items-center gap-1">
                         <h3 className="m-0 text-lg font-semibold text-center">{foreign.name}</h3>
-                        <Badge 
-                            value={EconomyTypeData[foreign.economyType as keyof typeof EconomyTypeData].name}
-                            className="text-sm"
-                            severity="info"
-                        />
                     </div>
 
                     <Divider className="my-1" />
@@ -90,6 +83,13 @@ export default function ForeignNode({data}: {data: ForeignNodeData}) {
                                 </span>
                             </div>
                         )}
+
+                        <div className="flex align-items-center justify-content-between">
+                            <span className="text-sm text-500">Market Access</span>
+                            <span className="text-sm font-semibold">
+                                {foreign.market_access * 100}%
+                            </span>
+                        </div>
                     </div>
                 </div>
             </Card>

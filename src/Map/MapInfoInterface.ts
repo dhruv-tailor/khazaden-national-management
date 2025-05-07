@@ -7,23 +7,23 @@ export interface MapInfoInterface {
         position: {x: number, y: number},
     }[]
     edges: Edge[];
-    uncolonzied: UncolonziedInterface[];
+    colonized: colonizedInterface[];
 }
 
 export const empty_map_info: MapInfoInterface = {
     nodes: [],
     edges: [],
-    uncolonzied: [],
+    colonized: [],
 }
 
-export interface UncolonziedInterface {
+export interface colonizedInterface {
     id: string,
     terrain: TerrainType,
     connections: [boolean,boolean,boolean,boolean]
     isSource: [boolean,boolean,boolean,boolean]
 }
 
-export const empty_uncolonzied: UncolonziedInterface = {
+export const empty_colonized: colonizedInterface = {
     id: '',
     terrain: TerrainType.Mountain,
     connections: [true,true,true,true],

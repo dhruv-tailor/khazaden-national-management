@@ -113,12 +113,14 @@ export const NextTurn = async (game: string) => {
         settlement.merchant_capacity = Math.round(merchant_cap * (1 - settlement.merchant_tax))
         merchant_capacity += Math.round(merchant_cap * settlement.merchant_tax)
 
+        console.log(settlement.merchant_capacity)
         // Remove merchant capacity used by trade deals
         settlement.trade_deals.forEach(deal => {
             if(deal.active === 'active') {
-                settlement.merchant_capacity -= totalGoods(deal.outgoing) - totalGoods(deal.incoming)
+                settlement.merchant_capacity -= totalGoods(deal.outgoing) + totalGoods(deal.incoming)
             }
         })
+        console.log(settlement.merchant_capacity)
 
         // Ensure merchant capacity is not negative
         settlement.merchant_capacity = Math.max(settlement.merchant_capacity,0)
@@ -206,8 +208,8 @@ export const NextTurn = async (game: string) => {
         nation.demand = scaleGoods(nation.demand, market_health * randMarketHealth() * market_modifier)
         nation.price_history = [...nation.price_history,nation.prices]
         nation.prices = calcPriceGoods(nation.prices,old_supply,nation.supply)
-        nation.available_supply = roundGoods(scaleGoods(nation.supply,0.05))
-        nation.available_demand = roundGoods(scaleGoods(nation.demand,0.05))
+        nation.available_supply = roundGoods(scaleGoods(nation.supply,nation.market_access))
+        nation.available_demand = roundGoods(scaleGoods(nation.demand,nation.market_access))
 
         // Take into account trade deals
         nation.trade_deals.forEach(deal => {

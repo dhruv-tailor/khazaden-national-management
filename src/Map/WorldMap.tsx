@@ -11,12 +11,13 @@ const nodeTypes = {
 }
 
 export default function WorldMap(
-    {nodes,edges,updateNodePositions,createUncolonizedNode}: 
+    {nodes,edges,updateNodePositions,createUncolonizedNode,buildRoad}: 
     {
         nodes: Node[],
         edges: Edge[],
         updateNodePositions: (nodes:{id: string, position: {x: number, y: number}}[]) => void,
-        createUncolonizedNode: (from: { nodeid: string; handleid: string; }) => void
+        createUncolonizedNode: (from: { nodeid: string; handleid: string; }) => void,
+        buildRoad: (from: { nodeid: string; handleid: string; },to: { nodeid: string; handleid: string; }) => void,
     }
         
     ) {
@@ -51,9 +52,35 @@ export default function WorldMap(
 
     const onConnectEnd = useCallback((_event: MouseEvent | TouchEvent, params: any) => {
         // Make sure that it's not connected to anything
-        console.log(params)
         if (params.toNode === null) {
             createUncolonizedNode({ nodeid: params.fromNode.id, handleid: params.fromHandle.id})
+        }
+        // If it's connecting to a node and a handle then build a road
+        if (params.toNode !== null && params.toHandle !== null) {
+            // Check if the two nodes are already connected
+            if (edges.find(
+                e => { return(
+                    (e.source === params.fromNode.id && e.target === params.toNode.id) || 
+                    (e.source === params.toNode.id && e.target === params.fromNode.id)
+                )})) {
+                return;
+            }
+            // Make sure that the handles don't alreayd have a connection elsewhere
+            if (edges.find(e => {
+                return(
+                    (e.source === params.fromNode.id && e.sourceHandle === params.fromHandle.id) ||
+                    (e.target === params.toNode.id && e.targetHandle === params.toHandle.id) ||
+                    (e.source === params.toNode.id && e.sourceHandle === params.toHandle.id) ||
+                    (e.target === params.fromNode.id && e.targetHandle === params.fromHandle.id)
+                )
+            })) {
+                return;
+            }
+            // Build a road
+            buildRoad(
+                {nodeid: params.fromNode.id, handleid: params.fromHandle.id},
+                {nodeid: params.toNode.id, handleid: params.toHandle.id}
+            )
         }
     }, []);
 
@@ -68,6 +95,7 @@ export default function WorldMap(
                 onNodeDragStop={onNodeDragStop}
                 onConnectEnd={onConnectEnd}
                 fitView
+                proOptions={{ hideAttribution: true }}
             >
                 <Background />
             </ReactFlow>

@@ -47,7 +47,7 @@ export const deleteSavegame = async (saveName: string) => {
     await remove(saveFile, {baseDir: BaseDirectory.Document});
 }
 
-export const createNewSave = async (saveName: string, spawnRate: number = 0.48)  => {
+export const createNewSave = async (saveName: string, spawnRate: number = 0.48, connectionSpawnRate: number = 0.47)  => {
     const savegame_folder = await savegameFolder();
     const saveFile = `${savegame_folder}${fileSeperator()}${saveName}.json`;
     new LazyStore(saveFile,{autoSave: false}); 
@@ -115,6 +115,7 @@ export const createNewSave = async (saveName: string, spawnRate: number = 0.48) 
     store.set('Current Year',728) // Current Year
     store.set('Current Month',0) // Current Month
     store.set('Foreign Spawn Rate', spawnRate) // The Chance that a foreign power will spawn when exploring
+    store.set('Connection Spawn Rate', connectionSpawnRate) // The Chance that a connection will spawn when exploring
     store.set('Map Info',{...empty_map_info,
         nodes: [
             { id: `s${0}`, position: {x: 370, y: 80} },
@@ -128,7 +129,7 @@ export const createNewSave = async (saveName: string, spawnRate: number = 0.48) 
     store.close();
 }
 
-export const createCustomSave = async (saveName: string, custom_resources: goodsdist, custom_clans: {[key in clanTypes]: number}, spawnRate: number = 0.48) => {
+export const createCustomSave = async (saveName: string, custom_resources: goodsdist, custom_clans: {[key in clanTypes]: number}, spawnRate: number = 0.48, connectionSpawnRate: number = 0.47) => {
     const savegame_folder = await savegameFolder();
     const saveFile = `${savegame_folder}${fileSeperator()}${saveName}.json`;
     new LazyStore(saveFile,{autoSave: false}); 
@@ -170,6 +171,7 @@ export const createCustomSave = async (saveName: string, custom_resources: goods
     store.set('Current Year',728) // Current Year
     store.set('Current Month',0) // Current Month
     store.set('Foreign Spawn Rate', spawnRate) // The Chance that a foreign power will spawn when exploring
+    store.set('Connection Spawn Rate', connectionSpawnRate) // The Chance that a connection will spawn when exploring
     store.set('Map Info',{...empty_map_info,
         nodes: [
             { id: `s${0}`, position: {x: 370, y: 80} },
@@ -182,7 +184,7 @@ export const createCustomSave = async (saveName: string, custom_resources: goods
     await store.save();
     store.close();
 }
-export const createJan728Save = async (saveName: string, spawnRate: number = 0.48) => {
+export const createJan728Save = async (saveName: string, spawnRate: number = 0.48, connectionSpawnRate: number = 0.47) => {
     const savegame_folder = await savegameFolder();
     const saveFile = `${savegame_folder}${fileSeperator()}${saveName}.json`;
     new LazyStore(saveFile,{autoSave: false}); 
@@ -269,6 +271,7 @@ export const createJan728Save = async (saveName: string, spawnRate: number = 0.4
     store.set('Current Year',728) // Current Year
     store.set('Current Month',1) // Current Month
     store.set('Foreign Spawn Rate', spawnRate) // The Chance that a foreign power will spawn when exploring
+    store.set('Connection Spawn Rate', connectionSpawnRate) // The Chance that a connection will spawn when exploring
     store.set('Map Info',{...empty_map_info,
         nodes: [
             { id: `s${0}`, position: {x: 370, y: 80} },
@@ -282,7 +285,7 @@ export const createJan728Save = async (saveName: string, spawnRate: number = 0.4
     store.close();
 }
 
-export const createJul728Save = async (saveName: string, spawnRate: number = 0.48) => {
+export const createJul728Save = async (saveName: string, spawnRate: number = 0.48, connectionSpawnRate: number = 0.47) => {
     const savegame_folder = await savegameFolder();
     const saveFile = `${savegame_folder}${fileSeperator()}${saveName}.json`;
     new LazyStore(saveFile,{autoSave: false}); 
@@ -372,6 +375,7 @@ export const createJul728Save = async (saveName: string, spawnRate: number = 0.4
     store.set('Current Year',728) // Current Year
     store.set('Current Month',7) // Current Month
     store.set('Foreign Spawn Rate', spawnRate) // The Chance that a foreign power will spawn when exploring
+    store.set('Connection Spawn Rate', connectionSpawnRate) // The Chance that a connection will spawn when exploring
     store.set('Map Info',{...empty_map_info,
         nodes: [
             { id: `s${0}`, position: {x: 370, y: 80} },
@@ -385,7 +389,7 @@ export const createJul728Save = async (saveName: string, spawnRate: number = 0.4
     store.close();
 }
 
-export const createJan729Save = async (saveName: string, spawnRate: number = 0.48) => {
+export const createJan729Save = async (saveName: string, spawnRate: number = 0.48, connectionSpawnRate: number = 0.47) => {
     const savegame_folder = await savegameFolder();
     const saveFile = `${savegame_folder}${fileSeperator()}${saveName}.json`;
     new LazyStore(saveFile,{autoSave: false}); 
@@ -475,9 +479,118 @@ export const createJan729Save = async (saveName: string, spawnRate: number = 0.4
     store.set('Osc Months Passed',0) // How Many months into the economy are we
     store.set('Market Trajectory', 0.0002) // The Veleocity of the market
     store.set('Turns Passed',0) // Turns since game start
-    store.set('Current Year',728) // Current Year
+    store.set('Current Year',729) // Current Year
     store.set('Current Month',1) // Current Month
     store.set('Foreign Spawn Rate', spawnRate) // The Chance that a foreign power will spawn when exploring
+    store.set('Connection Spawn Rate', connectionSpawnRate) // The Chance that a connection will spawn when exploring
+    store.set('Map Info',{...empty_map_info,
+        nodes: [
+            { id: `s${0}`, position: {x: 370, y: 80} },
+            { id: `f${1}`, position: {x: 790, y: 40} }
+        ],
+        edges: [
+            { id: '0l-1r', source: 's0', target: 'f1', sourceHandle: 'right', targetHandle: 'left' }
+        ]
+    })
+    await store.save();
+    store.close();
+}
+
+export const createJan730Save = async (saveName: string, spawnRate: number = 0.48, connectionSpawnRate: number = 0.47) => {
+    const savegame_folder = await savegameFolder();
+    const saveFile = `${savegame_folder}${fileSeperator()}${saveName}.json`;
+    new LazyStore(saveFile,{autoSave: false}); 
+    const store = await load(saveFile, {autoSave: false});
+    let global_id = 0;
+    let initial_settlement = newSettlement('Skarduhn', TerrainType.Mountain);
+    initial_settlement.global_id = `s${global_id.toString()}`;
+    global_id++;
+
+
+    initial_settlement.clans.forEach(clan => {
+        if(clan.id === clanTypes.runeSmiths) {
+            clan.population = 1
+            clan.development = 173
+        }
+        else if(clan.id === clanTypes.craftsmen) {
+            clan.tax_rate = 0.4
+            clan.development = 704
+            clan.population = 1
+        }
+        else if(clan.id === clanTypes.merchants) {
+            clan.tax_rate = 0.75
+            clan.development = 542
+            clan.population = 3
+        }
+        else if(clan.id === clanTypes.clerics) {
+            clan.population = 1
+            clan.development = 185
+        }
+        else if(clan.id === clanTypes.miners) {
+            clan.development = 1168
+            clan.population = 2
+        }
+        else if(clan.id === clanTypes.farmers) {
+            clan.tax_rate = 0.4
+            clan.development = 1720
+            clan.population = 6
+        }
+    })
+
+    initial_settlement.development_growth_bonus = clanTypes.miners
+    initial_settlement.population_growth_bonus = clanTypes.farmers
+
+    initial_settlement.stock = {
+        money: -2758,
+        food: 206,
+        beer: 191,
+        leather: 183,
+        artisanal: 154,
+        livestock: 34,
+        ornamental: 72,
+        enchanted: 0,
+        timber: 116,
+        tools: 133,
+        common_ores: 772,
+        medical: 25,
+        rare_ores: 80,
+        gems: 0,
+        runes: 11,
+        arms: 25,
+        books: 12,
+        enchanted_arms: 0,
+        charcoal: 0
+    }
+    
+    updateGoodsProduction(initial_settlement)
+
+    initial_settlement.projected_pop = 14
+    initial_settlement.merchant_capacity = 65
+    
+    const federal_interface: FederalInterface = {...empty_federal_interface,
+        settlements: [initial_settlement],
+        reserve: {...empty_goodsdist},
+        foreign_powers: [{...Eidgenossenkhazaden,global_id: `f${global_id.toString()}`}],
+        prices: {...initial_prices},
+        price_history: [],
+        merchant_capacity: 0,
+        loans: [],
+        armies: [],
+        trade_deals: [],
+    }
+    global_id++;
+    store.set('Undiscovered Foreign Powers',['Baetanuesa','Beznesti','Dragonsbane','Garozemle','Kayasahr','Pactusallamanni','Polabtheli','Saemark','Sledzianska','TerraKontor'])
+    store.set('Global ID',global_id)
+    store.set('Federal',federal_interface)
+    store.set('Positive Global Market Trend',true) //True means going up false means going down
+    store.set('Osc Period',60) // How Many months in the economy trend
+    store.set('Osc Months Passed',0) // How Many months into the economy are we
+    store.set('Market Trajectory', 0.0002) // The Veleocity of the market
+    store.set('Turns Passed',0) // Turns since game start
+    store.set('Current Year',730) // Current Year
+    store.set('Current Month',1) // Current Month
+    store.set('Foreign Spawn Rate', spawnRate) // The Chance that a foreign power will spawn when exploring
+    store.set('Connection Spawn Rate', connectionSpawnRate) // The Chance that a connection will spawn when exploring
     store.set('Map Info',{...empty_map_info,
         nodes: [
             { id: `s${0}`, position: {x: 370, y: 80} },

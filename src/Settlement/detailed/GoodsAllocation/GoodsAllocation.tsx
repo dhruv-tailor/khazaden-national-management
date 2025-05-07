@@ -1,4 +1,4 @@
-import { ClanInterface } from "../../../Clans/ClanInterface/ClanInterface";
+import { ClanInterface, clanTypes } from "../../../Clans/ClanInterface/ClanInterface";
 import { goodsdist, goodsId } from "../../../Goods/GoodsDist";
 import GoodsAllocator from "./GoodsAllocator";
 
@@ -42,7 +42,11 @@ export default function GoodsAllocation({clan,natCap,updateFunc}: {clan: ClanInt
     
     return(
         <div className="flex flex-column">
-            Unused Production: {available}
+            {(clan.id !== clanTypes.rulers) &&
+            (clan.id !== clanTypes.engineers) &&
+            (clan.id !== clanTypes.merchants) &&
+            (clan.id !== clanTypes.warriors) &&
+            (clan.id !== clanTypes.criminals)? <>Unused Production: {available}</> : <></>}
             <div className="flex flex-row gap-2">
                 {clan.isProduced.food ? <GoodsAllocator 
                     max={whichOne(natCap.food,available)} 

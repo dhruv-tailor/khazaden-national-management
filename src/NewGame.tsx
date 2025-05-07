@@ -2,7 +2,7 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { createCustomSave, createJan728Save, createJan729Save, createJul728Save, createNewSave } from "./utilities/SaveData";
+import { createCustomSave, createJan728Save, createJan729Save, createJan730Save, createJul728Save, createNewSave } from "./utilities/SaveData";
 import { Card } from "primereact/card";
 import { Panel } from "primereact/panel";
 import { RadioButton } from "primereact/radiobutton";
@@ -34,8 +34,9 @@ function NewGame() {
     let navigate = useNavigate();
 
     const [saveName, setSaveName] = useState('');
-    const [gameType, setGameType] = useState<'standard' | 'custom' | 'Jan_728' | 'Jul_728' | 'Jan_729'>('standard');
-    const [spawnRate, setSpawnRate] = useState(48); // Default spawn rate of 50%
+    const [gameType, setGameType] = useState<'standard' | 'custom' | 'Jan_728' | 'Jul_728' | 'Jan_729' | 'Jan_730'>('standard');
+    const [spawnRate, setSpawnRate] = useState(48); // Default spawn rate of 48%
+    const [connectionSpawnRate, setConnectionSpawnRate] = useState(47); // Default connection spawn rate of 47%
     
     // Clan distribution state
     const [clanDistribution, setClanDistribution] = useState<{[key in clanTypes]: number}>({
@@ -83,15 +84,17 @@ function NewGame() {
             return;
         }
         if (gameType === 'standard') {
-            await createNewSave(saveName, spawnRate / 100);
+            await createNewSave(saveName, spawnRate / 100, connectionSpawnRate / 100);
         } else if (gameType === 'custom') {
-            await createCustomSave(saveName, startingResources, clanDistribution, spawnRate / 100);
+            await createCustomSave(saveName, startingResources, clanDistribution, spawnRate / 100, connectionSpawnRate / 100);
         } else if (gameType === 'Jan_728') {
-            await createJan728Save(saveName, spawnRate / 100);
+            await createJan728Save(saveName, spawnRate / 100, connectionSpawnRate / 100);
         } else if (gameType === 'Jul_728') {
-            await createJul728Save(saveName, spawnRate / 100);
+            await createJul728Save(saveName, spawnRate / 100, connectionSpawnRate / 100);
         } else if (gameType === 'Jan_729') {
-            await createJan729Save(saveName, spawnRate / 100);
+            await createJan729Save(saveName, spawnRate / 100, connectionSpawnRate / 100);
+        } else if (gameType === 'Jan_730') {
+            await createJan730Save(saveName, spawnRate / 100, connectionSpawnRate / 100);
         }
         navigate(`/game/${saveName}`);
     };
@@ -212,6 +215,16 @@ function NewGame() {
                                         />
                                         <label htmlFor="scenario3" className="ml-2">Trojeryur 729</label>
                                     </div>
+                                    <div className="flex align-items-center">
+                                        <RadioButton 
+                                            inputId="scenario4" 
+                                            name="gametype" 
+                                            value="Jan_730" 
+                                            onChange={e => setGameType(e.value)} 
+                                            checked={gameType === 'Jan_730'}
+                                        />
+                                        <label htmlFor="scenario4" className="ml-2">Trojeryur 730</label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -233,6 +246,24 @@ function NewGame() {
                             className="w-full"
                         />
                         <small className="text-500">Adjust the rate at which foreign powers spawn when exploring.</small>
+                    </div>
+
+                    {/* Connection Spawn Rate Slider */}
+                    <div className="flex flex-column gap-2">
+                        <div className="flex align-items-center justify-content-between">
+                            <label htmlFor="connectionspawnrate" className="font-bold">Connection Spawn Rate</label>
+                            <span className="text-sm">{connectionSpawnRate}%</span>
+                        </div>
+                        <Slider
+                            id="connectionspawnrate"
+                            value={connectionSpawnRate}
+                            onChange={(e) => setConnectionSpawnRate(e.value as number)}
+                            min={0}
+                            max={100}
+                            step={1}
+                            className="w-full"
+                        />
+                        <small className="text-500">Adjust the rate at which connections spawn when exploring.</small>
                     </div>
 
                     {/* Start Game Button */}

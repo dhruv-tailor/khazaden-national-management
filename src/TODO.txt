@@ -1,16 +1,15 @@
 v0.2.0 plans
 -------------------
 Automated Trade deals - ✅
-world map - In Progress
-rework new settlement feature
-Random Events
+world map - ✅
+rework new settlement feature - ✅
+Random Events - In Progress
 Ability to Conduct Simple Diplomacy
 
 wip
 ----------
-Settle on Empty Land
-create road between existing nodes
-Market Access Variable for Foreign Nations
+change foreign nation opinion scale from -5 <-> 5 to -100 <-> 100
+Notification for pending deals
 
 potential bugs
 -----------------
@@ -36,6 +35,11 @@ Federal Node
 Empty land Node
 increase cost of exploration
 Discover New Foreign Nation
+Notification for unused production
+Added Jan 730 Start
+Market Access Variable for Foreign Nations
+create road between existing nodes
+Settle on Empty Land
 
 
 Future Features

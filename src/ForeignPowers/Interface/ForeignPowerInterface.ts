@@ -65,6 +65,7 @@ export interface ForeignPowerInterface {
     global_id: string;
     connections: [boolean,boolean,boolean,boolean];
     isSource: [boolean,boolean,boolean,boolean];
+    market_access: number; // What percentage of the market is available to interact with for the player
 }
 
 export const newForeignPower = (name: string, dwarfPopulation: number,economy: EconomyTypes,start_factor: number): ForeignPowerInterface => {
@@ -91,7 +92,8 @@ export const newForeignPower = (name: string, dwarfPopulation: number,economy: E
         trade_deals: [],
         global_id: '',
         connections: [true,true,true,true],
-        isSource: [false,false,false,false]
+        isSource: [false,false,false,false],
+        market_access: availability_factor
     })
 }
 
