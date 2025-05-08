@@ -80,6 +80,8 @@ export default function SettlementNode({data}: {data: SettlementNodeData}) {
             (c.id !== clanTypes.criminals)
         )}).length > 0 
 
+    const pending_deals = data.settlement.trade_deals.find(deal => deal.active === 'checking') ? true : false
+
     return (
         <div>
             {settlement.connections[0] && <Handle  type={settlement.isSource[0] ? "source" : "target"} position={Position.Top} id='top' />}
@@ -91,10 +93,16 @@ export default function SettlementNode({data}: {data: SettlementNodeData}) {
                 title={
                     <div className="flex gap-2 align-items-center justify-content-between">
                         <span className="text-xl font-bold">{settlement.visible_name}</span>
-                        {unused_production && (
-                            <Tooltip target=".unused-production-badge" content="Unused Production" />
-                        )}
-                        {unused_production && <Badge severity="warning" value={<GiFactory />} className="unused-production-badge" />}
+                        <div className="flex gap-2">
+                            {unused_production && (
+                                <Tooltip target=".unused-production-badge" content="Unused Production" />
+                            )}
+                            {unused_production && <Badge severity="warning" value={<GiFactory />} className="unused-production-badge" />}
+                            {pending_deals && (
+                                <Tooltip target=".pending-deals-badge" content="Pending Trade Deals" />
+                            )}
+                            {pending_deals && <Badge severity="info" value={<i className="pi pi-sync" />} className="pending-deals-badge" />}
+                        </div>
                     </div>
                 }
             >

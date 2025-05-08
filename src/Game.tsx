@@ -10,7 +10,6 @@ import ResourceDistribuition from "./components/ResourceDistribution";
 import { Button } from "primereact/button";
 import MoneyIconTT from "./tooltips/goods/MoneyIconTT";
 import NewSettlement from "./Settlement/NewSettlement";
-import { calcPriceGoods } from "./Economics/pricing/prices";
 import { NextTurn } from "./utilities/NextTurn";
 import { FederalChange } from "./utilities/SimpleFunctions";
 import { LoanInterface } from "./Economics/loans/loanInterface";
@@ -26,6 +25,8 @@ import { MapInfoInterface } from "./Map/MapInfoInterface";
 import { TerrainType } from "./Settlement/SettlementInterface/TerrainInterface";
 import { AllianceStatus, ForeignPowerInterface, ForeignRecognition, getForeignPower } from "./ForeignPowers/Interface/ForeignPowerInterface";
 import { PriorityQueue } from "./utilities/PriorityQueue";
+import { Tooltip } from "primereact/tooltip";
+import { Badge } from "primereact/badge";
 export interface FederalChangeProps {
     settlements: SettlementInterface[],
     loans: LoanInterface[],
@@ -63,6 +64,9 @@ export default function Game() {
     const [foreign_spawn_rate,setForeignSpawnRate] = useState<number>(0.48)
     const [connection_spawn_rate,setConnectionSpawnRate] = useState<number>(0.47)
     const [node_to_colonize,setNodeToColonize] = useState<{id: string, terrain: TerrainType} | null>(null)
+
+
+    const pending_deals = federal.trade_deals.find(deal => deal.active === 'checking') ? true : false
 
     const getSettlements = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
@@ -526,7 +530,10 @@ export default function Game() {
                         label='Economy' 
                         icon='pi pi-wallet' 
                         onClick={goToEconomy}
-                    />
+                    >
+                        {pending_deals && (<Tooltip target=".pending-deals-badge" content="Pending Trade Deals" />)}
+                        {pending_deals && <Badge severity="info" value={<i className="pi pi-sync" />} className="pending-deals-badge" />}
+                    </Button>
                     <Button 
                         className='flex-grow-1' 
                         severity="danger" 

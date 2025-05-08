@@ -45,8 +45,8 @@ export default function ForeignNode({data}: {data: ForeignNodeData}) {
                             <span className="text-sm text-500 mb-1">Relations</span>
                             <Knob 
                                 value={foreign.relations} 
-                                min={-5} 
-                                max={5} 
+                                min={-100} 
+                                max={100} 
                                 readOnly 
                                 size={45} 
                                 valueColor={knobColor(foreign.relations)}

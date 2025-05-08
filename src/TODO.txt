@@ -8,13 +8,6 @@ Ability to Conduct Simple Diplomacy
 
 wip
 ----------
-change foreign nation opinion scale from -5 <-> 5 to -100 <-> 100
-Notification for pending deals
-
-potential bugs
------------------
-make sure you can't connect a node to another node that already has a connection
-
 
 completed
 ---------
@@ -40,6 +33,8 @@ Added Jan 730 Start
 Market Access Variable for Foreign Nations
 create road between existing nodes
 Settle on Empty Land
+change foreign nation opinion scale from -5 <-> 5 to -100 <-> 100
+Notification for pending deals
 
 
 Future Features

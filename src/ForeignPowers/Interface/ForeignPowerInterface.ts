@@ -111,7 +111,7 @@ export const TerraKontor = newForeignPower("Terra Kontor", 0.03,EconomyTypes.Mar
 
 export const Eidgenossenkhazaden: ForeignPowerInterface = {
     ...newForeignPower("Eidgenossenkhazaden", 0.25,EconomyTypes.Dwarven,5),
-    relations: 2,
+    relations: 40,
     recognition: ForeignRecognition.Limited,
     isEmbargoed: false,
     immigrationRate: 0.10,
