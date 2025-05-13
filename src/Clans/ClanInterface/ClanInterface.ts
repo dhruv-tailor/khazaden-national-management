@@ -32,12 +32,16 @@ export interface ClanInterface {
     loyalty: number;
     loyalty_modifiers: modifier[]
     efficency: number;
+    efficency_modifiers: modifier[]
     taxed_productivity: number;
     goods_produced: number;
     productivity_rate: number;
     total_productivity: number;
 
     development: number;
+
+    pop_growth_modifiers: modifier[]
+    productivity_modifiers: modifier[]
 }
 
 export const empty_clan = {
@@ -51,16 +55,20 @@ export const empty_clan = {
     loyalty: 0,
     loyalty_modifiers: [],
     efficency: 0,
+    efficency_modifiers: [],
     taxed_productivity: 0,
     goods_produced: 0,
     productivity_rate: 0,
     total_productivity: 0,
-    development: 0
+    development: 0,
+
+    pop_growth_modifiers: [],
+    productivity_modifiers: []
 }
 
 export const clanGoodsConsumed = (clan: ClanInterface) => scaleGoods(clan.consumption_rate,clan.population)
 const taxationModifier = (tax_rate: number) => 3.24 + (1.23 * tax_rate) - (12.40 * (tax_rate ** 2))
-export const baseProductivity = (clan: ClanInterface) => ensureNumber((clan.loyalty + clan.efficency)/20) * 40 * clan.productivity_rate * clan.population
+export const baseProductivity = (clan: ClanInterface) => ensureNumber((clan.loyalty + clan.efficency)/20) * 40 * (clan.productivity_rate + clan.productivity_modifiers.reduce((sum,val) => sum + val.value,0)) * clan.population
 export const developmentBonus = (clan: ClanInterface) : number =>  Math.floor(
     Math.max(
         0,
@@ -175,13 +183,14 @@ export const calcEfficency = (clan: ClanInterface, settlement: SettlementInterfa
     }
     efficency = ensureNumber(efficency/total_goods_counted)
     efficency *= 5
+    clan.efficency_modifiers.forEach(modifier => {efficency += modifier.value})
     efficency = Math.max(efficency + developmentBonus(clan),0)
     efficency = Math.floor(efficency * bonus)
     return efficency
 }
 
 export const calcTaxedProductivity = (clan: ClanInterface, settlement: SettlementInterface) : number => {
-    const productivity_modifier = (1 - ensureNumber(settlement.deficet.food / settlement.consumption_rate.food)) * clan.productivity_rate
+    const productivity_modifier = (1 - ensureNumber(settlement.deficet.food / settlement.consumption_rate.food)) * (clan.productivity_rate + clan.productivity_modifiers.reduce((sum,val) => sum + val.value,0))
     return ((clan.efficency + clan.loyalty) / 20) * 40 * productivity_modifier * clan.population * clan.tax_rate
 }
 

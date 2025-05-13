@@ -199,6 +199,18 @@ export const NextTurn = async (game: string) => {
             settlement.loans = []
             settlement.stock = {...empty_goodsdist}
         }
+
+        // Remove expired modifiers
+        settlement.clans.forEach(clan => {
+            clan.efficency_modifiers.forEach(modifier => {modifier.duration -= 1})
+            clan.loyalty_modifiers.forEach(modifier => {modifier.duration -= 1})
+            clan.pop_growth_modifiers.forEach(modifier => {modifier.duration -= 1})
+            clan.productivity_modifiers.forEach(modifier => {modifier.duration -= 1})
+            clan.efficency_modifiers = clan.efficency_modifiers.filter(modifier => modifier.duration > 0)
+            clan.loyalty_modifiers = clan.loyalty_modifiers.filter(modifier => modifier.duration > 0)
+            clan.pop_growth_modifiers = clan.pop_growth_modifiers.filter(modifier => modifier.duration > 0)
+            clan.productivity_modifiers = clan.productivity_modifiers.filter(modifier => modifier.duration > 0)
+        })
     })
 
     foreign_nations?.forEach(nation => {

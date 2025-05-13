@@ -255,7 +255,7 @@ export const popGrowth = (settlement: SettlementInterface, foreign_nations: Fore
     let bonus = 0.00007 * settlement.clans.filter(clan => clan.id === clanTypes.clerics)[0].taxed_productivity
     let gained_pg = 0
     settlement.clans.forEach(clan => {
-        P0 += clan.population
+        P0 += clan.population * (clan.pop_growth_modifiers.reduce((sum,val) => sum + val.value,0))
         if(settlement.population_growth_bonus === clan.id) { gained_pg += (clan.total_productivity - clan.taxed_productivity) * 0.7 * bonus }
         else { gained_pg += (clan.total_productivity - clan.taxed_productivity) * 0.7 }
     })
