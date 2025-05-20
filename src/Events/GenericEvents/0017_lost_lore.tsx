@@ -36,12 +36,12 @@ export default function g0017_lost_lore({federal, updateFunc}: {federal: Federal
     return (
         <EventTemplate
             title="Lost Runes Discovered"
-            body={`A pile of lost runes has been discovered in ${rand_settlement.name}.`}
+            body={`A pile of lost runes has been discovered in ${rand_settlement.visible_name}.`}   
             effect_buttons={[
                 {
                     title: "Keep it",
                     effect: keepRunes,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <RunesIconTT/>
                             <PlusMinus value={rand_clan.population * 12}/>
@@ -51,7 +51,7 @@ export default function g0017_lost_lore({federal, updateFunc}: {federal: Federal
                 {
                     title: "Sell it",
                     effect: sellRunes,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <RunesIconTT/>
                             <PlusMinus value={Math.round(rand_clan.population * 12 * rand_settlement.prices.runes)}/>

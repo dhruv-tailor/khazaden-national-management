@@ -21,12 +21,12 @@ export default function g0019_masterpiece_created({federal,updateFunc}: {federal
     return (
         <EventTemplate
             title="Masterpiece Created"
-            body={`A masterpiece has been created in ${rand_settlement.name}.`}
+            body={`A masterpiece has been created in ${rand_settlement.visible_name}.`}
             effect_buttons={[
                 {
                     title: "I smell profit",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <MoneyIconTT/>
                             <PlusMinus value={Math.round(rand_settlement.prices.artisanal * 12 * rand_clan.population)}/>

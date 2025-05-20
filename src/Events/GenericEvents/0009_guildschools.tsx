@@ -30,12 +30,12 @@ export default function g0009_guildschools({federal,updateFunc}: {federal: Feder
     return (
         <EventTemplate
             title="Guild Schools"
-            body={`The people of ${rand_clan.name} in ${rand_settlement.name} have built guild schools.`}
+            body={`The people of ${rand_clan.name} in ${rand_settlement.visible_name} have built guild schools.`}
             effect_buttons={[
                 {
                     title: "Good for them",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <p>The people of ${rand_clan.name} in ${rand_settlement.name} will have a productivity boost for one year.</p>
                         <div className="flex flex-row gap-2">
                             <DevelopmentIconTT/>

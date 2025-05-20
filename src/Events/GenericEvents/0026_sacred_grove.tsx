@@ -39,12 +39,12 @@ export default function g0026_sacred_grove({federal, updateFunc}: {federal: Fede
     return (
         <EventTemplate
             title="Sacred Grove"
-            body={`A sacred grove has been discovered in ${rand_settlement.name}.`}
+            body={`A sacred grove has been discovered in ${rand_settlement.visible_name}.`}
             effect_buttons={[
                 {
                     title: "Harvest the Fruits of the Grove",
                     effect: harvest,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <EnchantedIconTT/>
                             <PlusMinus value={Math.round(12 * rand_clan.population)}/>
@@ -58,7 +58,7 @@ export default function g0026_sacred_grove({federal, updateFunc}: {federal: Fede
                 {
                     title: "Chop Down the Trees",
                     effect: chop,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <TimberIconTT/>
                             <PlusMinus value={Math.round(24 * rand_clan.population)}/>

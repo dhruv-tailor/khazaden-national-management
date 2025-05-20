@@ -23,12 +23,12 @@ export default function g0011_cult_of_personality({federal,updateFunc}: {federal
     return (
         <EventTemplate
             title="Cult of Personality"
-            body={`A cult of personality has arisen in ${rand_clan.name} in ${rand_settlement.name}.`}
+            body={`A cult of personality has arisen in ${rand_clan.name} in ${rand_settlement.visible_name}.`}
             effect_buttons={[
                 {
                     title: "Whatever works",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <LoyaltyIconTT/>
                             <PlusMinus value={1}/>

@@ -22,12 +22,12 @@ export default function g0036_drought_looms({federal, updateFunc}: {federal: Fed
     return (
         <EventTemplate
             title="Drought Looms"
-            body={`A drought is looming over ${rand_settlement.name} causing panic in the market.`}
+            body={`A drought is looming over ${rand_settlement.visible_name} causing panic in the market.`}
             effect_buttons={[
                 {
                     title: "Bruh why is there always a Toilet Paper Shortage?",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <FoodIconTT/>
                             prices increase by 20%

@@ -27,6 +27,7 @@ import { AllianceStatus, ForeignPowerInterface, ForeignRecognition, getForeignPo
 import { PriorityQueue } from "./utilities/PriorityQueue";
 import { Tooltip } from "primereact/tooltip";
 import { Badge } from "primereact/badge";
+import { random_events } from "./Events/RandomEvents";
 export interface FederalChangeProps {
     settlements: SettlementInterface[],
     loans: LoanInterface[],
@@ -65,8 +66,12 @@ export default function Game() {
     const [connection_spawn_rate,setConnectionSpawnRate] = useState<number>(0.47)
     const [node_to_colonize,setNodeToColonize] = useState<{id: string, terrain: TerrainType} | null>(null)
 
-
+    const [randomEventVisable,setRandomEventVisable] = useState<boolean>(false)
     const pending_deals = federal.trade_deals.find(deal => deal.active === 'checking') ? true : false
+
+    const [dataReady, setDataReady] = useState(true);
+
+    const [showMap, setShowMap] = useState(true);
 
     const getSettlements = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
@@ -74,12 +79,22 @@ export default function Game() {
             store.get<FederalInterface>('Federal').then(value => {if (value) {setFederal(value)}}),
             store.get<number>('Current Month').then(value => {if (value) {setCurrentMonth(value)}}),
             store.get<number>('Current Year').then(value => {if (value) {setCurrentYear(value)}}),
-            store.get<MapInfoInterface>('Map Info').then(value => {if (value) {setMapInfo(value)}}),
+            store.get<MapInfoInterface>('Map Info').then(value => {
+                if (value && value.nodes && value.nodes.length > 0 && value.edges && value.edges.length > 0) {
+                    setMapInfo(value);
+                } else {
+                    // Do NOT overwrite map_info if loaded data is empty or invalid
+                    console.warn('Loaded map data is empty or invalid, preserving previous map_info:', value);
+                }
+            }),
             store.get<number>('Global ID').then(value => {if (value) {setGlobalID(value)}}),
             store.get<string[]>('Undiscovered Foreign Powers').then(value => {if (value) {setUndiscoveredForeignPowers(value)}}),
             store.get<number>('Foreign Spawn Rate').then(value => {if (value) {setForeignSpawnRate(value)}}),
             store.get<number>('Connection Spawn Rate').then(value => {if (value) {setConnectionSpawnRate(value)}}),
         ])
+        if (federal.random_events.length > 0) {
+            setRandomEventVisable(true)
+        }
         updateSettlements()
     }
 
@@ -155,9 +170,13 @@ export default function Game() {
     }
 
     const processNextTurn = async () => {
-        await saveData()
-        await NextTurn(gameId ?? '')
-        await getSettlements()
+        setShowMap(false);
+        setDataReady(false);
+        await saveData();
+        await NextTurn(gameId ?? '');
+        await getSettlements();
+        setDataReady(true);
+        setShowMap(true);
     }
 
     const goToEconomy = async () => {
@@ -508,7 +527,65 @@ export default function Game() {
         setNodeToColonize({id: id, terrain: terrain})
         setNewSettlementVisable(true)
     }
+
+    const eventUpdate = (new_federal: FederalInterface) => {
+        setFederal({...new_federal,random_events: []})
+        setRandomEventVisable(false)
+    }
     
+    // Add logging before rendering WorldMap
+    console.log('Rendering WorldMap with nodes:', map_info.nodes, 'edges:', map_info.edges);
+
+    // Map nodes with detailed logging
+    const mappedNodes = map_info.nodes.map(node => {
+        let mapped;
+        if(node.id.startsWith('s')){
+            mapped = {
+                id: node.id,
+                type: 'settlement',
+                data: {
+                    settlement: federal.settlements.find(s => s.global_id === node.id),
+                    goTo: navigateSettlement,
+                    updateTaxation: updateTaxation,
+                    setMerchantTax: setMerchantTax,
+                    federal: federal,
+                    stimulus: giveGoods
+                },
+                position: {x: node.position.x, y: node.position.y},
+                draggable: true
+            };
+        }
+        else if(node.id.startsWith('f')){
+            mapped = {
+                id: node.id,
+                type: 'foreign',
+                data: {foreign: federal.foreign_powers.find(f => f.global_id === node.id)},
+                position: {x: node.position.x, y: node.position.y},
+                draggable: true
+            };
+        }
+        else if(node.id.startsWith('u')){
+            mapped = {
+                id: node.id,
+                type: 'uncolonized',
+                data: {
+                    uncolonized: map_info.colonized.find(u => u.id === node.id),
+                    colonizeNode: colonizeNode
+                },
+                position: {x: node.position.x, y: node.position.y},
+                draggable: true
+            };
+        }
+        else {
+            mapped = {id: 'error', data: {label: 'Error'}, position: {x: 0, y: 0}};
+        }
+        if (!mapped) {
+            console.warn('Node mapping produced undefined for node:', node);
+        }
+        return mapped;
+    });
+    console.log('Mapped nodes for WorldMap:', mappedNodes);
+
     return (
         <div className="flex flex-column gap-1">
             {/* Header Section */}
@@ -566,52 +643,31 @@ export default function Game() {
                 </div>
             </Card>
 
-            {map_info.nodes.length > 0 && (
-                <WorldMap nodes={map_info.nodes.map(node => {
-                    if(node.id.startsWith('s')){
-                    return {
-                        id: node.id,
-                        type: 'settlement',
-                        data: {
-                            settlement: federal.settlements.find(s => s.global_id === node.id),
-                            goTo: navigateSettlement,
-                            updateTaxation: updateTaxation,
-                            setMerchantTax: setMerchantTax,
-                            federal: federal,
-                            stimulus: giveGoods
-                        },
-                        position: {x: node.position.x, y: node.position.y},
-                        draggable: true
-                    }
-                    }
-                    else if(node.id.startsWith('f')){
-                        return {
-                            id: node.id,
-                            type: 'foreign',
-                            data: {foreign: federal.foreign_powers.find(f => f.global_id === node.id)},
-                            position: {x: node.position.x, y: node.position.y},
-                            draggable: true
-                        }
-                    }
-                    else if(node.id.startsWith('u')){
-                        return {
-                            id: node.id,
-                            type: 'uncolonized',
-                            data: {
-                                uncolonized: map_info.colonized.find(u => u.id === node.id),
-                                colonizeNode: colonizeNode
-                            },
-                            position: {x: node.position.x, y: node.position.y},
-                            draggable: true
-                        }
-                    }
-                    return {id: 'error', data: {label: 'Error'}, position: {x: 0, y: 0}}
-                    })} 
-                    edges={map_info.edges}
-                    updateNodePositions={updateNodePositions}
-                    createUncolonizedNode={confirmDiscovery}
-                    buildRoad={buildRoad}
-                />
+            {/* WorldMap Section with loading overlay */}
+            {showMap && map_info.nodes.length > 0 && map_info.edges && (
+                <div style={{position: 'relative'}}>
+                    <WorldMap
+                        key={JSON.stringify(map_info.nodes) + JSON.stringify(map_info.edges)}
+                        nodes={mappedNodes}
+                        edges={map_info.edges}
+                        updateNodePositions={updateNodePositions}
+                        createUncolonizedNode={confirmDiscovery}
+                        buildRoad={buildRoad}
+                    />
+                    {!dataReady && (
+                        <div style={{
+                            position: 'absolute',
+                            top: 0, left: 0, right: 0, bottom: 0,
+                            background: 'rgba(0,0,0,0.4)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 10
+                        }}>
+                            <span className="pi pi-spin pi-spinner" style={{fontSize: 48, color: 'white'}} />
+                        </div>
+                    )}
+                </div>
             )}
 
             {/* Stimulus Dialog */}
@@ -742,6 +798,16 @@ export default function Game() {
                     </div>
                 </div>
             </Dialog>
+
+            <Dialog
+                visible={randomEventVisable}
+                onHide={() => setRandomEventVisable(false)}
+                className="w-30rem"
+                closable={false}
+            >
+                {random_events.find(e => e.id === federal.random_events[0])?.event(federal,eventUpdate)}
+            </Dialog>
+
         </div>
     )
 }

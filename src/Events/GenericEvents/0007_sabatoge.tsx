@@ -23,12 +23,12 @@ export default function g0007_sabatoge({federal,updateFunc}: {federal: FederalIn
     return (
         <EventTemplate
             title="Sabotage"
-            body={`The people of ${rand_clan.name} in ${rand_settlement.name} have been sabatoged by unknown forces.`}
+            body={`The people of ${rand_clan.name} in ${rand_settlement.visible_name} have been sabatoged by unknown forces.`}
             effect_buttons={[
                 {
                     title: "We'll send a force to investigate",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <p>The people of ${rand_clan.name} in ${rand_settlement.name} will have a productivity loss for one year.</p>
                     </div>
                 }

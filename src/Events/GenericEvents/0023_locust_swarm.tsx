@@ -34,12 +34,12 @@ export default function g0023_locust_swarm({federal, updateFunc}: {federal: Fede
     return (
         <EventTemplate
             title="Locust Swarm"
-            body={`A locust swarm has been spotted in ${rand_settlement.name}.`}
+            body={`A locust swarm has been spotted in ${rand_settlement.visible_name}.`}
             effect_buttons={[
                 {
                     title: "Let Nature Take its Course",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <FoodIconTT/>
                             <PlusMinus value={Math.round(24 * rand_clan.population)}/>
@@ -49,7 +49,7 @@ export default function g0023_locust_swarm({federal, updateFunc}: {federal: Fede
                 {
                     title: "Try to Mitigate the Damage",
                     effect: mitigate,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <CharcoalIconTT/>
                             <PlusMinus value={Math.round(12 * rand_clan.population)}/>

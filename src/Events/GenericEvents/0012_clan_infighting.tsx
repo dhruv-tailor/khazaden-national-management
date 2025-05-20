@@ -22,12 +22,12 @@ export default function g0012_clan_infighting({federal,updateFunc}: {federal: Fe
     return (
         <EventTemplate
             title="Clan Infighting"
-            body={`There is clan infighting within the ${rand_clan.name} of ${rand_settlement.name}.`}
+            body={`There is clan infighting within the ${rand_clan.name} of ${rand_settlement.visible_name}.`}  
             effect_buttons={[
                 {
                     title: "Do Nothing",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <LoyaltyIconTT/>
                             <PlusMinus value={-1}/>

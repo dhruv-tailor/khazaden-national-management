@@ -23,12 +23,12 @@ export default function g0037_new_healing_rite({federal, updateFunc}: {federal: 
     return (
         <EventTemplate
             title="New Healing Rite"
-            body={`A new healing rite has been discovered by the Clerics of ${rand_settlement.name}.`}
+            body={`A new healing rite has been discovered by the Clerics of ${rand_settlement.visible_name}.`}
             effect_buttons={[
                 {
                     title: "Let's Pray",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <MedicalIconTT/>
                             prices decrease by 20%

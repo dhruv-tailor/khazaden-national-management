@@ -34,7 +34,7 @@ export default function g0020_trade_opportunity({federal, updateFunc}: {federal:
                 {
                     title: "Accept the offer",
                     effect: acceptOffer,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <EnchantedArmsIconTT/>
                             <PlusMinus value={Math.round(12 * rand_clan.population)}/>
@@ -56,7 +56,7 @@ export default function g0020_trade_opportunity({federal, updateFunc}: {federal:
                 {
                     title: "Reject the offer",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <p>The trade opportunity will be lost.</p>
                     </div>
                 }

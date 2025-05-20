@@ -25,12 +25,12 @@ export default function g0034_charcoal_shortage({federal, updateFunc}: {federal:
     return (
         <EventTemplate
             title="Charcoal Shortage"
-            body={`${rand_settlement.name} is experiencing a shortage of Charcoal based tools and weapons.`}
+            body={`${rand_settlement.visible_name} is experiencing a shortage of Charcoal based tools and weapons.`}
             effect_buttons={[
                 {
                     title: "Charcoal is Charcoal",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <CharcoalIconTT/>
                             prices increase by 20%

@@ -37,6 +37,17 @@ import g0037_new_healing_rite from "./GenericEvents/0037_new_healing_rite";
 import g0039_runic_storm from "./GenericEvents/0039_runic_storm";
 import g0040_cultural_renaissance from "./GenericEvents/0040_cultural_renaissance";
 import g0041_technological_revolution from "./GenericEvents/0041_technological_revolution";
+import { g0050_merchant_windfall } from "./GenericEvents/0050_merchant_windfall";
+import g0051_cultural_exchange from "./GenericEvents/0051_cultural_exchange";
+import g0053_envoy_visit from "./GenericEvents/0053_envoy_visit";
+import g0054_insulted_banquet from "./GenericEvents/0054_insulted_banquet";
+import g0055_international_summit from "./GenericEvents/0055_internation_summit";
+import g0058_market_shock from "./GenericEvents/0058_market_shock";
+import g0059_market_liberalization from "./GenericEvents/0059_market_liberalization";
+import g0062_foreign_mining_vein from "./GenericEvents/0062_foreign_mining_vein";
+import g0063_crop_blight from "./GenericEvents/0063_crop_blight";
+import g0064_economic_sanctions from "./GenericEvents/0064_economic_sanctions";
+import g0068_market_manipulation from "./GenericEvents/0068_market_manipulation";
 interface eventProps {
     id: number,
     conditional: (federal: FederalInterface) => boolean,
@@ -48,7 +59,7 @@ export const getRandomEventId = (federal: FederalInterface) => {
     return events[Math.floor(Math.random() * events.length)].id
 }
 
-const random_events: eventProps[] = [
+export const random_events: eventProps[] = [
     {
         id: 1,
         conditional: (federal: FederalInterface) => federal.settlements.some(
@@ -229,5 +240,60 @@ const random_events: eventProps[] = [
         id: 41,
         conditional: (_federal: FederalInterface) => true,
         event: (federal: FederalInterface, updateFunc: (federal: FederalInterface) => void) => g0041_technological_revolution({federal, updateFunc})
+    },
+    {
+        id: 50,
+        conditional: (federal: FederalInterface) => federal.settlements.some(s => s.trade_deals.length > 0),
+        event: (federal: FederalInterface, updateFunc: (federal: FederalInterface) => void) => g0050_merchant_windfall({federal, updateFunc})
+    },
+    {
+        id: 51,
+        conditional: (federal: FederalInterface) => federal.settlements.some(s => s.trade_deals.some(td => td.outgoing.books > 0 && td.type === 'foreign')),
+        event: (federal: FederalInterface, updateFunc: (federal: FederalInterface) => void) => g0051_cultural_exchange({federal, updateFunc})
+    },
+    {
+        id: 53,
+        conditional: (federal: FederalInterface) => federal.foreign_powers.length > 0,
+        event: (federal: FederalInterface, updateFunc: (federal: FederalInterface) => void) => g0053_envoy_visit({federal, updateFunc})
+    },
+    {
+        id: 54,
+        conditional: (federal: FederalInterface) => federal.foreign_powers.length > 0,
+        event: (federal: FederalInterface, updateFunc: (federal: FederalInterface) => void) => g0054_insulted_banquet({federal, updateFunc})
+    },
+    {
+        id: 55,
+        conditional: (federal: FederalInterface) => federal.foreign_powers.length > 0,
+        event: (federal: FederalInterface, updateFunc: (federal: FederalInterface) => void) => g0055_international_summit({federal, updateFunc})
+    },
+    {
+        id: 58,
+        conditional: (federal: FederalInterface) => federal.foreign_powers.length > 0,
+        event: (federal: FederalInterface, updateFunc: (federal: FederalInterface) => void) => g0058_market_shock({federal, updateFunc})
+    },
+    {
+        id: 59,
+        conditional: (federal: FederalInterface) => federal.foreign_powers.length > 0,
+        event: (federal: FederalInterface, updateFunc: (federal: FederalInterface) => void) => g0059_market_liberalization({federal, updateFunc})
+    },
+    {
+        id: 62,
+        conditional: (federal: FederalInterface) => federal.foreign_powers.length > 0,
+        event: (federal: FederalInterface, updateFunc: (federal: FederalInterface) => void) => g0062_foreign_mining_vein({federal, updateFunc})
+    },
+    {
+        id: 63,
+        conditional: (federal: FederalInterface) => federal.foreign_powers.length > 0,
+        event: (federal: FederalInterface, updateFunc: (federal: FederalInterface) => void) => g0063_crop_blight({federal, updateFunc})
+    },
+    {
+        id: 64,
+        conditional: (federal: FederalInterface) => federal.foreign_powers.length > 0,
+        event: (federal: FederalInterface, updateFunc: (federal: FederalInterface) => void) => g0064_economic_sanctions({federal, updateFunc})
+    },
+    {
+        id: 68,
+        conditional: (federal: FederalInterface) => federal.foreign_powers.length > 0,
+        event: (federal: FederalInterface, updateFunc: (federal: FederalInterface) => void) => g0068_market_manipulation({federal, updateFunc})
     }
 ]

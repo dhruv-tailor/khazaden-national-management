@@ -27,12 +27,12 @@ export default function g0033_counterfeit_runes({federal, updateFunc}: {federal:
     return (
         <EventTemplate
             title="Counterfeit Runes"
-            body={`Counterfeit Runes have been discovered in ${rand_settlement.name}.`}
+            body={`Counterfeit Runes have been discovered in ${rand_settlement.visible_name}.`}
             effect_buttons={[
                 {
                     title: "Trash the Fakes",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <RunesIconTT/>
                             <PlusMinus value={-Math.round(12 * rand_clan.population)}/>

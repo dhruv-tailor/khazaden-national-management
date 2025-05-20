@@ -27,12 +27,12 @@ export default function g0005_high_productivity({federal,updateFunc}: {federal: 
     return (
         <EventTemplate
             title="High Productivity"
-            body={`The productivity of ${rand_clan.name} in ${rand_settlement.name} is high.`}
+            body={`The productivity of ${rand_clan.name} in ${rand_settlement.visible_name} is high.`}
             effect_buttons={[
                 {
                     title: 'Great News!',
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <p>The productivity of ${rand_clan.name} in ${rand_settlement.name} is high.</p>
                         <div className="flex flex-row gap-2">
                             <PlusMinus value={1}/>

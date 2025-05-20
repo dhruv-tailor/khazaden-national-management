@@ -36,19 +36,19 @@ export default function g0018_structural_collapse({federal, updateFunc}: {federa
     return (
         <EventTemplate
             title="Structural Collapse"
-            body={`A structural collapse has occurred in a ${rand_clan.name} district of ${rand_settlement.name}.`}
+            body={`A structural collapse has occurred in a ${rand_clan.name} district of ${rand_settlement.visible_name}.`}
             effect_buttons={[
                 {
                     title: "Do Nothing",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <p>Productivity will drop for a year</p>
                     </div>
                 },
                 {
                     title: "Send in Engineers",
                     effect: sendEngineers,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <ToolsIconTT/>
                             <PlusMinus value={-(rand_clan.population * 12)}/>

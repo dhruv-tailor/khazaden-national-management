@@ -28,12 +28,12 @@ export default function g0002_populationboom({federal,updateFunc}: {federal: Fed
     return (
         <EventTemplate
             title="Population Boom"
-            body={`The population of ${rand_clan.name} in ${rand_settlement.name} is increasing at a faster rate than expected causing a strain on their efficency.`}
+            body={`The population of ${rand_clan.name} in ${rand_settlement.visible_name} is increasing at a faster rate than expected causing a strain on their efficency.`}
             effect_buttons={[
                 {
                     title: 'I See',
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <p>The population of ${rand_clan.name} in ${rand_settlement.name} is increasing at a faster rate for one year.</p>
                         <div className="flex flex-row gap-2">
                             <PlusMinus value={-1}/>

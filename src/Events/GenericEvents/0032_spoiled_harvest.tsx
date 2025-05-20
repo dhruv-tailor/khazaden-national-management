@@ -27,12 +27,12 @@ export default function g0032_spoiled_harvest({federal, updateFunc}: {federal: F
     return (
         <EventTemplate
             title="Spoiled Harvest"
-            body={`${rand_settlement.name} has experinced a string of spoiled harvests.`}
+            body={`${rand_settlement.visible_name} has experinced a string of spoiled harvests.`}
             effect_buttons={[
                 {
                     title: "Food is food",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <FoodIconTT/>
                             <PlusMinus value={Math.round(12 * rand_clan.population)}/>

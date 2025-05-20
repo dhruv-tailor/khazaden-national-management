@@ -24,12 +24,12 @@ export default function g0041_technological_revolution({federal, updateFunc}: {f
     return (
         <EventTemplate
             title="Technological Revolution"
-            body={`A technological revolution has broken out in ${rand_settlement.name}. The demand for outdated tools dwindles`}
+            body={`A technological revolution has broken out in ${rand_settlement.visible_name}. The demand for outdated tools dwindles`}
             effect_buttons={[
                 {
                     title: "Make the Most of the New Technology",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <ToolsIconTT/>
                             Prices decrease by 20%

@@ -26,12 +26,12 @@ export default function g0035_merchants_flood_market({federal, updateFunc}: {fed
     return (
         <EventTemplate
             title="Merchants Flood Market"
-            body={`Merchants in ${rand_settlement.name} are flooding the local market.`}
+            body={`Merchants in ${rand_settlement.visible_name} are flooding the local market.`}
             effect_buttons={[
                 {
                     title: "Paper Hands Much?",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <LeatherIconTT/>
                             prices decrease by 20%

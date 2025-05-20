@@ -9,6 +9,7 @@ import { LoanInterface, takeLoan } from "../Economics/loans/loanInterface";
 import { ensureNumber } from "./SimpleFunctions";
 import { FederalInterface } from "./FederalInterface";
 import { empty_federal_interface } from "./FederalInterface";
+import { getRandomEventId } from "../Events/RandomEvents";
 
 export const NextTurn = async (game: string) => {
     const store = await load(await saveLocation(game), {autoSave: false});
@@ -35,6 +36,11 @@ export const NextTurn = async (game: string) => {
 
     // Federal Merchant Capacity
     let merchant_capacity: number = 0
+
+    // Determine if a random event should occur 1 in 10 chance
+    if (Math.random() < 0.1) {
+        federal_interface.random_events.push(getRandomEventId(federal_interface))
+    }
 
     settlements?.forEach(settlement => {
         const market_health = randMarketHealth()
@@ -112,15 +118,12 @@ export const NextTurn = async (game: string) => {
         const merchant_cap = merchants.taxed_productivity
         settlement.merchant_capacity = Math.round(merchant_cap * (1 - settlement.merchant_tax))
         merchant_capacity += Math.round(merchant_cap * settlement.merchant_tax)
-
-        console.log(settlement.merchant_capacity)
         // Remove merchant capacity used by trade deals
         settlement.trade_deals.forEach(deal => {
             if(deal.active === 'active') {
                 settlement.merchant_capacity -= totalGoods(deal.outgoing) + totalGoods(deal.incoming)
             }
         })
-        console.log(settlement.merchant_capacity)
 
         // Ensure merchant capacity is not negative
         settlement.merchant_capacity = Math.max(settlement.merchant_capacity,0)

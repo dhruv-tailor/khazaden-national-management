@@ -25,12 +25,12 @@ export default function g0024_bountiful_harvest({federal, updateFunc}: {federal:
     return (
         <EventTemplate
             title="Bountiful Harvest"
-            body={`A bountiful harvest has been reaped in ${rand_settlement.name}.`}
+            body={`A bountiful harvest has been reaped in ${rand_settlement.visible_name}.`}
             effect_buttons={[
                 {
                     title: "Let Nature Take its Course",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <FoodIconTT/>
                             <PlusMinus value={Math.round(12 * rand_clan.population)}/>

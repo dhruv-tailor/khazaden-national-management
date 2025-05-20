@@ -30,12 +30,12 @@ export default function g0014_open_lottery({federal,updateFunc}: {federal: Feder
     return (
         <EventTemplate
             title="Open Casino"
-            body={`The ${rand_clan.name} of ${rand_settlement.name} want to build a casino for themselves. Should we build one?`}
+            body={`The ${rand_clan.name} of ${rand_settlement.visible_name} want to build a casino for themselves. Should we build one?`}
             effect_buttons={[
                 {
                     title: "Yes",
                     effect: buildCasino,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <EfficencyIconTT/>
                             <PlusMinus value={1}/>
@@ -59,7 +59,7 @@ export default function g0014_open_lottery({federal,updateFunc}: {federal: Feder
                 {
                     title: "No",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <p>The ${rand_clan.name} of ${rand_settlement.name} will not get a casino.</p>
                     </div>
                 }

@@ -14,7 +14,7 @@ export default function EventTemplate({title, body, effect_buttons}: {title: str
         <div>
             <h1>{title}</h1>
             <p>{body}</p>
-            <div className="flex flex-row gap-2">
+            <div className="flex flex-column gap-2">
                 {effect_buttons.map((button) => (
                     <Button onClick={button.effect}>
                         <ToolTips hover={button.title} body={button.tooltip}/>

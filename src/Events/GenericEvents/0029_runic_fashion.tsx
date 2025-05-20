@@ -27,12 +27,12 @@ export default function g0029_runic_fashion({federal, updateFunc}: {federal: Fed
     return (
         <EventTemplate
             title="Runic Fashion"
-            body={`Carrying around enchanted weapons encrusted with enchanted luxuries is all the rage in ${rand_settlement.name} among the ${rand_clan.name}.`}
+            body={`Carrying around enchanted weapons encrusted with enchanted luxuries is all the rage in ${rand_settlement.visible_name} among the ${rand_clan.name}.`}
             effect_buttons={[
                 {
                     title: "Let the Craze Pass",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <EnchantedIconTT/>
                             Prices increase by 20%

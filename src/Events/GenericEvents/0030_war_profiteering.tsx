@@ -28,12 +28,12 @@ export default function g0030_war_profiteering({federal, updateFunc}: {federal: 
     return (
         <EventTemplate
             title="War Profiteering"
-            body={`A war has broken out in the region. The ${rand_clan.name} of ${rand_settlement.name} are profiteering off of the war.`}
+            body={`A war has broken out in the region. The ${rand_clan.name} of ${rand_settlement.visible_name} are profiteering off of the war.`}
             effect_buttons={[
                 {
                     title: "Ethics Who?",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <ArmsIconTT/>
                             <PlusMinus value={Math.round(12 * rand_clan.population)}/>

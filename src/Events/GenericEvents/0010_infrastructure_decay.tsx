@@ -47,12 +47,12 @@ export default function g0010_infrastructure_decay({federal,updateFunc}: {federa
     return (
         <EventTemplate
             title="Infrastructure Decay"
-            body={`The infrastructure of ${rand_clan.name} in ${rand_settlement.name} is decaying.`}
+            body={`The infrastructure of ${rand_clan.name} in ${rand_settlement.visible_name} is decaying.`}
             effect_buttons={[
                 {
                     title: "Do Nothing",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <DevelopmentIconTT/>
                             <PlusMinus value={-Math.round(calcDevelopment(rand_clan,rand_settlement) * 12)}/>
@@ -67,7 +67,7 @@ export default function g0010_infrastructure_decay({federal,updateFunc}: {federa
                 {
                     title: "Fix it",
                     effect: fixIt,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <TimberIconTT/>
                             <PlusMinus value={-(rand_clan.population * 12)}/>

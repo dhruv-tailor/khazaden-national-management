@@ -16,12 +16,12 @@ export default function g0006_burnout({federal,updateFunc}: {federal: FederalInt
     return (
         <EventTemplate
             title="Burnout"
-            body={`The people of ${rand_clan.name} in ${rand_settlement.name} are burned out.`}
+            body={`The people of ${rand_clan.name} in ${rand_settlement.visible_name} are burned out.`}
             effect_buttons={[
                 {
                     title: "They should just grind harder",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <p>The people of ${rand_clan.name} in ${rand_settlement.name} will be burned out for one year.</p>
                         <div className="flex flex-row gap-2">
                             <PlusMinus value={-1}/>

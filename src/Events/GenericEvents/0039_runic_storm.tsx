@@ -27,12 +27,12 @@ export default function g0039_runic_storm({federal, updateFunc}: {federal: Feder
     return (
         <EventTemplate
             title="Runic Storm"
-            body={`A runic storm has hit ${rand_settlement.name}.`}
+            body={`A runic storm has hit ${rand_settlement.visible_name}.`}
             effect_buttons={[
                 {
                     title: "Let the Storm Pass",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <RunesIconTT/>
                             <PlusMinus value={Math.round(12 * rand_clan.population)}/>

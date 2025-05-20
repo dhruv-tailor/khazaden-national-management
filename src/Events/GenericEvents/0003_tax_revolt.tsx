@@ -31,12 +31,12 @@ export default function g0003_tax_revolt({federal,updateFunc}: {federal: Federal
     return (
         <EventTemplate
             title="Tax Revolt"
-            body={`The people of ${rand_clan.name} in ${rand_settlement.name} are revolting against the tax rate of ${rand_clan.tax_rate}.`}
+            body={`The people of ${rand_clan.name} in ${rand_settlement.visible_name} are revolting against the tax rate of ${rand_clan.tax_rate}.`}
             effect_buttons={[
                 {
                     title: "I'll consider it",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <p>The people of ${rand_clan.name} in ${rand_settlement.name} will be unhappy for one year.</p>
                         <div className="flex flex-row gap-2">
                             <PlusMinus value={-1}/>

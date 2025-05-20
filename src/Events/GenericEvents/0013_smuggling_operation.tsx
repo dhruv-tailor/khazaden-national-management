@@ -21,12 +21,12 @@ export default function g0013_smuggling_operation({federal,updateFunc}: {federal
     return (
         <EventTemplate
             title="Smuggling Operation"
-            body={`A smuggling operation has been discovered in ${rand_clan.name} of ${rand_settlement.name}.`}
+            body={`A smuggling operation has been discovered in ${rand_clan.name} of ${rand_settlement.visible_name}.`}
             effect_buttons={[
                 {
                     title: "Do Nothing",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <p>Productivity of {rand_clan.name} in {rand_settlement.name} will decrease for a year</p>
                     </div>
                 }

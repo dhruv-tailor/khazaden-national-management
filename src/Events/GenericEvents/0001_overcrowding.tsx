@@ -56,12 +56,12 @@ export default function g0001_overcrowding({federal,updateFunc}: {federal: Feder
     return (
         <EventTemplate
             title="Overcrowding"
-            body={`The population of ${settlement.name} is too high and there isn't enough land to build much more permanent housing.`}
+            body={`The population of ${settlement.visible_name} is too high and there isn't enough land to build much more permanent housing.`} 
             effect_buttons={[
                 {
                     title: 'Do Nothing',
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <PlusMinus value={-1}/>
                             <LoyaltyIconTT/>
@@ -76,7 +76,7 @@ export default function g0001_overcrowding({federal,updateFunc}: {federal: Feder
                 {
                     title: 'Build More Temporary Housing',
                     effect: buildTemporaryHousing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <PlusMinus value={-overcrowding}/>
                             <ToolsIconTT/>

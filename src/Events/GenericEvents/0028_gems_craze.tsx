@@ -20,12 +20,12 @@ export default function g0028_gems_craze({federal, updateFunc}: {federal: Federa
     return (
         <EventTemplate
             title="Gems Craze"
-            body={`A gems craze has been reported in ${rand_settlement.name}.`}
+            body={`A gems craze has been reported in ${rand_settlement.visible_name}.`}
             effect_buttons={[
                 {
                     title: "Let the Craze Pass",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <GemsIconTT/>
                             Prices increase by 20%

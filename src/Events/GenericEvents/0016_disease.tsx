@@ -41,19 +41,19 @@ export default function g0016_disease({federal,updateFunc}: {federal: FederalInt
     return (
         <EventTemplate
             title="Disease"
-            body={`A disease has broken out in ${rand_clan.name} of ${rand_settlement.name}.`}
+            body={`A disease has broken out in ${rand_clan.name} of ${rand_settlement.visible_name}.`}
             effect_buttons={[
                 {
                     title: "Do Nothing",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <p>Population growth will be reduced for a while and producitivity will drop for a year</p>
                     </div>
                 },
                 {
                     title: "Send in Clinical Aid",
                     effect: sendClinicalAid,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <MedicalIconTT/>
                             <PlusMinus value={-(rand_clan.population * 12)}/>

@@ -40,12 +40,12 @@ export default function g0008_resourcefulness({federal,updateFunc}: {federal: Fe
     return (
         <EventTemplate
             title="Resourcefulness"
-            body={`The people of ${rand_clan.name} in ${rand_settlement.name} have found a way to make more goods with less, granted we provide the nessesary supplies.`}
+            body={`The people of ${rand_clan.name} in ${rand_settlement.visible_name} have found a way to make more goods with less, granted we provide the nessesary supplies.`}
             effect_buttons={[
                 {
                     title: "Send them supplies",
                     effect: sendSupplies,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <p>The people of ${rand_clan.name} in ${rand_settlement.name} will have a productivity boost for one year.</p>
                         <div className="flex flex-row gap-2">
                             <PlusMinus value={-(rand_clan.population * 12)}/>
@@ -64,7 +64,7 @@ export default function g0008_resourcefulness({federal,updateFunc}: {federal: Fe
                 {
                     title: "Deny Request",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <p>They can manage with what they have.</p>
                     </div>
                 }

@@ -23,12 +23,12 @@ export default function g0040_cultural_renaissance({federal, updateFunc}: {feder
     return (
         <EventTemplate
             title="Cultural Renaissance"
-            body={`A cultural renaissance has broken out in ${rand_settlement.name}.`}
+            body={`A cultural renaissance has broken out in ${rand_settlement.visible_name}.`}
             effect_buttons={[
                 {
                     title: "Our Culture is the Best",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <ArtisanalIconTT/>
                             Prices increase by 20%

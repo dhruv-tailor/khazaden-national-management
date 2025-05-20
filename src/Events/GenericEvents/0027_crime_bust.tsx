@@ -24,12 +24,12 @@ export default function g0027_crime_bust({federal, updateFunc}: {federal: Federa
     return (
         <EventTemplate
             title="Crime Bust"
-            body={`A crime bust has been conducted in ${rand_settlement.name}.`}
+            body={`A crime bust has been conducted in ${rand_settlement.visible_name}.`}
             effect_buttons={[
                 {
                     title: "It's Payday!",
                     effect: doNothing,
-                    tooltip: <div className="flex flex-col">
+                    tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <EnchantedIconTT/>
                             <PlusMinus value={Math.round(12 * rand_clan.population)}/>
