@@ -46,7 +46,7 @@ export default function g0008_resourcefulness({federal,updateFunc}: {federal: Fe
                     title: "Send them supplies",
                     effect: sendSupplies,
                     tooltip: <div className="flex flex-column">
-                        <p>The people of ${rand_clan.name} in ${rand_settlement.name} will have a productivity boost for one year.</p>
+                        <p>The people of {rand_clan.name} in {rand_settlement.name} will have a productivity boost for one year.</p>
                         <div className="flex flex-row gap-2">
                             <PlusMinus value={-(rand_clan.population * 12)}/>
                             <BooksIconTT/>

@@ -29,7 +29,7 @@ export default function g0007_sabatoge({federal,updateFunc}: {federal: FederalIn
                     title: "We'll send a force to investigate",
                     effect: doNothing,
                     tooltip: <div className="flex flex-column">
-                        <p>The people of ${rand_clan.name} in ${rand_settlement.name} will have a productivity loss for one year.</p>
+                        <p>The people of {rand_clan.name} in {rand_settlement.name} will have a productivity loss for one year.</p>
                     </div>
                 }
             ]}

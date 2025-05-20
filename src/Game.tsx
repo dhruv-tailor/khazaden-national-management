@@ -5,11 +5,7 @@ import { load } from "@tauri-apps/plugin-store";
 import { saveLocation } from "./utilities/SaveData";
 import { addGoods, empty_goodsdist, goodsdist, roundGoods, subtractGoods } from "./Goods/GoodsDist";
 import DisplayGoods from "./components/goodsDislay";
-import { Dialog } from "primereact/dialog";
-import ResourceDistribuition from "./components/ResourceDistribution";
 import { Button } from "primereact/button";
-import MoneyIconTT from "./tooltips/goods/MoneyIconTT";
-import NewSettlement from "./Settlement/NewSettlement";
 import { NextTurn } from "./utilities/NextTurn";
 import { FederalChange } from "./utilities/SimpleFunctions";
 import { LoanInterface } from "./Economics/loans/loanInterface";
@@ -28,12 +24,19 @@ import { PriorityQueue } from "./utilities/PriorityQueue";
 import { Tooltip } from "primereact/tooltip";
 import { Badge } from "primereact/badge";
 import { random_events } from "./Events/RandomEvents";
+import StimulusDialog from "./components/dialogs/StimulusDialog";
+import NewSettlementDialog from "./components/dialogs/NewSettlementDialog";
+import ConfirmExplorationDialog from "./components/dialogs/ConfirmExplorationDialog";
+import BuildRoadDialog from "./components/dialogs/BuildRoadDialog";
+import RandomEventDialog from "./components/dialogs/RandomEventDialog";
+
 export interface FederalChangeProps {
     settlements: SettlementInterface[],
     loans: LoanInterface[],
     armies: ArmyInterface[],
     tradeDeals: TradeDealInterface[]
 }
+
 export default function Game() {
     const gameId = useParams().game
     let navigate = useNavigate();
@@ -68,8 +71,6 @@ export default function Game() {
 
     const [randomEventVisable,setRandomEventVisable] = useState<boolean>(false)
     const pending_deals = federal.trade_deals.find(deal => deal.active === 'checking') ? true : false
-
-    const [dataReady, setDataReady] = useState(true);
 
     const [showMap, setShowMap] = useState(true);
 
@@ -129,6 +130,7 @@ export default function Game() {
         store.set('Global ID',global_id)
         store.set('Undiscovered Foreign Powers',undiscovered_foreign_powers)
         store.set('Foreign Spawn Rate',foreign_spawn_rate)
+        store.set('Connection Spawn Rate',connection_spawn_rate)
         store.save()
     }
 
@@ -171,11 +173,9 @@ export default function Game() {
 
     const processNextTurn = async () => {
         setShowMap(false);
-        setDataReady(false);
         await saveData();
         await NextTurn(gameId ?? '');
         await getSettlements();
-        setDataReady(true);
         setShowMap(true);
     }
 
@@ -654,160 +654,76 @@ export default function Game() {
                         createUncolonizedNode={confirmDiscovery}
                         buildRoad={buildRoad}
                     />
-                    {!dataReady && (
-                        <div style={{
-                            position: 'absolute',
-                            top: 0, left: 0, right: 0, bottom: 0,
-                            background: 'rgba(0,0,0,0.4)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            zIndex: 10
-                        }}>
-                            <span className="pi pi-spin pi-spinner" style={{fontSize: 48, color: 'white'}} />
-                        </div>
-                    )}
                 </div>
             )}
 
-            {/* Stimulus Dialog */}
-            <Dialog 
-                header="Stimulus" 
-                visible={giveGoodsVisable} 
+            {/* Dialogs */}
+            <StimulusDialog 
+                visible={giveGoodsVisable}
                 onHide={() => {
-                    setGiveGoodsVisable(false)
-                    setWhoToGive('')
+                    setGiveGoodsVisable(false);
+                    setWhoToGive('');
                 }}
-                className="w-30rem"
-            >
-                <ResourceDistribuition 
-                    goods_cap={federal.reserve} 
-                    updateFunc={stimulus}
-                />
-            </Dialog>
+                goods_cap={federal.reserve}
+                updateFunc={stimulus}
+            />
 
-            {/* New Settlement Dialog */}
-            <Dialog
-                header="New Settlement"
+            <NewSettlementDialog
                 visible={newSettlementVisable}
                 onHide={() => setNewSettlementVisable(false)}
-                className="w-30rem"
-            >
-                <NewSettlement 
-                    max_resources={federal.reserve} 
-                    updateFunc={createSettlement}
-                    terrain={node_to_colonize?.terrain ?? TerrainType.Mountain}
-                    cost={((federal.settlements.length ** 2) * 4500)}
-                />
-            </Dialog>
+                max_resources={federal.reserve}
+                updateFunc={createSettlement}
+                terrain={node_to_colonize?.terrain ?? TerrainType.Mountain}
+                cost={((federal.settlements.length ** 2) * 4500)}
+            />
 
-            <Dialog
-                header="Confirm Exploration"
+            <ConfirmExplorationDialog
                 visible={confirmDiscoveryVisable}
-                onHide={() => setConfirmDiscoveryVisable(false)}
-                className="w-30rem"
-            >
-                <div className="flex flex-column gap-3">
-                    <div className="flex align-items-center gap-2">
-                        <i className="pi pi-map text-xl"></i>
-                        <span>Explore this territory?</span>
-                    </div>
-                    
-                    <div className="flex align-items-center gap-2">
-                        <MoneyIconTT/>
-                        <span>{(1 + ((map_info.nodes.length - 2)/10)) * 1000}</span>
-                    </div>
+                onHide={() => {
+                    setConfirmDiscoveryVisable(false);
+                    setFromNode(null);
+                }}
+                onConfirm={() => {
+                    setFederal({
+                        ...federal,
+                        reserve: {
+                            ...federal.reserve, 
+                            money: federal.reserve.money - ((1 + ((map_info.nodes.length - 2)/10)) * 1000)
+                        }
+                    });
+                    setConfirmDiscoveryVisable(false);
+                    if (fromNode) {
+                        if(Math.random() > foreign_spawn_rate) { createUncolonizedNode(fromNode);}
+                         else {spawnForeignPower(fromNode);}
+                    }
+                    setFromNode(null);
+                }}
+                cost={(1 + ((map_info.nodes.length - 2)/10)) * 1000}
+            />
 
-                    <div className="flex justify-content-end gap-2 mt-3">
-                        <Button 
-                            label="Cancel" 
-                            icon="pi pi-times" 
-                            onClick={() => {
-                                setConfirmDiscoveryVisable(false)
-                                setFromNode(null)
-                            }}
-                            className="p-button-text"
-                        />
-                        <Button 
-                            //disabled={federal.reserve.money < ((1 + ((map_info.nodes.length - 2)/10)) * 1000)}
-                            label="Explore" 
-                            icon="pi pi-check" 
-                            onClick={() => {
-                                setFederal({
-                                    ...federal,
-                                    reserve: {
-                                        ...federal.reserve, 
-                                        money: federal.reserve.money - ((1 + ((map_info.nodes.length - 2)/10)) * 1000)
-                                    }
-                                })
-                                setConfirmDiscoveryVisable(false);
-                                if (fromNode) {
-                                    if(Math.random() > foreign_spawn_rate){ createUncolonizedNode(fromNode);}
-                                    else{spawnForeignPower(fromNode);}
-                                }
-                                setFromNode(null);
-                            }}
-                            severity="success"
-                        />
-                    </div>
-                </div>
-            </Dialog>
-
-            <Dialog
-                header="Build Road"
+            <BuildRoadDialog
                 visible={buildRoadVisable}
-                onHide={() => setBuildRoadVisable(false)}
-                className="w-30rem"
-            >
-                <div className="flex flex-column gap-3">
-                    <div className="flex align-items-center gap-2">
-                        <i className="pi pi-map text-xl"></i>
-                        <span>Build a road between these territories?</span>
-                    </div>
-                    
-                    <div className="flex align-items-center gap-2">
-                        <MoneyIconTT/>
-                        <span>{fromNode && toNode ? Math.round(Math.sqrt((distance(fromNode.nodeid,toNode.nodeid) ** 2) / 2) * 1000) : 0}</span>
-                    </div>
+                onHide={() => {
+                    setBuildRoadVisable(false);
+                    setFromNode(null);
+                    setToNode(null);
+                }}
+                onConfirm={() => {
+                    if (fromNode && toNode) { generateRoad(fromNode, toNode); }
+                    setBuildRoadVisable(false);
+                    setFromNode(null);
+                    setToNode(null);
+                }}
+                cost={fromNode && toNode ? Math.round(Math.sqrt((distance(fromNode.nodeid,toNode.nodeid) ** 2) / 2) * 1000) : 0}
+            />
 
-                    <div className="flex justify-content-end gap-2 mt-3">
-                        <Button 
-                            label="Cancel" 
-                            icon="pi pi-times" 
-                            onClick={() => {
-                                setBuildRoadVisable(false)
-                                setFromNode(null)
-                                setToNode(null)
-                            }}
-                            className="p-button-text"
-                        />
-                        <Button 
-                            // disabled={federal.reserve.money < ((1 + ((map_info.edges.length - 2)/10)) * 1000)}
-                            label="Build Road" 
-                            icon="pi pi-check" 
-                            onClick={() => {
-                                if (fromNode && toNode) {
-                                    generateRoad(fromNode, toNode);
-                                }
-                                setBuildRoadVisable(false);
-                                setFromNode(null);
-                                setToNode(null);
-                            }}
-                            severity="success"
-                        />
-                    </div>
-                </div>
-            </Dialog>
-
-            <Dialog
+            <RandomEventDialog
                 visible={randomEventVisable}
                 onHide={() => setRandomEventVisable(false)}
-                className="w-30rem"
-                closable={false}
-            >
-                {random_events.find(e => e.id === federal.random_events[0])?.event(federal,eventUpdate)}
-            </Dialog>
-
+                event={random_events.find(e => e.id === federal.random_events[0])?.event ?? (() => <></>)}
+                federal={federal}
+                updateFunc={eventUpdate}
+            />
         </div>
-    )
+    );
 }

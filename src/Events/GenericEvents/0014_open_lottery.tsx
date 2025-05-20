@@ -60,7 +60,7 @@ export default function g0014_open_lottery({federal,updateFunc}: {federal: Feder
                     title: "No",
                     effect: doNothing,
                     tooltip: <div className="flex flex-column">
-                        <p>The ${rand_clan.name} of ${rand_settlement.name} will not get a casino.</p>
+                        <p>The {rand_clan.name} of {rand_settlement.name} will not get a casino.</p>
                     </div>
                 }
             ]}
