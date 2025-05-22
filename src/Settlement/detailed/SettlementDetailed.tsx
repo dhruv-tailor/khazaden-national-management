@@ -16,6 +16,8 @@ import NaturalResources from "./NaturalResources";
 import { addGoods, goodsdist, roundGoods } from "../../Goods/GoodsDist";
 import BureaucracyBonus from "./Bureaucracy/BureaucracyBonus";
 import PopConversion from "./PopConversion";
+import { FederalInterface } from "../../utilities/FederalInterface";
+import { empty_federal_interface } from "../../utilities/FederalInterface";
 
 export default function SettlementDetailed() {
     const gameId = useParams().game
@@ -30,22 +32,21 @@ export default function SettlementDetailed() {
 
     const getSettlement = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
-        const settlements = await store.get<SettlementInterface[]>('settlements');
-        const current_settlement = settlements?.find(settlement => settlement.name === settlementId)
+        const federal = await store.get<FederalInterface>('Federal') ?? {...empty_federal_interface};
+        const current_settlement = federal.settlements?.find(settlement => settlement.name === settlementId)
         if(current_settlement) {setSettlement(current_settlement)}
         setNewName(settlement.visible_name)
     }
 
     const saveData = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
-        const settlements = await store.get<SettlementInterface[]>('settlements') ?? [];
-        const updatedSettlements = settlements?.map(s => {
+        const federal = await store.get<FederalInterface>('Federal') ?? {...empty_federal_interface};
+        const updatedSettlements = federal.settlements?.map(s => {
             if (s.name === settlement.name) {return({...settlement})}
             return {...s}
         })
-        store.set('settlements',updatedSettlements)
+        store.set('Federal',{...federal,settlements: updatedSettlements})
         store.save()
-        console.log('saved')
     }
 
     useEffect(()=>{getSettlement()},[])

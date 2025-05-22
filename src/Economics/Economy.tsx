@@ -1,64 +1,44 @@
 import { Button } from "primereact/button";
 import { useNavigate, useParams } from "react-router";
-import { monthsStored, SettlementInterface } from "../Settlement/SettlementInterface/SettlementInterface";
 import { useEffect, useState } from "react";
 import DisplayGoods from "../components/goodsDislay";
-import { addGoods, empty_goodsdist, goodsdist, goodsId, minPerGood, multiplyGoods, roundGoods, scaleGoods, subtractGoods, totalGoods } from "../Goods/GoodsDist";
+import { addGoods, empty_goodsdist, goodsdist, multiplyGoods, roundGoods, subtractGoods, totalGoods, } from "../Goods/GoodsDist";
 import { load } from "@tauri-apps/plugin-store";
 import { saveLocation } from "../utilities/SaveData";
 import PriceChart, { priceChartDataProp, priceChartOptionsProp } from "./pricing/PriceChart";
-import { ForeignPowerInterface } from "../ForeignPowers/Interface/ForeignPowerInterface";
-import PriceCard from "./pricing/PriceCard";
-import { calcPriceGoods } from "./pricing/prices";
 import { Dialog } from "primereact/dialog";
-import SellGoods from "./selling/SellGoods";
-import MonthsStoredTT from "../tooltips/economy/monthsStoredTT";
-import { InputNumber } from "primereact/inputnumber";
-import { LoanInterface, takeLoan } from "./loans/loanInterface";
+import { takeLoan } from "./loans/loanInterface";
 import ViewLoans from "./loans/ViewLoans";
 import { Card } from "primereact/card";
-import { ArmyInterface } from "../Military/Army/Army";
+import TradeDealView from "./Trade/TradeDealView";
+import { FederalChange } from "../utilities/SimpleFunctions";
+import { empty_trade_deal, TradeDealInterface } from "./Trade/interface/TradeDealInterface";
+import { FederalInterface } from "../utilities/FederalInterface";
+import { empty_federal_interface } from "../utilities/FederalInterface";
 
 export default function Economy() {
     const gameId = useParams().game;
     let navigate = useNavigate();
 
-    const [settlements,setSettlements] = useState<SettlementInterface[]>([])
-    const [reserveGoods,setReserveGoods] = useState<goodsdist>({...empty_goodsdist});
     const [changeGoods,setChangeGoods] = useState<goodsdist>({...empty_goodsdist});
-    const [prices,setPrices] = useState<goodsdist>({...empty_goodsdist})
-    const [priceHistory,setPriceHistory] = useState<goodsdist[]>([])
-    const [merchantCapacity,setMerchantCapacity] = useState<number>(0);
-    const [FederalMonthsStored,setFederalMonthsStored] = useState<number>(0);
-    const [foreignPowers,setForeignPowers] = useState<ForeignPowerInterface[]>([])
-    const [loans,setLoans] = useState<LoanInterface[]>([])
+    const [federal,setFederal] = useState<FederalInterface>({...empty_federal_interface})
     const [showLoans,setShowLoans] = useState<boolean>(false)
-    const [armies,setArmies] = useState<ArmyInterface[]>([])
-    const [showSell, setShowSell] = useState(false)
-
     const getInfo = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
-        store.get<goodsdist>('Federal Reserve').then(value => {if (value) {setReserveGoods(value);}});
-        store.get<goodsdist>('Federal Prices').then(value => {if (value) {setPrices(value)}})
-        store.get<goodsdist[]>('Price History').then(value => {if (value) {setPriceHistory(value);}})
-        store.get<number>('Merchant Capacity').then(value => {if (value) {setMerchantCapacity(value)}});
-        store.get<number>('Months Stored').then(value => {if (value) {setFederalMonthsStored(value)}});
-        store.get<ForeignPowerInterface[]>('Foreign Powers').then(value => {if (value) {setForeignPowers(value)}});
-        store.get<LoanInterface[]>('Loans').then(value => {if (value) {setLoans(value)}});
-        store.get<ArmyInterface[]>('Armies').then(value => {if (value) {setArmies(value)}});
-        const get_settlements = await store.get<SettlementInterface[]>('settlements') ?? [];
-        setSettlements(get_settlements)
+        await Promise.all([
+            store.get<FederalInterface>('Federal').then(value => {if (value) {setFederal(value);}}),
+        ])    
         updateSettlements()
     }
 
     const updateSettlements = () => {
-        const change_reserve = settlements.map(settlement => {
+        const change_reserve = federal.settlements.map(settlement => {
             return settlement.clans.map(
                 clan => roundGoods(multiplyGoods(clan.production,settlement.taxation))
             ).reduce((sum,val) => addGoods(sum,val))
         }).reduce((sum,val) => addGoods(sum,val))
 
-        change_reserve.money = Math.round(settlements.map(settlement => {
+        change_reserve.money = Math.round(federal.settlements.map(settlement => {
             return settlement.clans.map(
                 clan => clan.tax_rate * clan.taxed_productivity
             ).reduce((sum,val) => sum + val) * settlement.taxation.money
@@ -71,16 +51,10 @@ export default function Economy() {
 
     const saveData = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
-        store.set('Federal Reserve',reserveGoods)
-        store.set('Federal Prices',prices)
-        store.set('Price History',priceHistory)
-        store.set('settlements',settlements)
-        store.set('Foreign Powers',foreignPowers)
-        store.set('Merchant Capacity',merchantCapacity)
-        store.set('Months Stored',FederalMonthsStored)
-        store.set('Loans',loans)
-        store.set('Armies',armies)
-        store.save()
+        await Promise.all([
+            store.set('Federal',federal),
+            store.save()
+        ])
     }
 
     const navigateTo = async (location: string) => {
@@ -88,132 +62,144 @@ export default function Economy() {
         navigate(location);
     }
 
-    const processSettlementOrder = (id: string, capUsed: number, order: goodsdist) => {
-        const s = settlements.map(settlement => {
-            if (id !== settlement.name) { return settlement }
-            const old_stock = settlement.stock
-            const new_stock = subtractGoods(settlement.stock,order)
-            const new_prices = calcPriceGoods(settlement.prices,old_stock,new_stock)
-            const old_reserve = {...reserveGoods}
-            setReserveGoods({...addGoods(order,reserveGoods),money: reserveGoods.money - totalGoods(multiplyGoods(order, roundGoods(settlement.prices)))})
-            setPrices(calcPriceGoods(prices,old_reserve,reserveGoods))
-            return {
-                ...settlement,
-                stock: {
-                    ...new_stock,
-                    money: totalGoods(multiplyGoods(order, roundGoods(settlement.prices)))
-                },
-                prices: new_prices
-            }
-        })
-        setSettlements([...s])
-        setMerchantCapacity(merchantCapacity - capUsed)
-    }
-
-    const processForeignOrder = (id: string, capUsed: number, order: goodsdist) => {
-        const f = foreignPowers.map(power => {
-            if (id !== power.name) { return power}
-            const old_reserve = {...reserveGoods}
-            setReserveGoods(
-                {
-                    ...addGoods(order,reserveGoods),
-                    money: reserveGoods.money - totalGoods(multiplyGoods(order, roundGoods(scaleGoods(power.prices,power.tarriffs + 1))))
-                })
-            setPrices(calcPriceGoods(prices,old_reserve,reserveGoods))
-            return {...power, available_supply: subtractGoods(power.available_supply,order)}
-        })
-        setForeignPowers([...f])
-        setMerchantCapacity(merchantCapacity - capUsed)
-    }
-
-    const processSell = (type: goodsId,units: number,name: string) => {
-        setShowSell(false)
-        const old_reserve = {...reserveGoods}
-        let money_gained = units
-        if (type === goodsId.food) {money_gained = units * prices.food}
-        if (type === goodsId.beer) {money_gained = units * prices.beer}
-        if (type === goodsId.leather) {money_gained = units * prices.leather}
-        if (type === goodsId.artisanal) {money_gained = units * prices.artisanal}
-        if (type === goodsId.livestock) {money_gained = units * prices.livestock}
-        if (type === goodsId.ornamental) {money_gained = units * prices.ornamental}
-        if (type === goodsId.enchanted) {money_gained = units * prices.enchanted}
-        if (type === goodsId.timber) {money_gained = units * prices.timber}
-        if (type === goodsId.tools) {money_gained = units * prices.tools}
-        if (type === goodsId.common_ores) {money_gained = units * prices.common_ores}
-        if (type === goodsId.medical) {money_gained = units * prices.medical}
-        if (type === goodsId.rare_ores) {money_gained = units * prices.rare_ores}
-        if (type === goodsId.gems) {money_gained = units * prices.gems}
-        if (type === goodsId.runes) {money_gained = units * prices.runes}
-        if (type === goodsId.arms) {money_gained = units * prices.arms}
-        if (type === goodsId.books) {money_gained = units * prices.books}
-        if (type === goodsId.enchanted_arms) {money_gained = units * prices.enchanted_arms}
-        if (type === goodsId.charcoal) {money_gained = units * prices.charcoal}
-        
-        setReserveGoods({
-            food: type === goodsId.food ? reserveGoods.food - units : reserveGoods.food,
-            beer: type === goodsId.beer ? reserveGoods.beer - units : reserveGoods.beer,
-            leather: type === goodsId.leather ? reserveGoods.leather - units : reserveGoods.leather,
-            artisanal: type === goodsId.artisanal ? reserveGoods.artisanal - units : reserveGoods.artisanal,
-            livestock: type === goodsId.livestock ? reserveGoods.livestock - units : reserveGoods.livestock,
-            ornamental: type === goodsId.ornamental ? reserveGoods.ornamental - units : reserveGoods.ornamental,
-            enchanted: type === goodsId.enchanted ? reserveGoods.enchanted - units : reserveGoods.enchanted,
-            timber: type === goodsId.timber ? reserveGoods.timber - units : reserveGoods.timber,
-            tools: type === goodsId.tools ? reserveGoods.tools - units : reserveGoods.tools,
-            common_ores: type === goodsId.common_ores ? reserveGoods.common_ores - units : reserveGoods.common_ores,
-            medical: type === goodsId.medical ? reserveGoods.medical - units : reserveGoods.medical,
-            rare_ores: type === goodsId.rare_ores ? reserveGoods.rare_ores - units : reserveGoods.rare_ores,
-            gems: type === goodsId.gems ? reserveGoods.gems - units : reserveGoods.gems,
-            runes: type === goodsId.runes ? reserveGoods.runes - units : reserveGoods.runes,
-            arms: type === goodsId.arms ? reserveGoods.arms - units : reserveGoods.arms,
-            books: type === goodsId.books ? reserveGoods.books - units : reserveGoods.books,
-            enchanted_arms: type === goodsId.enchanted_arms ? reserveGoods.enchanted_arms - units : reserveGoods.enchanted_arms,
-            charcoal: type === goodsId.charcoal ? reserveGoods.charcoal - units : reserveGoods.charcoal,
-            money: reserveGoods.money + money_gained
-        })
-        setPrices(calcPriceGoods(prices,old_reserve,reserveGoods))
-        setMerchantCapacity(merchantCapacity - units)
-        const f = foreignPowers.map(power => {
-            if (name !== power.name) {return power}
-            return {...power, available_supply: {
-                food: power.available_supply.food - (type === goodsId.food ? units : 0),
-                beer: power.available_supply.beer - (type === goodsId.beer ? units : 0),
-                leather: power.available_supply.leather - (type === goodsId.leather ? units : 0),
-                artisanal: power.available_supply.artisanal - (type === goodsId.artisanal ? units : 0),
-                livestock: power.available_supply.livestock - (type === goodsId.livestock ? units : 0),
-                ornamental: power.available_supply.ornamental - (type === goodsId.ornamental ? units : 0),
-                enchanted: power.available_supply.enchanted - (type === goodsId.enchanted ? units : 0),
-                timber: power.available_supply.timber - (type === goodsId.timber ? units : 0),
-                tools: power.available_supply.tools - (type === goodsId.tools ? units : 0),
-                common_ores: power.available_supply.common_ores - (type === goodsId.common_ores ? units : 0),
-                medical: power.available_supply.medical - (type === goodsId.medical ? units : 0),
-                rare_ores: power.available_supply.rare_ores - (type === goodsId.rare_ores ? units : 0),
-                gems: power.available_supply.gems - (type === goodsId.gems ? units : 0),
-                runes: power.available_supply.runes - (type === goodsId.runes ? units : 0),
-                arms: power.available_supply.arms - (type === goodsId.arms ? units : 0),
-                books: power.available_supply.books - (type === goodsId.books ? units : 0),
-                enchanted_arms: power.available_supply.enchanted_arms - (type === goodsId.enchanted_arms ? units : 0),
-                money: power.available_supply.money,
-                charcoal: power.available_supply.charcoal - (type === goodsId.charcoal ? units : 0)
-            }}
-        })
-        setForeignPowers([...f])
-    }
 
     const loanTaken = (settlement: string, amount: number) => {
-        const s = settlements.map(s => {
+        const s = federal.settlements.map(s => {
             if (settlement !== s.name) {return s}
-            setLoans([...loans,takeLoan(amount,s.visible_name,s.name)])
+            setFederal({...federal,loans: [...federal.loans,takeLoan(amount,s.visible_name,s.name)]})
             return {...s, available_loan: s.available_loan - amount}
         })
-        setSettlements([...s])
+        setFederal({...federal,settlements: s})
     }
 
-    const declareBankruptcy = () => {
-        setReserveGoods({...empty_goodsdist})
-        setLoans([])
-        setArmies([])
+    const declareBankruptcy = () => setFederal({...federal,reserve: {...empty_goodsdist},loans: [],armies: []})
+
+    const createTradeDeal = (partnerType: string, partnerId: string, length: number, tradeDealInfo: {
+        goodName: keyof goodsdist;
+        amount: number;
+        isOutgoing: boolean;
+        price: number;
+    }[]) => {
+        const uniqueId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        const new_deal : TradeDealInterface = {...empty_trade_deal}
+        new_deal.trade_id = uniqueId
+        if (partnerType === 'settlement') { 
+            new_deal.name = federal.settlements.find(s => s.name === partnerId)?.visible_name ?? ''
+            new_deal.active = 'sent'
+        }
+        else if (partnerType === 'foreign') {
+            new_deal.name = partnerId
+            new_deal.active = 'active'
+        }
+        new_deal.type = partnerType as "settlement" | "foreign" | "federal"
+        new_deal.duration = length
+        let merchant_cap_used = 0
+        tradeDealInfo.forEach(info => {
+            if (info.isOutgoing) { new_deal.outgoing[info.goodName] += info.amount }
+            else { new_deal.incoming[info.goodName] += info.amount }
+            if(info.goodName !== 'money') { merchant_cap_used += info.amount }
+        })
+        setFederal({...federal,
+            trade_deals: [...federal.trade_deals,{...new_deal}],
+            merchant_capacity: federal.merchant_capacity - merchant_cap_used
+        })
+        if (partnerType === 'foreign') {    
+            // The other details doesn't really matter it can stay the same
+            const mirror_deal: TradeDealInterface = {...new_deal,outgoing: {...new_deal.incoming},incoming:{...new_deal.outgoing}}
+            const fps = federal.foreign_powers.map(fp => {
+                if (fp.name !== partnerId) {return {...fp}}
+                return {
+                    ...fp,
+                    trade_deals: [...fp.trade_deals,mirror_deal],
+                    available_demand: subtractGoods(fp.available_demand,new_deal.outgoing),
+                    available_supply: subtractGoods(fp.available_supply,new_deal.incoming)
+                }
+            })
+            setFederal({...federal,foreign_powers: fps})
+        }
+        else if (partnerType === 'settlement') {
+            const mirror_deal: TradeDealInterface = {
+                ...new_deal,
+                outgoing: {...new_deal.incoming},
+                incoming:{...new_deal.outgoing},
+                id: 'federal',
+                name: 'Federal',
+                active: 'checking'
+            }
+            setFederal({...federal,
+                settlements: federal.settlements.map(s => {
+                    if (s.name !== partnerId) {return {...s}}
+                    return {
+                        ...s,
+                    trade_deals: [...s.trade_deals,{...mirror_deal}],
+                        merchant_capacity: s.merchant_capacity - merchant_cap_used
+                    }
+                })
+            })
+        }
     }
 
+    const handleAcceptDeal = (trade_id: string) => {
+        let type = ''
+        let partner = ''
+        federal.trade_deals.forEach(td => {
+            if (td.trade_id === trade_id) {
+                type = td.type
+                partner = td.name
+            }
+        })
+        setFederal({...federal,
+            trade_deals: federal.trade_deals.map(td => td.trade_id === trade_id ? {...td, active: 'active' as const} : td)
+        })
+        if (type === 'settlement') {
+            setFederal({...federal,
+                settlements: federal.settlements.map(s => {
+                    if (s.name !== partner) {return {...s}}
+                return {
+                    ...s,
+                    trade_deals: s.trade_deals.map(td => td.trade_id === trade_id ? {...td, active: 'active' as const} : td)
+                    }
+                })
+            })
+        }
+        else if (type === 'foreign') {
+            setFederal({...federal,
+                foreign_powers: federal.foreign_powers.map(fp => fp.name === partner ? {...fp, trade_deals: fp.trade_deals.map(td => td.trade_id === trade_id ? {...td, active: 'active' as const} : td)} : fp)
+            })
+        }
+    }
+
+    const handleDeclineDeal = (trade_id: string) => {
+        let type = ''
+        let partner = ''
+        let merchant_cap_used = 0
+        federal.trade_deals.forEach(td => {
+            if (td.trade_id === trade_id) {
+                type = td.type
+                partner = td.name
+                merchant_cap_used = totalGoods(td.outgoing) + totalGoods(td.incoming)
+            }
+        })
+        setFederal({...federal,
+            trade_deals: federal.trade_deals.filter(td => td.trade_id !== trade_id)
+        })
+        setFederal({...federal,
+            merchant_capacity: federal.merchant_capacity + merchant_cap_used
+        })
+        if (type === 'settlement') {
+            setFederal({...federal,
+                settlements: federal.settlements.map(s => {
+                    if (s.name !== partner) {return {...s}}
+                    return {...s, trade_deals: s.trade_deals.filter(td => td.trade_id !== trade_id), merchant_capacity: s.merchant_capacity + merchant_cap_used}
+                })
+            })
+        }
+        else if (type === 'foreign') {
+            setFederal({...federal,
+                foreign_powers: federal.foreign_powers.map(fp => fp.name === partner ? {...fp, trade_deals: fp.trade_deals.filter(td => td.trade_id !== trade_id)} : fp)
+            })
+        }
+    }
     return (
         <div className="flex flex-column gap-3">
             {/* Header Section */}
@@ -236,129 +222,59 @@ export default function Economy() {
 
             {/* Federal Reserve Section */}
             <Card title="Federal Reserve" className="sticky top-0 z-5 bg-black shadow-2">
-                <div className="flex flex-column gap-3">
-                    <div className="flex flex-row align-items-center gap-3">
-                        <div className="flex flex-column gap-1">
-                            <MonthsStoredTT/>
-                            <InputNumber 
-                                showButtons 
-                                size={4} 
-                                min={0} 
-                                value={FederalMonthsStored} 
-                                onChange={e => setFederalMonthsStored(e.value as number)}
-                            />
-                        </div>
-                        {settlements.length > 0 && (
-                            <DisplayGoods 
-                                stock={reserveGoods} 
-                                change={{
-                                    ...changeGoods,
-                                    money: settlements.map(
-                                        s => s.clans.map(
-                                            c => Math.round(c.tax_rate * c.taxed_productivity * s.taxation.money)
-                                        ).reduce((sum,val) => sum + val)
-                                    ).reduce((sum,val) => sum + val)
-                                }}
-                            />
-                        )}
-                        <Button 
-                            label="Sell Goods" 
-                            icon="pi pi-wallet" 
-                            severity="success" 
-                            onClick={() => setShowSell(true)}
-                            className="ml-auto"
+                <div className="flex flex-row align-items-center gap-3">
+                    {federal.settlements.length > 0 && (
+                        <DisplayGoods 
+                            stock={federal.reserve} 
+                            change={{
+                                ...changeGoods,
+                                money: federal.settlements.map(
+                                    s => s.clans.map(
+                                        c => Math.round(c.tax_rate * c.taxed_productivity * s.taxation.money)
+                                    ).reduce((sum,val) => sum + val,0)
+                                ).reduce((sum,val) => sum + val,0)
+                            }}
                         />
-                    </div>
+                    )}
                 </div>
             </Card>
 
             {/* Price Chart Section */}
             <Card title="Federal Prices">
                 <PriceChart 
-                    data={priceChartDataProp(priceHistory,prices)} 
+                    data={priceChartDataProp(federal.price_history,roundGoods(federal.prices))} 
                     options={priceChartOptionsProp()}
                 />
             </Card>
 
-            {/* Local Goods Section */}
-            <Card title='Local Goods'>
-                <div className="flex flex-column gap-3">
-                    <div className="font-bold">
-                        Merchant Capacity: {merchantCapacity} | 
-                        Available Money: {reserveGoods.money}
-                    </div>
-                    <div className="grid">
-                        {settlements.map(s => (
-                            <div key={s.name} className="col-12 md:col-6 lg:col-4">
-                                <PriceCard
-                                    name={s.visible_name}
-                                    id={s.name}
-                                    goods={minPerGood(roundGoods(subtractGoods(s.stock,monthsStored(s))),0)}
-                                    prices={roundGoods(s.prices)}
-                                    merchantCapacity={merchantCapacity}
-                                    maxCost={reserveGoods.money}
-                                    updateFunc={processSettlementOrder}
-                                    myGoods={roundGoods(reserveGoods)}
-                                    myChange={roundGoods(changeGoods)}
-                                />
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </Card>
-
-            {/* Global Goods Section */}
-            <Card title='Global Goods'>
-                <div className="flex flex-column gap-3">
-                    <div className="font-bold">
-                        Merchant Capacity: {merchantCapacity} | 
-                        Available Money: {reserveGoods.money}
-                    </div>
-                    <div className="grid">
-                        {foreignPowers.filter(power => !power.isEmbargoed).map(power => (
-                            <div key={power.name} className="col-12 md:col-6 lg:col-4">
-                                <PriceCard
-                                    name={power.name}
-                                    id={power.name}
-                                    goods={roundGoods(power.available_supply)}
-                                    prices={roundGoods(scaleGoods(power.prices,power.tarriffs + 1))}
-                                    merchantCapacity={merchantCapacity}
-                                    maxCost={reserveGoods.money}
-                                    updateFunc={processForeignOrder}
-                                    myGoods={roundGoods(reserveGoods)}
-                                    myChange={roundGoods(changeGoods)}
-                                />
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </Card>
-
-            {/* Dialogs */}
-            <Dialog 
-                header="Sell Goods" 
-                visible={showSell} 
-                onHide={() => setShowSell(false)}
-            >
-                <SellGoods
-                    merchantCapacity={merchantCapacity}
-                    supply={reserveGoods}
-                    foreignPowers={foreignPowers.filter(p => p.isEmbargoed === false)} 
-                    prices={prices} 
-                    competingPrices={settlements.map(s => s.prices)}
-                    currentChange={roundGoods(changeGoods)}
-                    updateFunc={processSell}
+            {/* Federal Trade Deals Section */}
+            <Card title="Federal Trade Deals">
+                <TradeDealView 
+                    tradedeals={federal.trade_deals} 
+                    foreignPowers={Object.values(federal.foreign_powers)} 
+                    settlements={federal.settlements} 
+                    currentStock={federal.reserve} 
+                    merchantCapacity={federal.merchant_capacity} 
+                    prices={federal.prices} 
+                    currentChange={changeGoods} 
+                    updateFunc={createTradeDeal}
+                    isFederal={true}
+                    federalReserve={federal.reserve}
+                    federalChange={FederalChange(federal)}
+                    federalPrices={federal.prices}
+                    federalMerchantCap={federal.merchant_capacity}
+                    handleAcceptDeal={handleAcceptDeal}
+                    handleDeclineDeal={handleDeclineDeal}
                 />
-            </Dialog>
-
+            </Card>
             <Dialog 
                 header="Loans" 
                 visible={showLoans} 
                 onHide={() => setShowLoans(false)}
             >
                 <ViewLoans 
-                    loans={loans} 
-                    settlements={settlements} 
+                    loans={federal.loans} 
+                    settlements={federal.settlements} 
                     updateFunc={loanTaken} 
                     declareBankruptcy={declareBankruptcy}
                 />

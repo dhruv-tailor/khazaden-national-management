@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
-import { TerrainData, TerrainType } from "./SettlementInterface/TerrainInterface";
+import { useState } from "react";
+import { TerrainType } from "./SettlementInterface/TerrainInterface";
 import { InputText } from "primereact/inputtext";
-import { SelectButton } from "primereact/selectbutton";
 import { RadioButton } from "primereact/radiobutton";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
@@ -12,16 +11,11 @@ import ResourceDistribuition from "../components/ResourceDistribution";
 import { empty_goodsdist, goodsdist, roundGoods, scaleGoods } from "../Goods/GoodsDist";
 import { newSettlement, SettlementInterface } from "./SettlementInterface/SettlementInterface";
 import { clanTypes } from "../Clans/ClanInterface/ClanInterface";
+import MoneyIconTT from "../tooltips/goods/MoneyIconTT";
 
-interface selectButtonTerrainInterface {
-    name: string;
-    value: TerrainType;
-}
 
-export default function NewSettlement({max_resources,updateFunc}: {max_resources: goodsdist,updateFunc: (s: SettlementInterface) => void}) {
-    const [terrainOptions, setTerrainOptions] = useState<selectButtonTerrainInterface[]>([])
+export default function NewSettlement({max_resources,updateFunc,terrain,cost,disabled = false}: {max_resources: goodsdist,updateFunc: (s: SettlementInterface) => void,terrain: TerrainType,cost: number,disabled?: boolean}) {
     const [name,setName] = useState<string>('')
-    const [terrain,setTerrain] = useState<TerrainType>(TerrainType.Mountain)
     const [settlerType, setSettlerType] = useState<string>('')
     const [popSelectVisible,setPopSelectVisible] = useState<boolean>(false)
     const [pops, setPopDist] = useState<popdist>({...empty_popdist})
@@ -30,17 +24,6 @@ export default function NewSettlement({max_resources,updateFunc}: {max_resources
     const [resourceSelectVisible,setResourceSelectVisable] = useState<boolean>(false)
     const [resources,setResources] = useState<goodsdist>({...empty_goodsdist})
 
-    useEffect(() => {
-        const terrain_count = Object.values(TerrainType).filter(value => typeof value === 'number') as number[]
-        const randVal = () => terrain_count[Math.floor(Math.random() * terrain_count.length)]
-        const t1 = randVal() as TerrainType
-        const t2 = randVal() as TerrainType
-        setTerrainOptions([
-            {name: TerrainData[TerrainType.Mountain].name, value: TerrainType.Mountain},
-            {name: TerrainData[t1].name, value: t1},
-            {name: TerrainData[t2].name, value: t2}
-        ])
-    },[])
 
     const setStartingPops = (p: popdist) => {
         setPopSelectVisible(false)
@@ -129,15 +112,6 @@ export default function NewSettlement({max_resources,updateFunc}: {max_resources
         <div className="flex flex-column gap-2">
             Settlement Name
             <InputText type="text" value={name} onChange={e => setName(e.target.value)}/>
-
-            Select Location
-            <SelectButton
-                value={terrain}
-                onChange={e => setTerrain(e.value)}
-                optionLabel='name'
-                options={terrainOptions}
-            />
-
             Initial Pops
             <div className="flex flex-row gap-3">
                 <div className="flex align-items-center">
@@ -203,8 +177,17 @@ export default function NewSettlement({max_resources,updateFunc}: {max_resources
             <Dialog visible={resourceSelectVisible} onHide={() => setResourceSelectVisable(false)} closable={false}>
                 <ResourceDistribuition goods_cap={max_resources} updateFunc={updateGoods} existing_dist={resources}/>
             </Dialog>
-            {(name !== '') && (settlerType !== '') && (resourceType !== '') ? 
-            <Button label="Settle Location" onClick={generateSettlement}/>:null}
+            <Button 
+                disabled={disabled || name === '' || settlerType === '' || resourceType === ''}
+                onClick={generateSettlement}
+                className={max_resources.money < cost ? "p-button-danger" : ""}
+            >
+                <div className="flex flex-row gap-2">
+                    {max_resources.money < cost ? <span>Insufficient Funds</span> : <span>Settle Location</span>}
+                    <MoneyIconTT/>
+                    <span className="font-bold">{cost}</span>
+                </div>
+            </Button>
         </div>
     )
 }

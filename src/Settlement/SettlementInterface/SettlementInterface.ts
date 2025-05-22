@@ -18,6 +18,7 @@ import { addGoods, empty_goodsdist, goodsdist, inverseGoodPercentages, multiplyG
 import { ensureNumber } from "../../utilities/SimpleFunctions";
 import { TerrainData, TerrainType } from "./TerrainInterface";
 import { RegimentInterface } from "../../Military/units/RegimentInterface";
+import { TradeDealInterface } from "../../Economics/Trade/interface/TradeDealInterface";
 export enum SettlementTier {
     Hamlet = 1,
     Village,
@@ -53,12 +54,16 @@ export interface SettlementInterface {
     price_history: goodsdist[]
     merchant_capacity: number;
 
-    months_stored: number;
     interest_rate: number;
     available_loan: number;
     loans: LoanInterface[];
 
     garrison: RegimentInterface[]
+    trade_deals: TradeDealInterface[];
+
+    global_id: string;
+    connections: [boolean,boolean,boolean,boolean]
+    isSource: [boolean,boolean,boolean,boolean]
 }
 
 
@@ -83,12 +88,15 @@ export const empty_settlement: SettlementInterface = {
     prices: {...initial_prices},
     price_history: [],
     merchant_capacity: 0,
-    months_stored: 1,
     interest_rate: 0.05,
     loans: [],
-    available_loan: 0,
+    available_loan: 2340,
     garrison: [],
     merchant_tax: 0,
+    trade_deals: [],
+    global_id: '',
+    connections: [true,true,true,true],
+    isSource: [true,true,true,true]
 }
 
 export const newSettlement = (name: string, terrain_type: TerrainType, visable_name?: string) => {
@@ -244,11 +252,10 @@ export const updateSettlmentStock = (settlement: SettlementInterface) => {
 export const popGrowth = (settlement: SettlementInterface, foreign_nations: ForeignPowerInterface[]) => {
     const K = settlement.projected_pop
     let P0 = 0
-    let bonus = 0.00007 * settlement.clans.filter(clan => clan.id === clanTypes.clerics)[0].taxed_productivity
     let gained_pg = 0
     settlement.clans.forEach(clan => {
-        P0 += clan.population
-        if(settlement.population_growth_bonus === clan.id) { gained_pg += (clan.total_productivity - clan.taxed_productivity) * 0.7 * bonus }
+        P0 += clan.population * (1 + clan.pop_growth_modifiers.reduce((sum,val) => sum + val.value,0))
+        if(settlement.population_growth_bonus === clan.id) { gained_pg += (clan.total_productivity - clan.taxed_productivity) * 0.7 * 1.2 }
         else { gained_pg += (clan.total_productivity - clan.taxed_productivity) * 0.7 }
     })
     gained_pg *= 0.7
@@ -281,13 +288,15 @@ export const settlementChange = (settlement: SettlementInterface): goodsdist => 
     }
     // Cost of Military
     change = subtractGoods(change,settlement.garrison.reduce((sum,val) => addGoods(sum,val.consumption_rate),{...empty_goodsdist}))
+
+    // Cost of Trade Deals
+    settlement.trade_deals.forEach(deal => {
+        if(deal.active === 'active') {
+            change = subtractGoods(change,deal.outgoing)
+            change = addGoods(change,deal.incoming)
+        }
+    })
     return change
-}
-
-export const monthsStored = (s: SettlementInterface): goodsdist => {
-    const change_per_turn = settlementChange(s)
-
-    return scaleGoods(MonthsStoreGetChange(change_per_turn),s.months_stored)
 }
 
 export const MonthsStoreGetChange = (g: goodsdist): goodsdist => {

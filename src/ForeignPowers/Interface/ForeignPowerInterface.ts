@@ -1,4 +1,5 @@
 import { initial_prices } from "../../Economics/pricing/prices";
+import { TradeDealInterface } from "../../Economics/Trade/interface/TradeDealInterface";
 import { EconomyTypeData, EconomyTypes } from "../../Goods/EconomyTypes";
 import { goodsdist, scaleGoods } from "../../Goods/GoodsDist";
 
@@ -47,7 +48,6 @@ export interface ForeignPowerInterface {
     relations: number;
     recognition: ForeignRecognition;
     isEmbargoed: boolean;
-    tarriffs: number;
     dwarfPopulation: number;
     immigrationRate: number;
     combatantStatus: CombatantStatus;
@@ -60,8 +60,13 @@ export interface ForeignPowerInterface {
     prices: goodsdist;
     available_supply: goodsdist;
     available_demand: goodsdist;
-    retlaitory_tariffs: number;
-    price_history: goodsdist[]
+    price_history: goodsdist[];
+    trade_deals: TradeDealInterface[];
+    global_id: string;
+    connections: [boolean,boolean,boolean,boolean];
+    isSource: [boolean,boolean,boolean,boolean];
+    market_access: number; // What percentage of the market is available to interact with for the player
+    diplomat_sent: boolean;
 }
 
 export const newForeignPower = (name: string, dwarfPopulation: number,economy: EconomyTypes,start_factor: number): ForeignPowerInterface => {
@@ -72,7 +77,6 @@ export const newForeignPower = (name: string, dwarfPopulation: number,economy: E
         relations: 0,
         recognition: ForeignRecognition.None,
         isEmbargoed: true,
-        tarriffs: 0,
         dwarfPopulation: dwarfPopulation,
         immigrationRate: 0,
         combatantStatus: CombatantStatus.Neutral,
@@ -85,8 +89,13 @@ export const newForeignPower = (name: string, dwarfPopulation: number,economy: E
         prices: {...initial_prices},
         available_supply: scaleGoods({ money: 1, ...EconomyTypeData[economy].demand }, pop_scaling_factor * availability_factor),
         available_demand: scaleGoods({ money: 1, ...EconomyTypeData[economy].demand }, pop_scaling_factor * availability_factor),
-        retlaitory_tariffs: 0,
-        price_history: []
+        price_history: [],
+        trade_deals: [],
+        global_id: '',
+        connections: [true,true,true,true],
+        isSource: [false,false,false,false],
+        market_access: availability_factor,
+        diplomat_sent: false
     })
 }
 
@@ -104,10 +113,37 @@ export const TerraKontor = newForeignPower("Terra Kontor", 0.03,EconomyTypes.Mar
 
 export const Eidgenossenkhazaden: ForeignPowerInterface = {
     ...newForeignPower("Eidgenossenkhazaden", 0.25,EconomyTypes.Dwarven,5),
-    relations: 2,
+    relations: 40,
     recognition: ForeignRecognition.Limited,
     isEmbargoed: false,
     immigrationRate: 0.10,
     allianceStatus: AllianceStatus.Neutral,
     militaryAccess: MilitaryAccess.Limited
 };
+
+export const getForeignPower = (name: string): ForeignPowerInterface => {
+    switch(name){
+        case "Baetanuesa":
+            return newForeignPower("Baetanuesa", 0.11,EconomyTypes.Colonial,2.5)
+        case "Beznesti":
+            return newForeignPower("Beznesti", 0,EconomyTypes.Colonial,2)
+        case "Dragonsbane":
+            return newForeignPower("Dragonsbane", 0.08,EconomyTypes.Balanced,5)
+        case "Garozemle":
+            return newForeignPower("Garozemle", 0.05,EconomyTypes.Aristocratic,6)
+        case "Kayasahr":
+            return newForeignPower("Kayasahr", 0.05,EconomyTypes.SilkRoad,2)
+        case "Pactusallamanni":
+            return newForeignPower("Pactusallamanni", 0.2,EconomyTypes.Balanced,2)
+        case "Polabtheli":
+            return newForeignPower("Polabtheli", 0,EconomyTypes.Elven,2)
+        case "Saemark":
+            return newForeignPower("Saemark", 0.2,EconomyTypes.Seaborne,7)
+        case "Sledzianska":
+            return newForeignPower("Sledzianska", 0.04,EconomyTypes.Agricultural,3)
+        case "TerraKontor":
+            return newForeignPower("Terra Kontor", 0.03,EconomyTypes.Martial,2.5)
+        default:
+            return newForeignPower("Unknown", 0,EconomyTypes.Colonial,2)
+    }
+}

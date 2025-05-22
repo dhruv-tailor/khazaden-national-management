@@ -58,9 +58,6 @@ export default function PopConversion({clans, updateFunc}: {clans: ClanInterface
 
     const handleConversion = () => {
         if (!sourceClan || !targetClan || amount <= 0) return;
-        
-        // Here you would implement the actual conversion logic
-        console.log(`Converting ${amount} from ${sourceClan.name} to ${targetClan.name}`);
         updateFunc(sourceClan.name, targetClan.name, amount, calculatedCost);
     };
 

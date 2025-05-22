@@ -1,24 +1,37 @@
-v0.1.1 plans
+v0.2.0 plans
 -------------------
+Automated Trade deals - ✅
+world map - ✅
+rework new settlement feature - ✅
+Random Events - In Progress
+Ability to Conduct Simple Diplomacy - ✅
 
-Features
----------------
-break down production quota into all components ✅
-pull out merchant capacity tax ✅
-
-QOL/ UI
-------
-See good surplus/deficit in buy/sell screen ✅
-UI in Federal Economy screen matches the UI in the settlement economy screen ✅
-Removed the need to constantly scroll up and down in the settlement screen going 'wait how many tools do I need to produce?' ✅
-
-Bugs
+wip
 ----------
-Finance not Finiance ✅
-Artisanal not Artisinal ✅
-Tools larping as Timber ✅
-Money not being rounded properly ✅
-foreign nations will no longer escalate a trade war that you de-escalted (even though you started it) ✅
-Farmers are illiterate as intended ✅
-Magic Runes are not required to guard wheat anymore ✅
-Prevented The Eid from refusing to buy crystal balls because it's cheaper by 0.0001 FP somewhere else ✅
+
+completed
+---------
+add trade screen for settlements
+delete sell and buy components
+remove buy and sell options from federal economy tab
+remove months stored
+retaliatory not retailitory
+ability to accept trade deals
+add trade screen for federal
+take into account trade for change
+process trade on next turn
+add random market movement to goods
+remove tariffs
+refactor federal stuff into one objects
+Settlement Node
+Federal Node
+Empty land Node
+increase cost of exploration
+Discover New Foreign Nation
+Notification for unused production
+Added nov 731 Start
+Market Access Variable for Foreign Nations
+create road between existing nodes
+Settle on Empty Land
+change foreign nation opinion scale from -5 <-> 5 to -100 <-> 100
+Notification for pending deals

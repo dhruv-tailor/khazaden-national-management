@@ -8,6 +8,8 @@ import { saveLocation } from "../../utilities/SaveData";
 import ArmyView from "./ArmyView";
 import { SettlementInterface } from "../../Settlement/SettlementInterface/SettlementInterface";
 import { RegimentInterface } from "../units/RegimentInterface";
+import { FederalInterface } from "../../utilities/FederalInterface";
+import { empty_federal_interface } from "../../utilities/FederalInterface";
 
 export default function FederalMilitary() {
     const gameId = useParams().game
@@ -18,8 +20,9 @@ export default function FederalMilitary() {
 
     const loadData = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
-        store.get<ArmyInterface[]>('armies').then(value => {if (value) {setArmies(value)}});
-        store.get<SettlementInterface[]>('settlements').then(value => {if (value) {setSettlements(value)}});
+        const federal = await store.get<FederalInterface>('Federal') ?? {...empty_federal_interface};
+        setArmies([...federal.armies])
+        setSettlements([...federal.settlements])
     }
 
     useEffect(() => {
@@ -33,8 +36,9 @@ export default function FederalMilitary() {
 
     const saveData = async () => {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
-        store.set('armies', armies)
-        store.set('settlements', settlements)
+        const federal = await store.get<FederalInterface>('Federal') ?? {...empty_federal_interface};
+        store.set('Federal',{...federal,armies: armies,settlements: settlements})
+        store.save()
     }
 
     const newArmy = () => {

@@ -46,7 +46,7 @@ export const newCriminals = () => {
         enchanted_arms: 0,
         charcoal: 0
     }
-    clan.loyalty_modifiers = [{name: 'Rage Against the Machine', value: -3}]
+    clan.loyalty_modifiers = [{name: 'Rage Against the Machine', value: -3,duration: Infinity}]
     clan.productivity_rate = 1
     return clan;
 }
