@@ -16,7 +16,8 @@ export interface FederalInterface {
     loans: LoanInterface[],
     armies: ArmyInterface[],
     trade_deals: TradeDealInterface[],
-    random_events: number[]
+    random_events: number[],
+    available_diplomats: number
 }
 
 export const empty_federal_interface: FederalInterface = {
@@ -29,5 +30,6 @@ export const empty_federal_interface: FederalInterface = {
     loans: [],
     armies: [],
     trade_deals: [],
-    random_events: []
+    random_events: [],
+    available_diplomats: 1
 }

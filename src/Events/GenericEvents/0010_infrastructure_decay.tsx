@@ -55,10 +55,12 @@ export default function g0010_infrastructure_decay({federal,updateFunc}: {federa
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <DevelopmentIconTT/>
+                            {Math.round(rand_clan.development)}
                             <PlusMinus value={-Math.round(calcDevelopment(rand_clan,rand_settlement) * 12)}/>
                         </div>
                         <div className="flex flex-row gap-2">
                             <EfficencyIconTT/>
+                            {Math.round(rand_clan.efficency)}
                             <PlusMinus value={-1}/>
                             For {rand_clan.name} in {rand_settlement.name} one year
                         </div>
@@ -70,14 +72,17 @@ export default function g0010_infrastructure_decay({federal,updateFunc}: {federa
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <TimberIconTT/>
+                            {Math.round(rand_settlement.stock.timber)}
                             <PlusMinus value={-(rand_clan.population * 12)}/>
                         </div>
                         <div className="flex flex-row gap-2">
                             <ToolsIconTT/>
+                            {Math.round(rand_settlement.stock.tools)}
                             <PlusMinus value={-(rand_clan.population * 12)}/>
                         </div>
                         <div className="flex flex-row gap-2">
                             <MoneyIconTT/>
+                            {Math.round(rand_settlement.stock.money)}
                             <PlusMinus value={-Math.round((rand_settlement.prices.timber + rand_settlement.prices.tools) * (rand_clan.population * 12))}/>
                         </div>
                     </div>

@@ -3,10 +3,9 @@ import { Handle, Position } from "@xyflow/react";
 import { Card } from 'primereact/card';
 import { Tag } from 'primereact/tag';
 import { TerrainData, TerrainType } from "../../Settlement/SettlementInterface/TerrainInterface";
-import { OverlayPanel } from 'primereact/overlaypanel';
 import { Button } from 'primereact/button';
 import { Badge } from 'primereact/badge';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { goodsdist, roundGoods, totalGoods } from "../../Goods/GoodsDist";
 import DisplayGoods from "../../components/goodsDislay";
 import { Dialog } from "primereact/dialog";
@@ -16,6 +15,7 @@ import { FaMapMarkedAlt } from "react-icons/fa";
 import { GiMountainCave, GiPineTree, GiMagicSwirl, GiWheat, GiFactory } from "react-icons/gi";
 import { Tooltip } from 'primereact/tooltip';
 import { clanTypes } from "../../Clans/ClanInterface/ClanInterface";
+import { ProgressBar } from 'primereact/progressbar';
 
 type SettlementNodeData = {
     settlement: SettlementInterface;
@@ -62,8 +62,6 @@ export default function SettlementNode({data}: {data: SettlementNodeData}) {
     const { settlement } = data;
     const totalPopulation = settlement.clans.reduce((sum, clan) => sum + clan.population, 0);
     const populationPercentage = Math.round((totalPopulation / settlement.pop_cap) * 100);
-    const op = useRef<OverlayPanel>(null);
-
     const [showTaxation, setShowTaxation] = useState(false);
 
     const setTaxation = (taxation: goodsdist) => data.updateTaxation(settlement.name,taxation);
@@ -90,6 +88,8 @@ export default function SettlementNode({data}: {data: SettlementNodeData}) {
             {settlement.connections[3] && <Handle type={settlement.isSource[3] ? "source" : "target"} position={Position.Right} id='right' />}
             
             <Card 
+                style={{ maxWidth: '420px', minWidth: '320px', margin: '0 auto' }}
+                className="settlement-card"
                 title={
                     <div className="flex gap-2 align-items-center justify-content-between">
                         <span className="text-xl font-bold">{settlement.visible_name}</span>
@@ -106,21 +106,24 @@ export default function SettlementNode({data}: {data: SettlementNodeData}) {
                     </div>
                 }
             >
-                <div className="flex flex-column gap-3">
-                    <div className="flex flex-column gap-1">
-                        <div className="flex align-items-center gap-2">
-                            <i className="pi pi-users text-500"></i>
-                            <span className="text-sm font-medium">Population</span>
-                        </div>
-                        <div className="flex align-items-center justify-content-between">
-                            <span className="text-sm">{totalPopulation.toLocaleString()} / {settlement.pop_cap.toLocaleString()}</span>
-                            <span className="text-sm text-500">{populationPercentage}%</span>
-                        </div>
+                <div className="flex flex-column gap-2">
+                    <div className="section-header">
+                        <i className="pi pi-users text-primary"></i>
+                        Population
                     </div>
+                    <div className="population-label">
+                        {totalPopulation} / {settlement.pop_cap}
+                    </div>
+                    <ProgressBar 
+                        value={populationPercentage} 
+                        showValue={false}
+                        className="population-bar"
+                        color={populationPercentage > 90 ? 'var(--red-500)' : populationPercentage > 70 ? 'var(--orange-500)' : 'var(--primary-color)'}
+                    />
 
-                    <div className="flex gap-2">
-                    <Tag severity={getTerrainSeverity(settlement.terrain_type)}>
-                        <span className="mr-2">{getTerrainIcon(settlement.terrain_type)}</span>
+                    <div className="flex flex-wrap gap-1 mb-1">
+                        <Tag severity={getTerrainSeverity(settlement.terrain_type)}>
+                            <span className="mr-2">{getTerrainIcon(settlement.terrain_type)}</span>
                             {TerrainData[settlement.terrain_type].name}
                         </Tag>
                         <Tag 
@@ -129,15 +132,37 @@ export default function SettlementNode({data}: {data: SettlementNodeData}) {
                         />
                     </div>
 
-                    <div className="flex gap-2 justify-content-end">
+                    <div className="divider" />
+
+                    <div className="section-header">
+                        <i className="pi pi-box text-primary"></i>
+                        Goods
+                    </div>
+                    <div className="compact-goods">
+                        <DisplayGoods 
+                            stock={roundGoods(settlement.stock)} 
+                            change={roundGoods(settlementChange(settlement))} 
+                        />
+                    </div>
+
+                    <div className="flex gap-1 justify-content-end mt-1">
                         <Button 
-                            icon="pi pi-info-circle" 
+                            icon="pi pi-money-bill" 
                             rounded 
                             text 
-                            onClick={(e) => op.current?.toggle(e)}
-                            aria-label="View Details"
-                            className="p-button-info"
-                            label="Details"
+                            label="Taxation"
+                            aria-label="Taxation"
+                            className="p-button-primary"
+                            onClick={()=>setShowTaxation(true)}
+                        />
+                        <Button 
+                            icon="pi pi-box" 
+                            rounded 
+                            text 
+                            label="Stimulus"
+                            aria-label="Stimulus"
+                            className="p-button-help"
+                            onClick={()=>data.stimulus(settlement.name)}
                         />
                         <Button 
                             icon="pi pi-arrow-right" 
@@ -151,33 +176,6 @@ export default function SettlementNode({data}: {data: SettlementNodeData}) {
                     </div>
                 </div>
             </Card>
-
-            <OverlayPanel ref={op} className="w-25rem" showCloseIcon>
-                <DisplayGoods 
-                    stock={roundGoods(settlement.stock)} 
-                    change={roundGoods(settlementChange(settlement))} 
-                />
-                <div className="flex gap-2 justify-content-end mt-3">
-                    <Button 
-                        icon="pi pi-money-bill" 
-                        rounded 
-                        text 
-                        label="Taxation"
-                        aria-label="Taxation"
-                        className="p-button-primary"
-                        onClick={()=>setShowTaxation(true)}
-                    />
-                    <Button 
-                        icon="pi pi-box" 
-                        rounded 
-                        text 
-                        label="Stimulus"
-                        aria-label="Stimulus"
-                        className="p-button-help"
-                        onClick={()=>data.stimulus(settlement.name)}
-                    />
-                </div>
-            </OverlayPanel>
 
             <Dialog 
                 header="Taxation" 

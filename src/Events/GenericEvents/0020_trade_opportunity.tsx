@@ -37,18 +37,22 @@ export default function g0020_trade_opportunity({federal, updateFunc}: {federal:
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <EnchantedArmsIconTT/>
+                            {Math.round(rand_settlement.stock.enchanted_arms)}
                             <PlusMinus value={Math.round(12 * rand_clan.population)}/>
                         </div>
                         <div className="flex flex-row gap-2">
                             <EnchantedIconTT/>
+                            {Math.round(rand_settlement.stock.enchanted)}
                             <PlusMinus value={Math.round(12 * rand_clan.population)}/>
                         </div>
                         <div className="flex flex-row gap-2">
                             <BooksIconTT/>
+                            {Math.round(rand_settlement.stock.books)}
                             <PlusMinus value={-Math.round(12 * rand_clan.population)}/>
                         </div>
                         <div className="flex flex-row gap-2">
                             <GemsIconTT/>
+                            {Math.round(rand_settlement.stock.gems)}
                             <PlusMinus value={-Math.round(12 * rand_clan.population)}/>
                         </div>
                     </div>

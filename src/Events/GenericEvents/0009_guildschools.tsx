@@ -39,6 +39,7 @@ export default function g0009_guildschools({federal,updateFunc}: {federal: Feder
                         <p>The people of {rand_clan.name} in {rand_settlement.name} will have a productivity boost for one year.</p>
                         <div className="flex flex-row gap-2">
                             <DevelopmentIconTT/>
+                            {Math.round(rand_clan.development)}
                             <PlusMinus value={Math.round(calcDevelopment(rand_clan,rand_settlement) * 12)}/>
                         </div>
                     </div>

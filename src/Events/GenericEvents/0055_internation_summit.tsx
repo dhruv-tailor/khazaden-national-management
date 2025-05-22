@@ -23,6 +23,7 @@ export default function g0055_international_summit({federal, updateFunc}: {feder
                         <p>Relations with all foreign powers will increase by <PlusMinus value={5} /></p>
                         <div className="flex flex-row gap-2">
                             <BooksIconTT />
+                            {federal.reserve.books}
                             <PlusMinus value={-federal.foreign_powers.length * 5} />
                         </div>
                     </div>

@@ -29,6 +29,7 @@ export default function g0019_masterpiece_created({federal,updateFunc}: {federal
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <MoneyIconTT/>
+                            {Math.round(rand_settlement.stock.money)}
                             <PlusMinus value={Math.round(rand_settlement.prices.artisanal * 12 * rand_clan.population)}/>
                         </div>
                     </div>

@@ -37,10 +37,11 @@ export default function g0003_tax_revolt({federal,updateFunc}: {federal: Federal
                     title: "I'll consider it",
                     effect: doNothing,
                     tooltip: <div className="flex flex-column">
-                        <p>The people of ${rand_clan.name} in ${rand_settlement.name} will be unhappy for one year.</p>
+                        <p>The people of {rand_clan.name} in {rand_settlement.name} will be unhappy for one year.</p>
                         <div className="flex flex-row gap-2">
-                            <PlusMinus value={-1}/>
                             <LoyaltyIconTT/>
+                            {Math.round(rand_clan.loyalty)}
+                            <PlusMinus value={-1}/>
                         </div>
                     </div>
                 }

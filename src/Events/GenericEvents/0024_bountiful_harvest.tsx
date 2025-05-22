@@ -33,10 +33,12 @@ export default function g0024_bountiful_harvest({federal, updateFunc}: {federal:
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <FoodIconTT/>
+                            {Math.round(rand_settlement.stock.food)}
                             <PlusMinus value={Math.round(12 * rand_clan.population)}/>
                         </div>
                         <div className="flex flex-row gap-2">
                             <LivestockIconTT/>
+                            {Math.round(rand_settlement.stock.livestock)}
                             <PlusMinus value={Math.round(12 * rand_clan.population)}/>
                         </div>
                     </div>

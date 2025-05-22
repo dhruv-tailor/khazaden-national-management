@@ -34,11 +34,14 @@ export default function g0031_oversupply({federal, updateFunc}: {federal: Federa
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <ToolsIconTT/>
+                            {Math.round(rand_settlement.stock.tools)}
                             <PlusMinus value={Math.round(12 * rand_clan.population)}/>
                         </div>
                         <div className="flex flex-row gap-2">
-                            <ToolsIconTT/>
-                            Prices decrease by 20%
+                            <ToolsIconTT/> 
+                            <span>Prices</span>
+                            {Math.round(rand_settlement.prices.tools)}
+                            <PlusMinus value={Math.round(rand_settlement.prices.tools * 0.2)}/>
                         </div>
                     </div>
                 }

@@ -33,7 +33,7 @@ export default function g0005_high_productivity({federal,updateFunc}: {federal: 
                     title: 'Great News!',
                     effect: doNothing,
                     tooltip: <div className="flex flex-column">
-                        <p>The productivity of ${rand_clan.name} in ${rand_settlement.name} is high.</p>
+                        <p>The productivity of {rand_clan.name} in {rand_settlement.name} is high.</p>
                         <div className="flex flex-row gap-2">
                             <PlusMinus value={1}/>
                             Productivity Rate for {rand_clan.name} in {rand_settlement.name} for one year

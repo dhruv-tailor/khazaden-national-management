@@ -348,9 +348,9 @@ export default function TradeDealView(
                             <span className="font-semibold">Outgoing:</span>
                             <div className="flex align-items-center gap-1">
                                 <MoneyIconTT />
-                                <span>{selectedGoods
+                                <span>{Math.round(selectedGoods
                                     .filter(good => good.isOutgoing)
-                                    .reduce((sum, good) => sum + (good.amount * good.price), 0)
+                                    .reduce((sum, good) => sum + (good.amount * good.price), 0))
                                 }</span>
                             </div>
                         </div>
@@ -358,9 +358,9 @@ export default function TradeDealView(
                             <span className="font-semibold">Incoming:</span>
                             <div className="flex align-items-center gap-1">
                                 <MoneyIconTT />
-                                <span>{Math.round(selectedGoods
+                                <span>{Math.round(Math.round(selectedGoods
                                     .filter(good => !good.isOutgoing)
-                                    .reduce((sum, good) => sum + (good.amount * good.price), 0))
+                                    .reduce((sum, good) => sum + (good.amount * good.price), 0)))
                                 }</span>
                             </div>
                         </div>

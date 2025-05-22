@@ -35,11 +35,14 @@ export default function g0039_runic_storm({federal, updateFunc}: {federal: Feder
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <RunesIconTT/>
+                            {Math.round(rand_settlement.stock.runes)}
                             <PlusMinus value={Math.round(12 * rand_clan.population)}/>
                         </div>
                         <div className="flex flex-row gap-2"> 
-                            <EnchantedIconTT/>
-                            Prices increase by 20%
+                            <EnchantedIconTT/> 
+                            <span>Prices</span>
+                            {Math.round(rand_settlement.prices.enchanted)}
+                            <PlusMinus value={Math.round(rand_settlement.prices.enchanted * 0.2)}/>
                         </div>
                     </div>
                 }

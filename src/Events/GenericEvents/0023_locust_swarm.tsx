@@ -42,6 +42,7 @@ export default function g0023_locust_swarm({federal, updateFunc}: {federal: Fede
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <FoodIconTT/>
+                            {Math.round(rand_settlement.stock.food)}
                             <PlusMinus value={Math.round(24 * rand_clan.population)}/>
                         </div>
                     </div>
@@ -52,10 +53,12 @@ export default function g0023_locust_swarm({federal, updateFunc}: {federal: Fede
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <CharcoalIconTT/>
+                            {Math.round(rand_settlement.stock.charcoal)}
                             <PlusMinus value={Math.round(12 * rand_clan.population)}/>
                         </div>
                         <div className="flex flex-row gap-2">
                             <RunesIconTT/>
+                            {Math.round(rand_settlement.stock.runes)}
                             <PlusMinus value={Math.round(12 * rand_clan.population)}/>
                         </div>
                     </div>

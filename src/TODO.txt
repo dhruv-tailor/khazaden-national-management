@@ -4,7 +4,7 @@ Automated Trade deals - ✅
 world map - ✅
 rework new settlement feature - ✅
 Random Events - In Progress
-Ability to Conduct Simple Diplomacy
+Ability to Conduct Simple Diplomacy - ✅
 
 wip
 ----------
@@ -29,14 +29,9 @@ Empty land Node
 increase cost of exploration
 Discover New Foreign Nation
 Notification for unused production
-Added Jan 730 Start
+Added nov 731 Start
 Market Access Variable for Foreign Nations
 create road between existing nodes
 Settle on Empty Land
 change foreign nation opinion scale from -5 <-> 5 to -100 <-> 100
 Notification for pending deals
-
-
-Future Features
----------------------
-Random Empire generation

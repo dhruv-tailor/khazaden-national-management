@@ -118,7 +118,7 @@ export const createNewSave = async (saveName: string, spawnRate: number = 0.48, 
     store.set('Connection Spawn Rate', connectionSpawnRate) // The Chance that a connection will spawn when exploring
     store.set('Map Info',{...empty_map_info,
         nodes: [
-            { id: `s${0}`, position: {x: 370, y: 80} },
+            { id: `s${0}`, position: {x: 230, y: -10} },
             { id: `f${1}`, position: {x: 790, y: 40} }
         ],
         edges: [
@@ -174,7 +174,7 @@ export const createCustomSave = async (saveName: string, custom_resources: goods
     store.set('Connection Spawn Rate', connectionSpawnRate) // The Chance that a connection will spawn when exploring
     store.set('Map Info',{...empty_map_info,
         nodes: [
-            { id: `s${0}`, position: {x: 370, y: 80} },
+            { id: `s${0}`, position: {x: 230, y: -10} },
             { id: `f${1}`, position: {x: 790, y: 40} }
         ],
         edges: [
@@ -274,7 +274,7 @@ export const createJan728Save = async (saveName: string, spawnRate: number = 0.4
     store.set('Connection Spawn Rate', connectionSpawnRate) // The Chance that a connection will spawn when exploring
     store.set('Map Info',{...empty_map_info,
         nodes: [
-            { id: `s${0}`, position: {x: 370, y: 80} },
+            { id: `s${0}`, position: {x: 230, y: -10} },
             { id: `f${1}`, position: {x: 790, y: 40} }
         ],
         edges: [
@@ -378,7 +378,7 @@ export const createJul728Save = async (saveName: string, spawnRate: number = 0.4
     store.set('Connection Spawn Rate', connectionSpawnRate) // The Chance that a connection will spawn when exploring
     store.set('Map Info',{...empty_map_info,
         nodes: [
-            { id: `s${0}`, position: {x: 370, y: 80} },
+            { id: `s${0}`, position: {x: 230, y: -10} },
             { id: `f${1}`, position: {x: 790, y: 40} }
         ],
         edges: [
@@ -485,7 +485,7 @@ export const createJan729Save = async (saveName: string, spawnRate: number = 0.4
     store.set('Connection Spawn Rate', connectionSpawnRate) // The Chance that a connection will spawn when exploring
     store.set('Map Info',{...empty_map_info,
         nodes: [
-            { id: `s${0}`, position: {x: 370, y: 80} },
+            { id: `s${0}`, position: {x: 230, y: -10} },
             { id: `f${1}`, position: {x: 790, y: 40} }
         ],
         edges: [
@@ -496,7 +496,7 @@ export const createJan729Save = async (saveName: string, spawnRate: number = 0.4
     store.close();
 }
 
-export const createJan730Save = async (saveName: string, spawnRate: number = 0.48, connectionSpawnRate: number = 0.47) => {
+export const createNov731Save = async (saveName: string, spawnRate: number = 0.48, connectionSpawnRate: number = 0.47) => {
     const savegame_folder = await savegameFolder();
     const saveFile = `${savegame_folder}${fileSeperator()}${saveName}.json`;
     new LazyStore(saveFile,{autoSave: false}); 
@@ -508,56 +508,64 @@ export const createJan730Save = async (saveName: string, spawnRate: number = 0.4
 
 
     initial_settlement.clans.forEach(clan => {
-        if(clan.id === clanTypes.runeSmiths) {
+        if(clan.id === clanTypes.rulers) {
+            clan.population = 2
+            clan.tax_rate = 0.75
+            clan.development = 846
+        }
+        else if(clan.id === clanTypes.runeSmiths) {
             clan.population = 1
-            clan.development = 173
+            clan.tax_rate = 0.75
+            clan.development = 390
         }
         else if(clan.id === clanTypes.craftsmen) {
-            clan.tax_rate = 0.4
-            clan.development = 704
+            clan.tax_rate = 0.6
+            clan.development = 783
             clan.population = 1
         }
         else if(clan.id === clanTypes.merchants) {
-            clan.tax_rate = 0.75
-            clan.development = 542
+            clan.tax_rate = 0.6
+            clan.development = 1162
             clan.population = 3
         }
         else if(clan.id === clanTypes.clerics) {
             clan.population = 1
-            clan.development = 185
+            clan.tax_rate = 0.75
+            clan.development = 277
         }
         else if(clan.id === clanTypes.miners) {
-            clan.development = 1168
+            clan.development = 1694
             clan.population = 2
         }
         else if(clan.id === clanTypes.farmers) {
             clan.tax_rate = 0.4
-            clan.development = 1720
-            clan.population = 6
+            clan.development = 2321
+            clan.population = 7
         }
     })
 
-    initial_settlement.development_growth_bonus = clanTypes.miners
+    initial_settlement.development_growth_bonus = clanTypes.craftsmen
     initial_settlement.population_growth_bonus = clanTypes.farmers
+    initial_settlement.efficency_bonus = clanTypes.miners
 
     initial_settlement.stock = {
-        money: -2758,
-        food: 206,
-        beer: 191,
-        leather: 183,
-        artisanal: 154,
-        livestock: 34,
-        ornamental: 72,
+        money: 440,
+        food: 36,
+        beer: 4,
+        leather: 1,
+        artisanal: 0,
+        livestock: 0,
+        ornamental: 0,
         enchanted: 0,
-        timber: 116,
-        tools: 133,
-        common_ores: 772,
-        medical: 25,
-        rare_ores: 80,
+        timber: 368,
+        tools: 1,
+        common_ores: 1,
+        medical: 0,
+        rare_ores: 5,
         gems: 0,
-        runes: 11,
-        arms: 25,
-        books: 12,
+        runes: 0,
+        arms: 0,
+        books: 0,
         enchanted_arms: 0,
         charcoal: 0
     }
@@ -587,13 +595,13 @@ export const createJan730Save = async (saveName: string, spawnRate: number = 0.4
     store.set('Osc Months Passed',0) // How Many months into the economy are we
     store.set('Market Trajectory', 0.0002) // The Veleocity of the market
     store.set('Turns Passed',0) // Turns since game start
-    store.set('Current Year',730) // Current Year
-    store.set('Current Month',1) // Current Month
+    store.set('Current Year',731) // Current Year
+    store.set('Current Month',11) // Current Month
     store.set('Foreign Spawn Rate', spawnRate) // The Chance that a foreign power will spawn when exploring
     store.set('Connection Spawn Rate', connectionSpawnRate) // The Chance that a connection will spawn when exploring
     store.set('Map Info',{...empty_map_info,
         nodes: [
-            { id: `s${0}`, position: {x: 370, y: 80} },
+            { id: `s${0}`, position: {x: 230, y: -10} },
             { id: `f${1}`, position: {x: 790, y: 40} }
         ],
         edges: [

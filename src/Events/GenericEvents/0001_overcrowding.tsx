@@ -78,16 +78,19 @@ export default function g0001_overcrowding({federal,updateFunc}: {federal: Feder
                     effect: buildTemporaryHousing,
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
-                            <PlusMinus value={-overcrowding}/>
                             <ToolsIconTT/>
-                        </div>
-                        <div className="flex flex-row gap-2">
+                            {Math.round(settlement.stock.tools)}
                             <PlusMinus value={-overcrowding}/>
-                            <TimberIconTT/>
                         </div>
                         <div className="flex flex-row gap-2">
-                            <PlusMinus value={-Math.round((settlement.prices.tools + settlement.prices.timber) * overcrowding)}/>
+                            <TimberIconTT/>
+                            {Math.round(settlement.stock.timber)}
+                            <PlusMinus value={-overcrowding}/>
+                        </div>
+                        <div className="flex flex-row gap-2">
                             <MoneyIconTT/>
+                            {Math.round(settlement.stock.money)}
+                            <PlusMinus value={-Math.round((settlement.prices.tools + settlement.prices.timber) * overcrowding)}/>
                         </div>
                     </div>
                 }

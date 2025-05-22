@@ -56,10 +56,12 @@ export default function g0016_disease({federal,updateFunc}: {federal: FederalInt
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <MedicalIconTT/>
+                            {Math.round(rand_settlement.stock.medical)}
                             <PlusMinus value={-(rand_clan.population * 12)}/>
                         </div>
                         <div className="flex flex-row gap-2">
                             <BooksIconTT/>
+                            {Math.round(rand_settlement.stock.books)}
                             <PlusMinus value={-(rand_clan.population * 12)}/>
                         </div>
                     </div>

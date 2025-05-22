@@ -35,11 +35,14 @@ export default function g0033_counterfeit_runes({federal, updateFunc}: {federal:
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <RunesIconTT/>
+                            {Math.round(rand_settlement.stock.runes)}
                             <PlusMinus value={-Math.round(12 * rand_clan.population)}/>
                         </div>
                         <div className="flex flex-row gap-2">
-                            <RunesIconTT/>
-                            Prices increase by 20%
+                            <RunesIconTT/> 
+                            <span>Prices</span>
+                            {Math.round(rand_settlement.prices.runes)}
+                            <PlusMinus value={Math.round(rand_settlement.prices.runes * 0.2)}/>
                         </div>
                     </div>
                 }

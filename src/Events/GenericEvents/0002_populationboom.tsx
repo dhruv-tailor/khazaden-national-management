@@ -36,8 +36,9 @@ export default function g0002_populationboom({federal,updateFunc}: {federal: Fed
                     tooltip: <div className="flex flex-column">
                         <p>The population of ${rand_clan.name} in ${rand_settlement.name} is increasing at a faster rate for one year.</p>
                         <div className="flex flex-row gap-2">
-                            <PlusMinus value={-1}/>
                             <EfficencyIconTT/>
+                            {Math.round(rand_clan.efficency)}
+                            <PlusMinus value={-1}/>
                             For {rand_clan.name} in {rand_settlement.name} one year
                         </div>
                     </div>

@@ -1,3 +1,4 @@
+import PlusMinus from "../../components/PlusMinus"
 import ArtisanalIconTT from "../../tooltips/goods/ArtisanalIconTT"
 import OrnamentalIconTT from "../../tooltips/goods/OrnamentalIconTT"
 import { FederalInterface } from "../../utilities/FederalInterface"
@@ -30,12 +31,16 @@ export default function g0040_cultural_renaissance({federal, updateFunc}: {feder
                     effect: doNothing,
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
-                            <ArtisanalIconTT/>
-                            Prices increase by 20%
+                            <ArtisanalIconTT/> 
+                            <span>Prices</span>
+                            {Math.round(rand_settlement.prices.artisanal)}
+                            <PlusMinus value={Math.round(rand_settlement.prices.artisanal * 0.2)}/>
                         </div>
                         <div className="flex flex-row gap-2">
-                            <OrnamentalIconTT/>
-                            Prices increase by 20%
+                            <OrnamentalIconTT/> 
+                            <span>Prices</span>
+                            {Math.round(rand_settlement.prices.ornamental)}
+                            <PlusMinus value={Math.round(rand_settlement.prices.ornamental * 0.2)}/>
                         </div>
                     </div>
                 }

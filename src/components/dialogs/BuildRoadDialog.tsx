@@ -7,13 +7,15 @@ interface BuildRoadDialogProps {
     onHide: () => void;
     onConfirm: () => void;
     cost: number;
+    disabled?: boolean;
 }
 
 export default function BuildRoadDialog({ 
     visible, 
     onHide, 
     onConfirm,
-    cost 
+    cost,
+    disabled = false
 }: BuildRoadDialogProps) {
     return (
         <Dialog
@@ -45,6 +47,7 @@ export default function BuildRoadDialog({
                         icon="pi pi-check" 
                         onClick={onConfirm}
                         severity="success"
+                        disabled={disabled}
                     />
                 </div>
             </div>

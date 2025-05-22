@@ -34,11 +34,14 @@ export default function g0029_runic_fashion({federal, updateFunc}: {federal: Fed
                     effect: doNothing,
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
-                            <EnchantedIconTT/>
-                            Prices increase by 20%
+                            <EnchantedIconTT/> 
+                            <span>Prices</span>
+                            {Math.round(rand_settlement.prices.enchanted)}
+                            <PlusMinus value={Math.round(rand_settlement.prices.enchanted * 0.2)}/>
                         </div>
                         <div className="flex flex-row gap-2">
-                            <EnchantedArmsIconTT/>
+                            <EnchantedArmsIconTT/> 
+                            {Math.round(rand_settlement.stock.enchanted_arms)}
                             <PlusMinus value={Math.round(12 * rand_clan.population)}/>
                         </div>
                     </div>

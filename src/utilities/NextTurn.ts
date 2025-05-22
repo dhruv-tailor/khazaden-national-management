@@ -121,7 +121,8 @@ export const NextTurn = async (game: string) => {
         // Remove merchant capacity used by trade deals
         settlement.trade_deals.forEach(deal => {
             if(deal.active === 'active') {
-                settlement.merchant_capacity -= totalGoods(deal.outgoing) + totalGoods(deal.incoming)
+                settlement.merchant_capacity -= totalGoods(deal.outgoing) 
+                settlement.merchant_capacity -= totalGoods(deal.incoming)
             }
         })
 
@@ -234,6 +235,14 @@ export const NextTurn = async (game: string) => {
                 deal.duration -= 1
             }
         })
+
+        // Diplomat Sent
+        if (nation.diplomat_sent) {
+            nation.relations += 1
+        }
+
+        nation.relations = Math.max(nation.relations,-100)
+        nation.relations = Math.min(nation.relations,100)
     })
 
     // Calculate federal military expenses

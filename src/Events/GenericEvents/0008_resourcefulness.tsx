@@ -48,16 +48,19 @@ export default function g0008_resourcefulness({federal,updateFunc}: {federal: Fe
                     tooltip: <div className="flex flex-column">
                         <p>The people of {rand_clan.name} in {rand_settlement.name} will have a productivity boost for one year.</p>
                         <div className="flex flex-row gap-2">
-                            <PlusMinus value={-(rand_clan.population * 12)}/>
                             <BooksIconTT/>
-                        </div>
-                        <div className="flex flex-row gap-2">
+                            {Math.round(rand_settlement.stock.books)}
                             <PlusMinus value={-(rand_clan.population * 12)}/>
-                            <ToolsIconTT/>
                         </div>
                         <div className="flex flex-row gap-2">
-                            <PlusMinus value={-Math.round((rand_clan.population * 48) * (rand_settlement.prices.tools + rand_settlement.prices.books))}/>
+                            <ToolsIconTT/>
+                            {Math.round(rand_settlement.stock.tools)}
+                            <PlusMinus value={-(rand_clan.population * 12)}/>
+                        </div>
+                        <div className="flex flex-row gap-2">
                             <MoneyIconTT/>
+                            {Math.round(rand_settlement.stock.money)}
+                            <PlusMinus value={-Math.round((rand_clan.population * 48) * (rand_settlement.prices.tools + rand_settlement.prices.books))}/>
                         </div>
                     </div>
                 },

@@ -51,6 +51,7 @@ export default function g0018_structural_collapse({federal, updateFunc}: {federa
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <ToolsIconTT/>
+                            {Math.round(rand_settlement.stock.tools)}
                             <PlusMinus value={-(rand_clan.population * 12)}/>
                         </div>
                     </div>

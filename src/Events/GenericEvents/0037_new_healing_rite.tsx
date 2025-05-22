@@ -1,4 +1,5 @@
 import { clanTypes } from "../../Clans/ClanInterface/ClanInterface";
+import PlusMinus from "../../components/PlusMinus";
 import BooksIconTT from "../../tooltips/goods/BooksIconTT";
 import MedicalIconTT from "../../tooltips/goods/MedicalIconTT";
 import { FederalInterface } from "../../utilities/FederalInterface";
@@ -30,12 +31,14 @@ export default function g0037_new_healing_rite({federal, updateFunc}: {federal: 
                     effect: doNothing,
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
-                            <MedicalIconTT/>
-                            prices decrease by 20%
+                            <MedicalIconTT/> Prices
+                            {Math.round(rand_settlement.prices.medical)}
+                            <PlusMinus value={Math.round(rand_settlement.prices.medical * 0.2)}/>
                         </div>
                         <div className="flex flex-row gap-2">
-                            <BooksIconTT/>
-                            prices increase by 20%
+                            <BooksIconTT/> Prices
+                            {Math.round(rand_settlement.prices.books)}
+                            <PlusMinus value={Math.round(rand_settlement.prices.books * 0.2)}/>
                         </div>
                     </div>
                 }

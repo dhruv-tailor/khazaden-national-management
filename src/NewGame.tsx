@@ -2,7 +2,7 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { createCustomSave, createJan728Save, createJan729Save, createJan730Save, createJul728Save, createNewSave } from "./utilities/SaveData";
+import { createCustomSave, createJan728Save, createJan729Save, createJul728Save, createNewSave, createNov731Save } from "./utilities/SaveData";
 import { Card } from "primereact/card";
 import { Panel } from "primereact/panel";
 import { RadioButton } from "primereact/radiobutton";
@@ -34,7 +34,7 @@ function NewGame() {
     let navigate = useNavigate();
 
     const [saveName, setSaveName] = useState('');
-    const [gameType, setGameType] = useState<'standard' | 'custom' | 'Jan_728' | 'Jul_728' | 'Jan_729' | 'Jan_730'>('standard');
+    const [gameType, setGameType] = useState<'standard' | 'custom' | 'Jan_728' | 'Jul_728' | 'Jan_729' | 'Nov_731'>('standard');
     const [spawnRate, setSpawnRate] = useState(48); // Default spawn rate of 48%
     const [connectionSpawnRate, setConnectionSpawnRate] = useState(47); // Default connection spawn rate of 47%
     
@@ -93,8 +93,8 @@ function NewGame() {
             await createJul728Save(saveName, spawnRate / 100, connectionSpawnRate / 100);
         } else if (gameType === 'Jan_729') {
             await createJan729Save(saveName, spawnRate / 100, connectionSpawnRate / 100);
-        } else if (gameType === 'Jan_730') {
-            await createJan730Save(saveName, spawnRate / 100, connectionSpawnRate / 100);
+        } else if (gameType === 'Nov_731') {
+            await createNov731Save(saveName, spawnRate / 100, connectionSpawnRate / 100);
         }
         navigate(`/game/${saveName}`);
     };
@@ -219,11 +219,11 @@ function NewGame() {
                                         <RadioButton 
                                             inputId="scenario4" 
                                             name="gametype" 
-                                            value="Jan_730" 
+                                            value="Nov_731" 
                                             onChange={e => setGameType(e.value)} 
-                                            checked={gameType === 'Jan_730'}
+                                            checked={gameType === 'Nov_731'}
                                         />
-                                        <label htmlFor="scenario4" className="ml-2">Trojeryur 730</label>
+                                        <label htmlFor="scenario4" className="ml-2">Velnyur 731</label>
                                     </div>
                                 </div>
                             </div>

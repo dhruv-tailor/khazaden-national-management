@@ -24,8 +24,9 @@ export default function g0006_burnout({federal,updateFunc}: {federal: FederalInt
                     tooltip: <div className="flex flex-column">
                         <p>The people of {rand_clan.name} in {rand_settlement.name} will be burned out for one year.</p>
                         <div className="flex flex-row gap-2">
-                            <PlusMinus value={-1}/>
                             <EfficencyIconTT/>
+                            {Math.round(rand_clan.efficency)}
+                            <PlusMinus value={-1}/>
                         </div>
                     </div>
                 }

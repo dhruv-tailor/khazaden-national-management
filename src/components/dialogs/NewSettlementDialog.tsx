@@ -11,6 +11,7 @@ interface NewSettlementDialogProps {
     updateFunc: (s: SettlementInterface) => void;
     terrain: TerrainType;
     cost: number;
+    disabled?: boolean;
 }
 
 export default function NewSettlementDialog({ 
@@ -19,7 +20,8 @@ export default function NewSettlementDialog({
     max_resources, 
     updateFunc, 
     terrain, 
-    cost 
+    cost,
+    disabled = false
 }: NewSettlementDialogProps) {
     return (
         <Dialog
@@ -33,6 +35,7 @@ export default function NewSettlementDialog({
                 updateFunc={updateFunc}
                 terrain={terrain}
                 cost={cost}
+                disabled={disabled}
             />
         </Dialog>
     );

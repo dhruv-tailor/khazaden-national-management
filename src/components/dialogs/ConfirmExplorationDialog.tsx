@@ -7,13 +7,15 @@ interface ConfirmExplorationDialogProps {
     onHide: () => void;
     onConfirm: () => void;
     cost: number;
+    disabled?: boolean;
 }
 
 export default function ConfirmExplorationDialog({ 
     visible, 
     onHide, 
     onConfirm,
-    cost 
+    cost,
+    disabled = false
 }: ConfirmExplorationDialogProps) {
     return (
         <Dialog
@@ -45,6 +47,7 @@ export default function ConfirmExplorationDialog({
                         icon="pi pi-check" 
                         onClick={onConfirm}
                         severity="success"
+                        disabled={disabled}
                     />
                 </div>
             </div>

@@ -1,3 +1,4 @@
+import PlusMinus from "../../components/PlusMinus";
 import FoodIconTT from "../../tooltips/goods/FoodIconTT";
 import LivestockIconTT from "../../tooltips/goods/LivestockIconTT";
 import { FederalInterface } from "../../utilities/FederalInterface";
@@ -29,12 +30,16 @@ export default function g0036_drought_looms({federal, updateFunc}: {federal: Fed
                     effect: doNothing,
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
-                            <FoodIconTT/>
-                            prices increase by 20%
+                            <FoodIconTT/> 
+                            <span>Prices</span>
+                            {Math.round(rand_settlement.prices.food)}
+                            <PlusMinus value={Math.round(rand_settlement.prices.food * 0.2)}/>
                         </div>
                         <div className="flex flex-row gap-2">
-                            <LivestockIconTT/>
-                            prices increase by 20%
+                            <LivestockIconTT/> 
+                            <span>Prices</span>
+                            {Math.round(rand_settlement.prices.livestock)}
+                            <PlusMinus value={Math.round(rand_settlement.prices.livestock * 0.2)}/>
                         </div>
                     </div>
                 }

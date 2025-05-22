@@ -32,6 +32,7 @@ export default function g0027_crime_bust({federal, updateFunc}: {federal: Federa
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <EnchantedIconTT/>
+                            {Math.round(rand_settlement.stock.enchanted)}
                             <PlusMinus value={Math.round(12 * rand_clan.population)}/>
                         </div>
                     </div>

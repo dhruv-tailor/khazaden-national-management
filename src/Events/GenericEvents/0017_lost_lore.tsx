@@ -1,5 +1,6 @@
 import { clanTypes } from "../../Clans/ClanInterface/ClanInterface";
 import PlusMinus from "../../components/PlusMinus";
+import MoneyIconTT from "../../tooltips/goods/MoneyIconTT";
 import RunesIconTT from "../../tooltips/goods/RunesIconTT";
 import { FederalInterface } from "../../utilities/FederalInterface";
 import EventTemplate from "../EventTemplate";
@@ -44,6 +45,7 @@ export default function g0017_lost_lore({federal, updateFunc}: {federal: Federal
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <RunesIconTT/>
+                            {Math.round(rand_settlement.stock.runes)}
                             <PlusMinus value={rand_clan.population * 12}/>
                         </div>
                     </div>
@@ -53,7 +55,8 @@ export default function g0017_lost_lore({federal, updateFunc}: {federal: Federal
                     effect: sellRunes,
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
-                            <RunesIconTT/>
+                            <MoneyIconTT/>
+                            {Math.round(rand_settlement.stock.money)}
                             <PlusMinus value={Math.round(rand_clan.population * 12 * rand_settlement.prices.runes)}/>
                         </div>
                     </div>

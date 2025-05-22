@@ -1,3 +1,4 @@
+import PlusMinus from "../../components/PlusMinus";
 import ArmsIconTT from "../../tooltips/goods/ArmsIconTT";
 import CharcoalIconTT from "../../tooltips/goods/CharcoalIconTT";
 import ToolsIconTT from "../../tooltips/goods/ToolsIconTT";
@@ -32,16 +33,22 @@ export default function g0034_charcoal_shortage({federal, updateFunc}: {federal:
                     effect: doNothing,
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
-                            <CharcoalIconTT/>
-                            prices increase by 20%
+                            <CharcoalIconTT/> 
+                            <span>Prices</span>
+                            {Math.round(rand_settlement.prices.charcoal)}
+                            <PlusMinus value={Math.round(rand_settlement.prices.charcoal * 0.2)}/>
                         </div>
                         <div className="flex flex-row gap-2">
-                            <ToolsIconTT/>
-                            prices increase by 20%
+                            <ToolsIconTT/> 
+                            <span>Prices</span>
+                            {Math.round(rand_settlement.prices.tools)}
+                            <PlusMinus value={Math.round(rand_settlement.prices.tools * 0.2)}/>
                         </div>
                         <div className="flex flex-row gap-2">
-                            <ArmsIconTT/>
-                            prices increase by 20%
+                            <ArmsIconTT/> 
+                            <span>Prices</span>
+                            {Math.round(rand_settlement.prices.arms)}
+                            <PlusMinus value={Math.round(rand_settlement.prices.arms * 0.2)}/>
                         </div>
                     </div>
                 }

@@ -140,6 +140,7 @@ export default function Game() {
         s.name = `settlement${federal.settlements.length + 1}`
         setFederal({
             ...federal,
+            available_diplomats: federal.available_diplomats + 1,
             settlements: [...federal.settlements,{
                 ...s,
                 global_id: new_id,
@@ -532,9 +533,47 @@ export default function Game() {
         setFederal({...new_federal,random_events: []})
         setRandomEventVisable(false)
     }
-    
-    // Add logging before rendering WorldMap
-    console.log('Rendering WorldMap with nodes:', map_info.nodes, 'edges:', map_info.edges);
+
+    const sendDiplomat = (id: string) => {
+        setFederal({
+            ...federal,
+            available_diplomats: federal.available_diplomats - 1,
+            foreign_powers: federal.foreign_powers.map(f => {
+                if (f.global_id !== id) {return f}
+                return {...f, diplomat_sent: true}
+            })
+        })
+    }
+
+    const recallDiplomat = (id: string) => {
+        setFederal({
+            ...federal,
+            available_diplomats: federal.available_diplomats + 1,
+            foreign_powers: federal.foreign_powers.map(f => {
+                if (f.global_id !== id) {return f}
+                return {...f, diplomat_sent: false, relations: Math.max(f.relations - 20, -100)}
+            })
+        })
+    }
+    const increaseImmigrantion = (id: string) => {
+        setFederal({
+            ...federal,
+            foreign_powers: federal.foreign_powers.map(f => {
+                if (f.global_id !== id) {return f}
+                return {...f, immigrationRate: f.immigrationRate + 0.05, relations: f.relations - 20}
+            })
+        })
+    }
+
+    const increaseMarketAccess = (id: string) => {
+        setFederal({
+            ...federal,
+            foreign_powers: federal.foreign_powers.map(f => {
+                if (f.global_id !== id) {return f}
+                return {...f, market_access: f.market_access + 0.05, relations: f.relations - 20}
+            })
+        })
+    }
 
     // Map nodes with detailed logging
     const mappedNodes = map_info.nodes.map(node => {
@@ -559,7 +598,14 @@ export default function Game() {
             mapped = {
                 id: node.id,
                 type: 'foreign',
-                data: {foreign: federal.foreign_powers.find(f => f.global_id === node.id)},
+                data: {
+                    foreign: federal.foreign_powers.find(f => f.global_id === node.id),
+                    sendDiplomat: sendDiplomat,
+                    recallDiplomat: recallDiplomat,
+                    increaseImmigrantion: increaseImmigrantion,
+                    increaseMarketAccess: increaseMarketAccess,
+                    availableDiplomats: federal.available_diplomats > 0
+                },
                 position: {x: node.position.x, y: node.position.y},
                 draggable: true
             };
@@ -584,7 +630,6 @@ export default function Game() {
         }
         return mapped;
     });
-    console.log('Mapped nodes for WorldMap:', mappedNodes);
 
     return (
         <div className="flex flex-column gap-1">
@@ -622,8 +667,8 @@ export default function Game() {
             </div>
 
             {/* Federal Reserve Section */}
-            <Card className="sticky top-0  z-5 bg-black shadow-2">
-                <div className="flex flex-column">
+            <div className="flex flex-row gap-2">
+                <Card className="sticky top-0 flex-grow-1 z-5 bg-black shadow-2">
                     <div className="flex flex-row justify-content-between align-items-center">
                         <h2 className="m-0">Federal Reserve</h2>
                         {federal.settlements.length > 0 && (
@@ -640,8 +685,11 @@ export default function Game() {
                             />
                         )}
                     </div>
-                </div>
-            </Card>
+                </Card>
+                <Card className="sticky top-0 flex-grow z-5 bg-black shadow-2">
+                    Available Diplomats: {federal.available_diplomats}
+                </Card>
+            </div>
 
             {/* WorldMap Section with loading overlay */}
             {showMap && map_info.nodes.length > 0 && map_info.edges && (
@@ -675,6 +723,7 @@ export default function Game() {
                 updateFunc={createSettlement}
                 terrain={node_to_colonize?.terrain ?? TerrainType.Mountain}
                 cost={((federal.settlements.length ** 2) * 4500)}
+                disabled={((federal.settlements.length ** 2) * 4500) > federal.reserve.money}
             />
 
             <ConfirmExplorationDialog
@@ -699,6 +748,9 @@ export default function Game() {
                     setFromNode(null);
                 }}
                 cost={(1 + ((map_info.nodes.length - 2)/10)) * 1000}
+                disabled={
+                    !fromNode || ((1 + ((map_info.nodes.length - 2)/10)) * 1000 > federal.reserve.money)
+                }
             />
 
             <BuildRoadDialog
@@ -715,6 +767,10 @@ export default function Game() {
                     setToNode(null);
                 }}
                 cost={fromNode && toNode ? Math.round(Math.sqrt((distance(fromNode.nodeid,toNode.nodeid) ** 2) / 2) * 1000) : 0}
+                disabled={
+                    !fromNode || !toNode ||
+                    (fromNode && toNode && Math.round(Math.sqrt((distance(fromNode.nodeid,toNode.nodeid) ** 2) / 2) * 1000) > federal.reserve.money)
+                }
             />
 
             <RandomEventDialog

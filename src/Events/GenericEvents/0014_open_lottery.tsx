@@ -38,20 +38,24 @@ export default function g0014_open_lottery({federal,updateFunc}: {federal: Feder
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <EfficencyIconTT/>
+                            {Math.round(rand_clan.efficency)}
                             <PlusMinus value={1}/>
                             For {rand_clan.name} in {rand_settlement.name} one year
                         </div>
                         <div className="flex flex-row gap-2">
                             <LoyaltyIconTT/>
+                            {Math.round(rand_clan.loyalty)}
                             <PlusMinus value={1}/>
                             For {rand_clan.name} in {rand_settlement.name} one year
                         </div>
                         <div className="flex flex-row gap-2">
                             <MoneyIconTT/>
+                            {Math.round(rand_settlement.stock.money)}
                             <PlusMinus value={-Math.round(rand_clan.population * 12 * rand_settlement.prices.ornamental)}/>
                         </div>
                         <div className="flex flex-row gap-2">
                             <OrnamentalIconTT/>
+                            {Math.round(rand_settlement.stock.ornamental)}
                             <PlusMinus value={-(rand_clan.population * 12)}/>
                         </div>
                     </div>

@@ -48,6 +48,10 @@ import g0062_foreign_mining_vein from "./GenericEvents/0062_foreign_mining_vein"
 import g0063_crop_blight from "./GenericEvents/0063_crop_blight";
 import g0064_economic_sanctions from "./GenericEvents/0064_economic_sanctions";
 import g0068_market_manipulation from "./GenericEvents/0068_market_manipulation";
+import g0071_arcane_dispute from "./GenericEvents/0071_arcane_dispute";
+import g0072_demand_for_copies from "./GenericEvents/0072_demand_for_copies";
+import g0074_archivist_festival from "./GenericEvents/0074_archivist_festival";
+import g0078_doctrinal_rift from "./GenericEvents/0078_doctrinal_rift";
 interface eventProps {
     id: number,
     conditional: (federal: FederalInterface) => boolean,
@@ -295,5 +299,25 @@ export const random_events: eventProps[] = [
         id: 68,
         conditional: (federal: FederalInterface) => federal.foreign_powers.length > 0,
         event: (federal: FederalInterface, updateFunc: (federal: FederalInterface) => void) => g0068_market_manipulation({federal, updateFunc})
+    },
+    {
+        id: 71,
+        conditional: (federal: FederalInterface) => federal.settlements.some(s => s.clans.some(c => c.id === clanTypes.archivists && c.population > 0)),
+        event: (federal: FederalInterface, updateFunc: (federal: FederalInterface) => void) => g0071_arcane_dispute({federal, updateFunc})
+    },
+    {
+        id: 72,
+        conditional: (federal: FederalInterface) => federal.settlements.some(s => s.clans.some(c => c.id === clanTypes.archivists && c.population > 0)),
+        event: (federal: FederalInterface, updateFunc: (federal: FederalInterface) => void) => g0072_demand_for_copies({federal, updateFunc})
+    },
+    {
+        id: 74,
+        conditional: (federal: FederalInterface) => federal.settlements.some(s => s.clans.some(c => c.id === clanTypes.archivists && c.population > 0)),
+        event: (federal: FederalInterface, updateFunc: (federal: FederalInterface) => void) => g0074_archivist_festival({federal, updateFunc})
+    },
+    {
+        id: 78,
+        conditional: (federal: FederalInterface) => federal.settlements.some(s => s.clans.some(c => c.id === clanTypes.clerics && c.population > 0)),
+        event: (federal: FederalInterface, updateFunc: (federal: FederalInterface) => void) => g0078_doctrinal_rift({federal, updateFunc})
     }
 ]

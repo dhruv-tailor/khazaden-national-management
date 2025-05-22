@@ -14,7 +14,7 @@ import { clanTypes } from "../Clans/ClanInterface/ClanInterface";
 import MoneyIconTT from "../tooltips/goods/MoneyIconTT";
 
 
-export default function NewSettlement({max_resources,updateFunc,terrain,cost}: {max_resources: goodsdist,updateFunc: (s: SettlementInterface) => void,terrain: TerrainType,cost: number}) {
+export default function NewSettlement({max_resources,updateFunc,terrain,cost,disabled = false}: {max_resources: goodsdist,updateFunc: (s: SettlementInterface) => void,terrain: TerrainType,cost: number,disabled?: boolean}) {
     const [name,setName] = useState<string>('')
     const [settlerType, setSettlerType] = useState<string>('')
     const [popSelectVisible,setPopSelectVisible] = useState<boolean>(false)
@@ -178,7 +178,7 @@ export default function NewSettlement({max_resources,updateFunc,terrain,cost}: {
                 <ResourceDistribuition goods_cap={max_resources} updateFunc={updateGoods} existing_dist={resources}/>
             </Dialog>
             <Button 
-                disabled={name === '' || settlerType === '' || resourceType === ''}
+                disabled={disabled || name === '' || settlerType === '' || resourceType === ''}
                 onClick={generateSettlement}
                 className={max_resources.money < cost ? "p-button-danger" : ""}
             >

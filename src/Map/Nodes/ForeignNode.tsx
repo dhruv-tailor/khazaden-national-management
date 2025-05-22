@@ -2,15 +2,16 @@ import { Handle, Position } from "@xyflow/react";
 import { ForeignPowerInterface } from "../../ForeignPowers/Interface/ForeignPowerInterface";
 import { Card } from 'primereact/card';
 import { Knob } from 'primereact/knob';
-import { RecognitionBadge } from "../../ForeignPowers/badges/RecognitionBadge";
-import { AllianceStatusBadge } from "../../ForeignPowers/badges/AllianceStatusBadge";
-import { CombatantStatusBadge } from "../../ForeignPowers/badges/CombatantStatusBadge";
-import { MilitaryAccessBadge } from "../../ForeignPowers/badges/MilitaryAccessBadge";
-import { VassalStatusBadge } from "../../ForeignPowers/badges/VassalStatusBadge";
 import { Divider } from 'primereact/divider';
+import { SplitButton } from 'primereact/splitbutton';
 
 type ForeignNodeData = {
     foreign: ForeignPowerInterface;
+    sendDiplomat: (id: string) => void;
+    recallDiplomat: (id: string) => void;
+    increaseImmigrantion: (id: string) => void;
+    increaseMarketAccess: (id: string) => void;
+    availableDiplomats: boolean;
 };
 
 export default function ForeignNode({data}: {data: ForeignNodeData}) {
@@ -22,6 +23,21 @@ export default function ForeignNode({data}: {data: ForeignNodeData}) {
         else if (value > 0) {return 'var(--green-500)';} 
         return 'var(--yellow-500)';
     }
+
+    const splitItems = [
+        {
+            label: 'Increase Immigration',
+            icon: 'pi pi-arrow-up',
+            disabled: foreign.relations < 20,
+            command: () => data.increaseImmigrantion(foreign.global_id)
+        },
+        {
+            label: 'Increase Market Access',
+            icon: 'pi pi-chart-line',
+            disabled: foreign.relations < 20,
+            command: () => data.increaseMarketAccess(foreign.global_id)
+        }
+    ];
 
     return (
         <div className="foreign-node">
@@ -42,7 +58,6 @@ export default function ForeignNode({data}: {data: ForeignNodeData}) {
                     {/* Relations and Status */}
                     <div className="flex flex-row align-items-center justify-content-center gap-3">
                         <div className="flex flex-column align-items-center">
-                            <span className="text-sm text-500 mb-1">Relations</span>
                             <Knob 
                                 value={foreign.relations} 
                                 min={-100} 
@@ -52,13 +67,6 @@ export default function ForeignNode({data}: {data: ForeignNodeData}) {
                                 valueColor={knobColor(foreign.relations)}
                                 className="mb-2"
                             />
-                        </div>
-                        <div className="flex flex-column gap-1 ml-2">
-                            <RecognitionBadge recognition={foreign.recognition}/>
-                            <CombatantStatusBadge combatantStatus={foreign.combatantStatus}/>
-                            <AllianceStatusBadge allianceStatus={foreign.allianceStatus}/>
-                            <VassalStatusBadge vassalStatus={foreign.vassalStatus}/>
-                            <MilitaryAccessBadge militaryAccess={foreign.militaryAccess}/>
                         </div>
                     </div>
 
@@ -79,7 +87,7 @@ export default function ForeignNode({data}: {data: ForeignNodeData}) {
                             <div className="flex align-items-center justify-content-between">
                                 <span className="text-sm text-500">Immigration</span>
                                 <span className="text-sm font-semibold">
-                                    {(foreign.immigrationRate * 100).toFixed(1)}%
+                                    {(foreign.immigrationRate * 100).toFixed(0)}%
                                 </span>
                             </div>
                         )}
@@ -89,6 +97,26 @@ export default function ForeignNode({data}: {data: ForeignNodeData}) {
                             <span className="text-sm font-semibold">
                                 {foreign.market_access * 100}%
                             </span>
+                        </div>
+
+                        <Divider className="my-2" />
+                        <div className="flex justify-content-end mt-1">
+                            <SplitButton
+                                label={!foreign.diplomat_sent ? 'Send Diplomat' : 'Recall Diplomat'}
+                                icon={!foreign.diplomat_sent ? 'pi pi-user-plus' : 'pi pi-user-minus'}
+                                className="p-button-primary p-button-sm"
+                                model={splitItems}
+                                disabled={!data.availableDiplomats && !foreign.diplomat_sent}
+                                onClick={() => {
+                                    if (!foreign.diplomat_sent) {
+                                        data.sendDiplomat(foreign.global_id);
+                                    } else {
+                                        data.recallDiplomat(foreign.global_id);
+                                    }
+                                }}
+                                tooltip={!foreign.diplomat_sent ? 'Send a diplomat to this nation' : 'Recall your diplomat from this nation'}
+                                tooltipOptions={{ position: 'top' }}
+                            />
                         </div>
                     </div>
                 </div>

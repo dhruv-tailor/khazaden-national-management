@@ -36,11 +36,14 @@ export default function g0030_war_profiteering({federal, updateFunc}: {federal: 
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <ArmsIconTT/>
+                            {Math.round(rand_settlement.stock.arms)}
                             <PlusMinus value={Math.round(12 * rand_clan.population)}/>
                         </div>
                         <div className="flex flex-row gap-2">
-                            <EnchantedArmsIconTT/>
-                            Prices increase by 20%
+                            <EnchantedArmsIconTT/> 
+                            <span>Prices</span>
+                            {Math.round(rand_settlement.prices.enchanted_arms)}
+                            <PlusMinus value={Math.round(rand_settlement.prices.enchanted_arms * 0.2)}/>
                         </div>
                     </div>
                 }

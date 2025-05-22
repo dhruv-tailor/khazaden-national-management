@@ -90,7 +90,7 @@ export const empty_settlement: SettlementInterface = {
     merchant_capacity: 0,
     interest_rate: 0.05,
     loans: [],
-    available_loan: 5000,
+    available_loan: 2340,
     garrison: [],
     merchant_tax: 0,
     trade_deals: [],
@@ -252,11 +252,10 @@ export const updateSettlmentStock = (settlement: SettlementInterface) => {
 export const popGrowth = (settlement: SettlementInterface, foreign_nations: ForeignPowerInterface[]) => {
     const K = settlement.projected_pop
     let P0 = 0
-    let bonus = 0.00007 * settlement.clans.filter(clan => clan.id === clanTypes.clerics)[0].taxed_productivity
     let gained_pg = 0
     settlement.clans.forEach(clan => {
         P0 += clan.population * (1 + clan.pop_growth_modifiers.reduce((sum,val) => sum + val.value,0))
-        if(settlement.population_growth_bonus === clan.id) { gained_pg += (clan.total_productivity - clan.taxed_productivity) * 0.7 * bonus }
+        if(settlement.population_growth_bonus === clan.id) { gained_pg += (clan.total_productivity - clan.taxed_productivity) * 0.7 * 1.2 }
         else { gained_pg += (clan.total_productivity - clan.taxed_productivity) * 0.7 }
     })
     gained_pg *= 0.7

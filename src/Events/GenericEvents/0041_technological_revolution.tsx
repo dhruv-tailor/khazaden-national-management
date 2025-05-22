@@ -1,3 +1,4 @@
+import PlusMinus from "../../components/PlusMinus"
 import ArmsIconTT from "../../tooltips/goods/ArmsIconTT"
 import CommonOresIconTT from "../../tooltips/goods/CommonOresTT"
 import ToolsIconTT from "../../tooltips/goods/ToolsIconTT"
@@ -31,16 +32,22 @@ export default function g0041_technological_revolution({federal, updateFunc}: {f
                     effect: doNothing,
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
-                            <ToolsIconTT/>
-                            Prices decrease by 20%
+                            <ToolsIconTT/> 
+                            <span>Prices</span>
+                            {Math.round(rand_settlement.prices.tools)}
+                            <PlusMinus value={Math.round(rand_settlement.prices.tools * 0.2)}/>
                         </div>
                         <div className="flex flex-row gap-2">
-                            <ArmsIconTT/>
-                            Prices decrease by 20%
+                            <ArmsIconTT/> 
+                            <span>Prices</span>
+                            {Math.round(rand_settlement.prices.arms)}
+                            <PlusMinus value={Math.round(rand_settlement.prices.arms * 0.2)}/>
                         </div>
                         <div className="flex flex-row gap-2">
-                            <CommonOresIconTT/>
-                            Prices decrease by 20%
+                            <CommonOresIconTT/> 
+                            <span>Prices</span>
+                            {Math.round(rand_settlement.prices.common_ores)}
+                            <PlusMinus value={Math.round(rand_settlement.prices.common_ores * 0.2)}/>
                         </div>
                     </div>
                 }

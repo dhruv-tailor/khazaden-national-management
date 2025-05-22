@@ -35,11 +35,14 @@ export default function g0032_spoiled_harvest({federal, updateFunc}: {federal: F
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <FoodIconTT/>
+                            {Math.round(rand_settlement.stock.food)}
                             <PlusMinus value={Math.round(12 * rand_clan.population)}/>
                         </div>
                         <div className="flex flex-row gap-2">
-                            <FoodIconTT/>
-                            Prices increase by 20%
+                            <FoodIconTT/> 
+                            <span>Prices</span>
+                            {Math.round(rand_settlement.prices.food)}
+                            <PlusMinus value={Math.round(rand_settlement.prices.food * 0.2)}/>
                         </div>
                     </div>
                 }

@@ -1,4 +1,5 @@
 import { clanTypes } from "../../Clans/ClanInterface/ClanInterface";
+import PlusMinus from "../../components/PlusMinus";
 import ArtisanalIconTT from "../../tooltips/goods/ArtisanalIconTT";
 import LeatherIconTT from "../../tooltips/goods/LeatherIconTT";
 import LivestockIconTT from "../../tooltips/goods/LivestockIconTT";
@@ -33,16 +34,22 @@ export default function g0035_merchants_flood_market({federal, updateFunc}: {fed
                     effect: doNothing,
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
-                            <LeatherIconTT/>
-                            prices decrease by 20%
+                            <LeatherIconTT/> 
+                            <span>Prices</span>
+                            {Math.round(rand_settlement.prices.leather)}
+                            <PlusMinus value={Math.round(rand_settlement.prices.leather * 0.2)}/>
                         </div>
                         <div className="flex flex-row gap-2">
-                            <LivestockIconTT/>
-                            prices decrease by 20%
+                            <LivestockIconTT/> 
+                            <span>Prices</span>
+                            {Math.round(rand_settlement.prices.livestock)}
+                            <PlusMinus value={Math.round(rand_settlement.prices.livestock * 0.2)}/>
                         </div>
                         <div className="flex flex-row gap-2">
-                            <ArtisanalIconTT/>
-                            prices decrease by 20%
+                            <ArtisanalIconTT/> 
+                            <span>Prices</span>
+                            {Math.round(rand_settlement.prices.artisanal)}
+                            <PlusMinus value={Math.round(rand_settlement.prices.artisanal * 0.2)}/>
                         </div>
                     </div>
                 }

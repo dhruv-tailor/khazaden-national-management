@@ -30,6 +30,7 @@ export default function g0012_clan_infighting({federal,updateFunc}: {federal: Fe
                     tooltip: <div className="flex flex-column">
                         <div className="flex flex-row gap-2">
                             <LoyaltyIconTT/>
+                            {Math.round(rand_clan.loyalty)}
                             <PlusMinus value={-1}/>
                             For {rand_clan.name} in {rand_settlement.name} one year
                         </div>
