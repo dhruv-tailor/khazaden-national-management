@@ -1,3 +1,4 @@
+import { CharacterInterface } from "../Character/Generator/CharacterInterface";
 import { LoanInterface } from "../Economics/loans/loanInterface";
 import { initial_prices } from "../Economics/pricing/prices";
 import { TradeDealInterface } from "../Economics/Trade/interface/TradeDealInterface";
@@ -17,7 +18,10 @@ export interface FederalInterface {
     armies: ArmyInterface[],
     trade_deals: TradeDealInterface[],
     random_events: number[],
-    available_diplomats: number
+    available_diplomats: number,
+    characters: CharacterInterface[],
+    king: string,
+    vizier: string,
 }
 
 export const empty_federal_interface: FederalInterface = {
@@ -31,5 +35,8 @@ export const empty_federal_interface: FederalInterface = {
     armies: [],
     trade_deals: [],
     random_events: [],
-    available_diplomats: 1
+    available_diplomats: 1,
+    characters: [],
+    king: "",
+    vizier: "",
 }

@@ -29,6 +29,8 @@ import NewSettlementDialog from "./components/dialogs/NewSettlementDialog";
 import ConfirmExplorationDialog from "./components/dialogs/ConfirmExplorationDialog";
 import BuildRoadDialog from "./components/dialogs/BuildRoadDialog";
 import RandomEventDialog from "./components/dialogs/RandomEventDialog";
+import CharacterPortrait from "./Character/CharacterView";
+import { empty_character } from "./Character/Generator/CharacterInterface";
 
 export interface FederalChangeProps {
     settlements: SettlementInterface[],
@@ -636,7 +638,17 @@ export default function Game() {
             {/* Header Section */}
             <div className="flex flex-column gap-1">
                 <div className="flex flex-row align-items-center justify-content-between">
-                    <h1 className="m-0">Game Management</h1>
+                    <div className="flex flex-row gap-1">
+                        <CharacterPortrait 
+                            character={federal.characters.find(c => c.id === federal.king) ?? empty_character} 
+                            otherCharacters={federal.characters}
+                        />
+                        <CharacterPortrait 
+                            character={federal.characters.find(c => c.id === federal.vizier) ?? empty_character} 
+                            otherCharacters={federal.characters} 
+                        />
+                    </div>
+                    
                     <Button 
                         label={`${MonthInfo[currentMonth as keyof typeof MonthInfo].name} ${currentYear} | Next Turn`} 
                         size='small' 
