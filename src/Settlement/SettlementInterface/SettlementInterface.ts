@@ -64,6 +64,8 @@ export interface SettlementInterface {
     global_id: string;
     connections: [boolean,boolean,boolean,boolean]
     isSource: [boolean,boolean,boolean,boolean]
+
+    governer: string
 }
 
 
@@ -96,7 +98,9 @@ export const empty_settlement: SettlementInterface = {
     trade_deals: [],
     global_id: '',
     connections: [true,true,true,true],
-    isSource: [true,true,true,true]
+    isSource: [true,true,true,true],
+
+    governer: ''
 }
 
 export const newSettlement = (name: string, terrain_type: TerrainType, visable_name?: string) => {

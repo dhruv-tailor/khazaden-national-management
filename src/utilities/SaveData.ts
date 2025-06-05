@@ -11,7 +11,7 @@ import { initial_prices } from "../Economics/pricing/prices";
 import {Eidgenossenkhazaden } from "../ForeignPowers/Interface/ForeignPowerInterface";
 import { empty_federal_interface, FederalInterface } from "./FederalInterface";
 import { empty_map_info } from "../Map/MapInfoInterface";
-import { generate_family } from "../Character/Generator/CharacterGenerator";
+import { generate_family, generate_random_character } from "../Character/Generator/CharacterGenerator";
 const fileSeperator = () => {
     const osType = type();
     if (osType === 'windows') {
@@ -136,11 +136,23 @@ async function createSaveFile(config: SaveConfig) {
     federal_interface.king = federal_interface.characters[0].id;
     federal_interface.characters[0].title = federal_interface.characters[0].gender === 'male' ? 'King' : 'Queen';
     global_id += federal_interface.characters.length;
-    const influential_family = generate_family(global_id);
-    influential_family[0].title ='Vizier'
-    federal_interface.vizier = influential_family[0].id;
-    federal_interface.characters.push(...influential_family);
-    global_id += influential_family.length;
+    // Generate Settlement
+    federal_interface.settlements.forEach(settlement => {
+        // Generate Governer
+        const governer = generate_random_character(`g${global_id}`, 'random');
+        governer.title = 'Governer';
+        settlement.governer = governer.id;
+        global_id++;
+        federal_interface.characters.push(governer);
+        // Generate Clan Leaders
+        settlement.clans.forEach(clan => {
+            const clan_leader = generate_random_character(`c${global_id}`, 'random');
+            clan_leader.title = `${clan.name} Leader`;
+            clan.leader = clan_leader.id;
+            global_id++;
+            federal_interface.characters.push(clan_leader);
+        })
+    })
     // Set common save data
     store.set('Undiscovered Foreign Powers', ['Baetanuesa','Beznesti','Dragonsbane','Garozemle','Kayasahr','Pactusallamanni','Polabtheli','Saemark','Sledzianska','TerraKontor']);
     store.set('Global ID', global_id);

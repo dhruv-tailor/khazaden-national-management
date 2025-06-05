@@ -18,6 +18,7 @@ import BureaucracyBonus from "./Bureaucracy/BureaucracyBonus";
 import PopConversion from "./PopConversion";
 import { FederalInterface } from "../../utilities/FederalInterface";
 import { empty_federal_interface } from "../../utilities/FederalInterface";
+import { CharacterInterface } from "../../Character/Generator/CharacterInterface";
 
 export default function SettlementDetailed() {
     const gameId = useParams().game
@@ -26,6 +27,7 @@ export default function SettlementDetailed() {
     let navigate = useNavigate();
 
     const [settlement, setSettlement] = useState<SettlementInterface>({...empty_settlement});
+    const [characters,setCharacters] = useState<CharacterInterface[]>([])
     const [rename,setRename] = useState<boolean>(false)
     const [newName,setNewName] = useState<string>('')
     const [showPopConversion,setShowPopConversion] = useState<boolean>(false)
@@ -34,7 +36,9 @@ export default function SettlementDetailed() {
         const store = await load(await saveLocation(gameId ?? ''), {autoSave: false});
         const federal = await store.get<FederalInterface>('Federal') ?? {...empty_federal_interface};
         const current_settlement = federal.settlements?.find(settlement => settlement.name === settlementId)
+        const current_characters = federal.characters
         if(current_settlement) {setSettlement(current_settlement)}
+        if(current_characters) {setCharacters(current_characters)}
         setNewName(settlement.visible_name)
     }
 
@@ -240,6 +244,7 @@ export default function SettlementDetailed() {
                             updateGoods={updateGoods}
                             settlmentFunds={settlement.stock.money}
                             updateDevelopment={updateDevelopment}
+                            characters={characters}
                         />
                     }
                     return <></>

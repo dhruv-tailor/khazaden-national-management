@@ -21,7 +21,6 @@ export interface FederalInterface {
     available_diplomats: number,
     characters: CharacterInterface[],
     king: string,
-    vizier: string,
 }
 
 export const empty_federal_interface: FederalInterface = {
@@ -38,5 +37,4 @@ export const empty_federal_interface: FederalInterface = {
     available_diplomats: 1,
     characters: [],
     king: "",
-    vizier: "",
 }

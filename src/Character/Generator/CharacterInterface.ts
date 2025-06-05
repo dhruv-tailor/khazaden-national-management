@@ -1,3 +1,6 @@
+import { clanTypes } from "../../Clans/ClanInterface/ClanInterface";
+import { empty_goodsdist, goodsdist } from "../../Goods/GoodsDist";
+
 export interface CharacterInterface {
     name: string;
     family_name: string;
@@ -15,6 +18,13 @@ export interface CharacterInterface {
     spouse: string | null;
     alive: boolean;
     birth_month: number;
+    // Only relevant for Clan leaders
+    desired_max_tax_rate: number;
+    // Only relevant for Governers
+    desired_min_clan_tax_rates: { [key in clanTypes]?: { tax_rate: number }};
+    desired_max_federal_tax_rates: goodsdist;
+    // Only relevant for Kings
+    desired_min_federal_tax_rates: goodsdist;
 }
 
 export const empty_character: CharacterInterface = {
@@ -33,7 +43,11 @@ export const empty_character: CharacterInterface = {
     children: [],
     spouse: null,
     alive: true,
-    birth_month: 0
+    birth_month: 0,
+    desired_max_tax_rate: 0,
+    desired_min_clan_tax_rates: {},
+    desired_max_federal_tax_rates: {...empty_goodsdist},
+    desired_min_federal_tax_rates: {...empty_goodsdist}
 }
 
 

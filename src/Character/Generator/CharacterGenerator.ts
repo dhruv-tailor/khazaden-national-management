@@ -4,6 +4,7 @@ import { negative_traits } from "./traits";
 import { dwarf_family_names, dwarf_names_female } from "./names";
 import { dwarf_names_male } from "./names";
 import { gaussian_random } from "../../utilities/SimpleFunctions";
+import { clanTypes } from "../../Clans/ClanInterface/ClanInterface";
 
 export const generate_random_character = (id: string, gender: "male" | "female" | "random", family_name?: string): CharacterInterface => {
     const character = {...empty_character};
@@ -25,6 +26,64 @@ export const generate_random_character = (id: string, gender: "male" | "female" 
     else { character.sexuality = "straight"; }
     character.age = generate_age();
     character.birth_month = Math.floor(Math.random() * 12);
+    character.desired_max_tax_rate = Math.random()
+    character.desired_min_clan_tax_rates = {
+        [clanTypes.archivists]: { tax_rate: Math.random() },
+        [clanTypes.clerics]: { tax_rate: Math.random() },
+        [clanTypes.craftsmen]: { tax_rate: Math.random() },
+        [clanTypes.criminals]: { tax_rate: Math.random() },
+        [clanTypes.farmers]: { tax_rate: Math.random() },
+        [clanTypes.merchants]: { tax_rate: Math.random() },
+        [clanTypes.engineers]: { tax_rate: Math.random() },
+        [clanTypes.foresters]: { tax_rate: Math.random() },
+        [clanTypes.miners]: { tax_rate: Math.random() },
+        [clanTypes.rulers]: { tax_rate: Math.random() },
+        [clanTypes.runeSmiths]: { tax_rate: Math.random() },
+        [clanTypes.warriors]: { tax_rate: Math.random() },
+    }
+    character.desired_max_federal_tax_rates = {
+        money: Math.random(),
+        food: Math.random(),
+        beer: Math.random(),
+        leather: Math.random(),
+        artisanal: Math.random(),
+        livestock: Math.random(),
+        ornamental: Math.random(),
+        enchanted: Math.random(),
+        timber: Math.random(),
+        tools: Math.random(),
+        common_ores: Math.random(),
+        medical: Math.random(),
+        rare_ores: Math.random(),
+        gems: Math.random(),
+        runes: Math.random(),
+        arms: Math.random(),
+        books: Math.random(),
+        enchanted_arms: Math.random(),
+        charcoal: Math.random(),
+    }
+    character.desired_min_federal_tax_rates = {
+        money: Math.random(),
+        food: Math.random(),
+        beer: Math.random(),
+        leather: Math.random(),
+        artisanal: Math.random(),
+        livestock: Math.random(),
+        ornamental: Math.random(),
+        enchanted: Math.random(),
+        timber: Math.random(),
+        tools: Math.random(),
+        common_ores: Math.random(),
+        medical: Math.random(),
+        rare_ores: Math.random(),
+        gems: Math.random(),
+        runes: Math.random(),
+        arms: Math.random(),
+        books: Math.random(),
+        enchanted_arms: Math.random(),
+        charcoal: Math.random(),
+    }
+    
     return character;
 }
 

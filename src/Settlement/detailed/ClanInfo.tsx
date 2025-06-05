@@ -14,9 +14,11 @@ import { goodsdist } from "../../Goods/GoodsDist";
 import { Button } from "primereact/button";
 import { InputNumber } from "primereact/inputnumber";
 import { useState } from "react";
+import { CharacterInterface, empty_character } from "../../Character/Generator/CharacterInterface";
+import CharacterView from "../../Character/CharacterView";
 
 export default function ClanInfo(
-    {clan,updateTax,natCap,updateGoods,settlmentFunds,updateDevelopment}: 
+    {clan,updateTax,natCap,updateGoods,settlmentFunds,updateDevelopment,characters}: 
     {
         clan: ClanInterface,
         updateTax: (id: clanTypes, newRate: number) => void,
@@ -24,6 +26,7 @@ export default function ClanInfo(
         updateGoods: (id: clanTypes, goods: goodsdist) => void,
         settlmentFunds: number,
         updateDevelopment: (id: clanTypes, amount: number) => void,
+        characters: CharacterInterface[]
     }) {
     const icon = releventClanTT[clan.id]
     const valueTemplate = (value: number) => <>{Math.round(value/10)}</>
@@ -41,6 +44,10 @@ export default function ClanInfo(
                     <div className="flex flex-row align-items-center gap-2">
                         <span className="text-2xl">{icon}</span>
                         <h2 className="m-0">{clan.name}</h2>
+                        <CharacterView 
+                            character={characters.find(c => c.id === clan.leader) ?? empty_character} 
+                            otherCharacters={characters}
+                        />
                     </div>
                     <div className="flex flex-row align-items-center gap-2">
                         <PopulationIconTT/>
@@ -92,6 +99,10 @@ export default function ClanInfo(
 
                 {/* Tax Section */}
                 <div className="flex flex-column gap-2">
+                    <div className="flex flex-row align-items-center gap-2">
+                        <span>Max Tolerated Tax Rate:</span>
+                        <span>{Math.round((characters.find(c => c.id === clan.leader)?.desired_max_tax_rate ?? 0) * 100)} %</span>
+                    </div>
                     <div className="flex flex-row justify-content-between align-items-center">
                         <span>Tax Rate</span>
                         <InputText 

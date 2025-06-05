@@ -643,10 +643,6 @@ export default function Game() {
                             character={federal.characters.find(c => c.id === federal.king) ?? empty_character} 
                             otherCharacters={federal.characters}
                         />
-                        <CharacterPortrait 
-                            character={federal.characters.find(c => c.id === federal.vizier) ?? empty_character} 
-                            otherCharacters={federal.characters} 
-                        />
                     </div>
                     
                     <Button 

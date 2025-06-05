@@ -16,6 +16,8 @@ import { GiMountainCave, GiPineTree, GiMagicSwirl, GiWheat, GiFactory } from "re
 import { Tooltip } from 'primereact/tooltip';
 import { clanTypes } from "../../Clans/ClanInterface/ClanInterface";
 import { ProgressBar } from 'primereact/progressbar';
+import CharacterView from "../../Character/CharacterView";
+import { empty_character } from "../../Character/Generator/CharacterInterface";
 
 type SettlementNodeData = {
     settlement: SettlementInterface;
@@ -92,6 +94,7 @@ export default function SettlementNode({data}: {data: SettlementNodeData}) {
                 className="settlement-card"
                 title={
                     <div className="flex gap-2 align-items-center justify-content-between">
+                        <CharacterView character={data.federal.characters.find(c => c.id === settlement.governer) ?? empty_character} otherCharacters={data.federal.characters} />
                         <span className="text-xl font-bold">{settlement.visible_name}</span>
                         <div className="flex gap-2">
                             {unused_production && (

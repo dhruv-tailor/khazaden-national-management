@@ -42,6 +42,7 @@ export interface ClanInterface {
 
     pop_growth_modifiers: modifier[]
     productivity_modifiers: modifier[]
+    leader: string;
 }
 
 export const empty_clan = {
@@ -63,7 +64,8 @@ export const empty_clan = {
     development: 0,
 
     pop_growth_modifiers: [],
-    productivity_modifiers: []
+    productivity_modifiers: [],
+    leader: ""
 }
 
 export const clanGoodsConsumed = (clan: ClanInterface) => scaleGoods(clan.consumption_rate,clan.population)
